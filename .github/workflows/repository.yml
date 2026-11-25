@@ -1,0 +1,28 @@
+name: Repository checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Check bootstrap files
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in README.md LICENSE CONTRIBUTING.md SECURITY.md CODE_OF_CONDUCT.md \
+            adr/0000-template.md rfc/0000-template.md \
+            .github/ISSUE_TEMPLATE/bug_report.yml .github/ISSUE_TEMPLATE/feature_request.yml; do
+            test -s "$file" || { echo "Missing or empty: $file"; exit 1; }
+          done
+          for dir in frontend-web frontend-mobile frontend-desktop backend \
+            modules/vitafabric modules/lifeweaver plugins homeassistant docs \
+            architecture adr rfc roadmap governance security tests infrastructure; do
+            test -s "$dir/README.md" || { echo "Missing or empty: $dir/README.md"; exit 1; }
+          done

@@ -1,0 +1,14 @@
+# Local dependencies and build outputs
+node_modules/
+dist/
+build/
+.dart_tool/
+.flutter-plugins-dependencies
+target/
+__pycache__/
+.venv/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example

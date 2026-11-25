@@ -1,0 +1,26 @@
+name: Feature request
+description: Suggest an improvement to LifeLedger.
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: Do not include health information or credentials.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem would this solve and for whom?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the desired behavior and any alternatives.
+    validations:
+      required: true
+  - type: textarea
+    id: implications
+    attributes:
+      label: Privacy, security, and interoperability considerations
+      description: Describe relevant data flows, risks, or FHIR/MCP implications.
