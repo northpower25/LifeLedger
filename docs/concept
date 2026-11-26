@@ -167,4 +167,211 @@ Nicht Standard.
 
 ---
 
-# Der wichtigste neue Baustein: Consent &
+# Der wichtigste neue Baustein: Consent & Identity Layer
+
+Aktuell tauchen Einwilligung und Zugriffsrechte mehrfach auf.
+
+Für deine neue Vision reicht das nicht mehr.
+
+Ich würde eine eigene Plattform-Komponente schaffen:
+
+```text
+LifeLedger Identity
+```
+
+Verantwortlich für:
+
+```text
+Benutzer
+Familienmitglieder
+Vertreter
+Freigaben
+Rollen
+Notfallzugriffe
+Plugin-Rechte
+KI-Freigaben
+Cloud-Synchronisierung
+```
+
+Praktisch ein Gesundheits-Pendant zu:
+
+```text
+IAM
+```
+
+in AWS und Azure.
+
+---
+
+# Plugin-Modell drastisch erweitern
+
+Die aktuelle Plugin-Roadmap denkt hauptsächlich an Connectoren.
+
+Für deine Plattformvision würde ich mindestens sechs Plugin-Typen definieren.
+
+## Connector Plugins
+
+```text
+Garmin
+Fitbit
+Oura
+Apple Health
+```
+
+## Integration Plugins
+
+```text
+Home Assistant
+Matrix
+Nextcloud
+Open WebUI
+```
+
+## Provider Plugins
+
+```text
+OpenAI
+Claude
+Gemini
+Ollama
+```
+
+## Storage Plugins
+
+```text
+SQLite
+PostgreSQL
+OneDrive
+S3
+Nextcloud
+```
+
+## UI Plugins
+
+```text
+Dashboards
+Widgets
+Ansichten
+```
+
+## App Plugins
+
+```text
+Medikamentenmanager
+Schlaftagebuch
+Ernährungstracker
+Sportanalyse
+```
+
+---
+
+# VitaFabric wird noch wichtiger
+
+Wenn dieses Modell funktionieren soll, darf kein Plugin direkt an Gesundheitsdaten.
+
+Genau das wird in den aktuellen Roadmaps mehrfach angedeutet.
+
+Ich würde daraus eine harte Plattformregel machen:
+
+```text
+Plugin
+   ↓
+VitaFabric API
+   ↓
+FHIR Layer
+   ↓
+Storage
+```
+
+Nie:
+
+```text
+Plugin
+   ↓
+Datenbank
+```
+
+---
+
+# Home Assistant als Vorbild, aber nicht 1:1
+
+Hier sehe ich den größten potenziellen Fehler.
+
+Home Assistant vertraut Integrationen relativ stark.
+
+Das kannst du bei Gesundheitsdaten nicht.
+
+Jedes Plugin braucht:
+
+```text
+Manifest
+Capabilities
+Rechte
+Consent
+Signatur
+Provenienz
+```
+
+Beispiel:
+
+```json
+{
+  "capabilities": [
+    "read_observations",
+    "read_medication"
+  ]
+}
+```
+
+---
+
+# Marketplace statt Registry
+
+Strategisch würde ich langfristig nicht von Plugin Registry sprechen.
+
+Sondern von:
+
+```text
+LifeLedger Marketplace
+```
+
+mit:
+
+```text
+Community
+Verified
+Official
+```
+
+ähnlich Home Assistant HACS plus offiziellem Store.
+
+---
+
+# Der größte Vorteil dieser Neuausrichtung
+
+Damit entsteht kein Produkt für Gesundheitsakten.
+
+Sondern ein Betriebssystem für persönliche Gesundheitsdaten.
+
+Und das löst gleichzeitig mehrere Probleme:
+
+- Erweiterbarkeit wird zum Kernkonzept.
+- Integrationen werden erstklassige Bürger der Plattform.
+- VitaFabric erhält eine klare Rolle als Daten-Gateway.
+- LifeWeaver wird eine optionale Plattformfunktion statt ein separater Produktbereich.
+- Die Gesundheitsakte wird eine Referenz-App statt der gesamte Produktzweck.
+
+## Vision Statement
+
+```text
+LifeLedger
+
+A local-first personal health platform
+
+inspired by Home Assistant
+
+with VitaFabric as the trusted health data bus
+
+and applications, integrations and AI capabilities
+delivered through a secure plugin ecosystem.
+```
