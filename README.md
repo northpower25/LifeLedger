@@ -44,7 +44,8 @@ The architecture is design intent, not a statement of implemented features.
 
 See the [architecture overview](docs/architecture/README.md), the
 [repository migration report](docs/architecture/repository_migration_report.md),
-and [CONTRIBUTING](CONTRIBUTING.md) to learn more.
+the [assessment and roadmaps](docs/roadmap/README.md), and
+[CONTRIBUTING](CONTRIBUTING.md) to learn more.
 
 ## Get involved
 
