@@ -1,12 +1,19 @@
 # LifeLedger Copilot Instructions
 
-These rules override implementation convenience.
+Version: 1.0
 
-Copilot must always prioritize these principles.
+Status: Mandatory
+
+These instructions apply to all Copilot generated code, documents,
+specifications, architectures, pull requests and repository changes.
+
+If any generated output conflicts with this document, this document wins.
 
 ---
 
 # Project Identity
+
+Project:
 
 LifeLedger
 
@@ -16,203 +23,387 @@ Your Health.
 Your Data.
 Your Timeline.
 
----
-
-# Architecture
-
-LifeLedger consists of:
-
-- LifeLedger
-- VitaFabric
-- LifeWeaver
-
-Never blur responsibilities between these components.
+LifeLedger is a Local-First, Privacy-First, Open Source Personal Health Intelligence Platform.
 
 ---
 
-# LifeLedger Responsibilities
+# Platform Components
 
-- Health Record
-- Documents
-- Medication
-- Family History
+The platform consists of three major systems.
+
+## LifeLedger
+
+Responsibilities:
+
+- Personal Health Record
 - Health Timeline
+- Medical Documents
+- Family Health
+- Medication Tracking
 - Companion Apps
+- Emergency Profiles
 
-LifeLedger must NOT contain:
+LifeLedger must not contain:
 
-- AI provider logic
+- AI provider implementations
+- FHIR mapping implementations
 - Connector implementations
-- FHIR mapping logic
 
 ---
 
-# VitaFabric Responsibilities
+## VitaFabric
 
-- FHIR Canonical Model
-- Data Mapping
+Responsibilities:
+
+- FHIR R4 Canonical Model
+- Data Integration
 - Connectors
 - Synchronization
-- Provenance
+- Provenance Tracking
+- Data Quality
+- Storage Abstraction
 
 All health data enters the platform through VitaFabric.
 
-No direct provider-specific models may bypass VitaFabric.
+No component may bypass VitaFabric.
 
 ---
 
-# LifeWeaver Responsibilities
+## LifeWeaver
+
+Responsibilities:
 
 - AI Providers
-- MCP
-- Agents
+- MCP Client
+- MCP Server
+- Agent Framework
 - RAG
-- Health Twin
+- Knowledge Graph
+- Personal Health Twin
 
-No AI logic belongs in LifeLedger.
-
----
-
-# Privacy First
-
-Never introduce:
-
-- telemetry
-- tracking
-- analytics
-- hidden cloud dependencies
-
-without explicit approval.
+No AI implementation belongs inside LifeLedger.
 
 ---
 
-# Local First
+# Immutable Principles
 
-Every feature must work locally.
+The following principles are non-negotiable.
+
+## Privacy First
+
+User privacy takes precedence over convenience.
+
+---
+
+## Local First
+
+Every feature must operate locally.
 
 Cloud support is optional.
 
-Cloud support may never become mandatory.
+Cloud services must never become mandatory.
 
 ---
 
-# FHIR First
+## FHIR First
 
 FHIR R4 is the canonical health model.
 
-Avoid creating parallel health models.
+Alternative health data models are prohibited.
 
 ---
 
-# MCP First
+## MCP First
 
-AI integrations must remain MCP-compatible.
+MCP compatibility must be preserved.
 
-Avoid AI vendor lock-in.
+Avoid provider-specific coupling.
 
 ---
 
-# Open Source First
+## AI Agnostic
+
+No dependency on a single AI provider.
+
+Supported providers should remain interchangeable.
+
+---
+
+## Open Source First
 
 Prefer:
 
-- open standards
-- open protocols
-- open file formats
+- Open Standards
+- Open Protocols
+- Open Formats
 
-Avoid proprietary dependencies.
+Avoid unnecessary proprietary dependencies.
 
 ---
 
-# Security First
+## Vendor Neutral
 
-Never store health data unencrypted.
+No wearable, AI provider, storage provider or platform receives special treatment.
+
+---
+
+## Provenance First
+
+Every imported health record must record:
+
+- source
+- connector
+- import timestamp
+- original identifier
+
+---
+
+## Consent First
+
+Data access must always respect user consent.
+
+No exceptions.
+
+---
+
+## Security First
+
+Health data must be encrypted.
+
+Security shall never be deferred.
+
+---
+
+## Internationalization First
+
+The entire platform shall be localization-ready.
+
+No component may assume:
+
+- English-only
+- US date formats
+- single timezone
+
+---
+
+# Repository Structure Rules
+
+The repository structure is authoritative.
 
 Use:
 
-- AES-256-GCM
-- Argon2
-- Provenance Tracking
-- Consent Model
+platform/
+
+    vitafabric/
+
+    lifeweaver/
+
+Never recreate:
+
+modules/
 
 ---
 
-# Before Every Change
+Use:
 
-Validate:
+integrations/
 
-□ Does this belong in LifeLedger?
+Never reintroduce:
 
-□ Does this belong in VitaFabric?
+homeassistant/
 
-□ Does this belong in LifeWeaver?
+as a root folder.
 
-□ Does this violate Local First?
+---
 
-□ Does this violate Privacy First?
+Use:
 
-□ Does this bypass FHIR?
+docs/
 
-□ Does this create vendor lock-in?
+as primary source of documentation.
 
-□ Does this bypass Consent Management?
+Avoid duplicate documentation locations.
 
-□ Does this bypass Provenance Tracking?
+---
 
-If any answer is YES:
+Use:
 
-Stop and document the architectural impact.
+specifications/
 
-Do not proceed automatically.
+for technical specifications.
 
-# Pull Request Validation Rules
+Avoid architecture definitions outside specifications or docs.
 
-Every PR must answer:
+---
 
-□ Does this bypass VitaFabric?
+# Architecture Rules
 
-□ Does this introduce a second health model?
+Before creating any component ask:
 
-□ Does this violate FHIR?
+1. Does this belong in LifeLedger?
+2. Does this belong in VitaFabric?
+3. Does this belong in LifeWeaver?
 
-□ Does this create provider lock-in?
+If unclear:
 
-□ Does this introduce non-local dependencies?
+Stop.
 
-□ Does this reduce user ownership?
+Create ADR.
 
-□ Does this bypass consent checks?
+Do not guess.
 
-□ Does this bypass provenance tracking?
+---
 
-□ Does this introduce hardcoded UI strings?
+# Data Rules
 
-□ Does this violate internationalization?
+Health data must:
 
-□ Does this store health data unencrypted?
+- pass through VitaFabric
+- map to FHIR
+- record provenance
+- support consent enforcement
 
-□ Does this introduce telemetry?
+Direct storage of provider-specific payloads is forbidden.
 
-□ Does this create AI-provider dependencies?
+---
 
-If yes:
+# AI Rules
 
-PR must be rejected.
+LifeWeaver owns:
 
-Reject PR when:
+- Agents
+- MCP
+- RAG
+- AI Providers
 
-- hardcoded secrets detected
+Avoid:
 
-- plaintext health data stored
+- OpenAI-specific abstractions
+- Anthropic-specific abstractions
+- Gemini-specific abstractions
 
-- telemetry added
+Use provider interfaces.
 
-- untranslated UI strings added
+---
 
-- AI provider abstractions bypassed
+# Localization Rules
 
-- FHIR bypassed
+Never hardcode:
 
-- consent checks bypassed
+- UI strings
+- notifications
+- dialog text
+- error messages
 
-- provenance tracking bypassed
+Use translation keys.
+
+Every new UI element must support localization.
+
+---
+
+# Security Rules
+
+Forbidden:
+
+- plaintext health data
+- hardcoded secrets
+- unencrypted backups
+- analytics without consent
+- hidden telemetry
+
+Required:
+
+- AES-256-GCM
+- Argon2
+- RBAC
+- Audit Logging
+
+---
+
+# Documentation Rules
+
+Architecture changes require:
+
+- ADR
+- Documentation update
+
+Major changes require:
+
+- RFC
+
+Implementation without documentation is prohibited.
+
+---
+
+# Pull Request Requirements
+
+Every Pull Request must answer:
+
+[ ] FHIR compliant
+
+[ ] VitaFabric compliant
+
+[ ] LifeWeaver compliant
+
+[ ] Local First compliant
+
+[ ] Privacy First compliant
+
+[ ] MCP compatible
+
+[ ] AI Agnostic
+
+[ ] Provenance compliant
+
+[ ] Consent compliant
+
+[ ] Localization compliant
+
+[ ] Security compliant
+
+[ ] No vendor lock-in introduced
+
+---
+
+# Automatic PR Rejection Criteria
+
+Reject Pull Request if:
+
+- FHIR is bypassed
+- VitaFabric is bypassed
+- Consent checks are bypassed
+- Provenance tracking is bypassed
+- Hardcoded UI strings are introduced
+- Telemetry is added
+- Plaintext health data is stored
+- Hardcoded secrets are introduced
+- Vendor-specific AI logic leaks into LifeWeaver
+- Cloud dependency becomes mandatory
+
+---
+
+# Decision Process
+
+When uncertainty exists:
+
+1. Check ADRs
+2. Check Specifications
+3. Check Product Documentation
+4. Create ADR
+5. Request architectural review
+
+Never make silent architectural changes.
+
+---
+
+# Long-Term Goal
+
+LifeLedger shall become the open-source reference platform for:
+
+- Personal Health Records
+- Wearable Aggregation
+- FHIR Interoperability
+- AI-Assisted Health Insights
+- Privacy-First Health Data Management
+
+Every implementation decision should be evaluated against this goal.
