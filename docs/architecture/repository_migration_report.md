@@ -27,12 +27,14 @@ did not have dedicated locations.
 
 ## Rationale
 
-The layout makes the platform boundaries explicit: LifeLedger is the product
-platform, with VitaFabric and LifeWeaver as first-class platform components;
-Home Assistant is an integration rather than a platform module. A single
-documentation tree is distinct from authoritative technical specifications,
-and future resource categories are discoverable without implying that they
-already contain software.
+The layout supports the proposed LifeLedger Platform framing: a personal
+health-record reference application with distinct VitaFabric data and
+LifeWeaver AI responsibilities. Shared services, identity and consent, and
+plugin contracts still require architectural review. Home Assistant is an
+integration rather than a platform module. A single documentation tree is
+distinct from authoritative technical specifications, and future resource
+categories are discoverable without implying that they already contain
+software.
 
 ## Impact
 
@@ -44,9 +46,9 @@ implementation. Consumers of the former paths must use the new locations.
 
 ## Future benefits
 
-The structure supports independent ownership and growth of the LifeLedger,
-VitaFabric, and LifeWeaver platforms; clearer integration boundaries; easier
-navigation for contributors; and a stable separation between explanatory
-documentation and normative specifications. Dedicated asset, branding,
-deployment, infrastructure, and tooling locations provide room to grow while
-keeping this bootstrap repository implementation-free.
+The structure supports independent ownership and growth of LifeLedger,
+VitaFabric and LifeWeaver; clearer integration boundaries; easier navigation
+for contributors; and a stable separation between explanatory documentation
+and normative specifications. Dedicated asset, branding, deployment,
+infrastructure and tooling locations provide room to grow while keeping this
+bootstrap repository implementation-free.

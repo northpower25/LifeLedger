@@ -16,6 +16,7 @@
 ## Technical Users
 
 - Developers
+- Application, integration, and plugin developers
 - Researchers
 - AI Engineers
 

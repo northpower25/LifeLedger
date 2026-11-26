@@ -10,12 +10,22 @@ or make medical decisions.
 
 ## LifeLedger Platform Architecture
 
-The platform has three first-class parts:
+LifeLedger is envisioned as a local-first personal health platform. The
+personal health record is its first reference application; applications,
+integrations and AI capabilities are intended to use shared, secure platform
+contracts rather than access data stores directly.
 
-- **LifeLedger** is the personal health record platform.
-- **VitaFabric** is the interoperability platform for health data exchange,
-  including planned FHIR standards support.
-- **LifeWeaver** is the AI, Model Context Protocol (MCP), and agent platform.
+The platform's component responsibilities remain distinct:
+
+- **LifeLedger** owns the health-record product experience and applications.
+- **VitaFabric** owns health-data integration, FHIR mapping, provenance and
+  storage abstraction. Health data must pass through VitaFabric.
+- **LifeWeaver** owns optional AI providers, MCP and agents.
+
+Shared runtime, identity and consent, security, and plugin hosting are proposed
+platform capabilities under review, not implemented services or accepted
+component assignments. The [platform proposal](rfc/0001-platform-direction.md)
+and [architecture overview](docs/architecture/README.md) describe their status.
 
 The architecture is design intent, not a statement of implemented features.
 
@@ -42,7 +52,8 @@ The architecture is design intent, not a statement of implemented features.
 | `assets/` | Shared diagrams, images, screenshots, and presentations |
 | `adr/`, `rfc/` | Architecture decisions and community proposals |
 
-See the [architecture overview](docs/architecture/README.md), the
+See the [platform vision](https://github.com/northpower25/LifeLedger/blob/main/docs/concept),
+the [architecture overview](docs/architecture/README.md), the
 [repository migration report](docs/architecture/repository_migration_report.md),
 the [assessment and roadmaps](docs/roadmap/README.md), and
 [CONTRIBUTING](CONTRIBUTING.md) to learn more.

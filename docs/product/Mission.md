@@ -1,6 +1,6 @@
 # LifeLedger Mission
 
-LifeLedger enables every individual to:
+The LifeLedger Platform aims to enable individuals and communities to:
 
 - collect health data
 - organize health data
@@ -8,6 +8,11 @@ LifeLedger enables every individual to:
 - share health data selectively
 
 without surrendering ownership to platform vendors.
+
+The personal health record is its first reference application. Shared
+platform services, integrations and future applications must preserve local
+operation, user control and the VitaFabric health-data boundary. The platform
+and plugin ecosystem remain design proposals, not available capabilities.
 
 The project prioritizes:
 
