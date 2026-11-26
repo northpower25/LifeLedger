@@ -1,0 +1,706 @@
+# RFC-0005: Event Bus Architecture
+
+Status: Draft  
+Type: Architecture RFC  
+Owner: Platform Core  
+Depends On: RFC-0002 Platform Core Architecture  
+Depends On: RFC-0003 Identity & Consent Framework  
+Depends On: RFC-0004 Capability & Permission Model  
+Blocks: RFC-0006, RFC-0007, RFC-0010, RFC-0011
+
+---
+
+# 1. Zusammenfassung
+
+Dieses RFC definiert den plattformweiten Event Bus der LifeLedger Plattform.
+
+Der Event Bus ermöglicht die lose Kopplung zwischen:
+
+```text
+LifeLedger
+VitaFabric
+LifeWeaver
+Plugins
+Integrationen
+Deployment-Komponenten
+```
+
+Der Event Bus ist Bestandteil des Core Runtime.
+
+Er stellt sicher:
+
+- Entkopplung von Komponenten
+- Erweiterbarkeit
+- Auditierbarkeit
+- Pluginfähigkeit
+- Synchronisationsunterstützung
+- Reaktionsfähigkeit auf Änderungen
+
+---
+
+# 2. Ziele
+
+## Ziele
+
+```text
+Lose Kopplung
+
+Asynchrone Verarbeitung
+
+Erweiterbarkeit
+
+Auditierbarkeit
+
+Offline-Fähigkeit
+
+Event Replay
+
+Plugin Integration
+```
+
+---
+
+## Nichtziele
+
+```text
+Message Broker Cluster
+
+Enterprise Service Bus
+
+Cloud-Abhängigkeit
+
+Externe MQ Pflicht
+```
+
+---
+
+# 3. Architekturprinzipien
+
+## Local First
+
+Der Event Bus muss lokal funktionieren.
+
+Keine Netzwerkverbindung erforderlich.
+
+---
+
+## Event Driven
+
+Komponenten fragen nicht regelmäßig Daten ab.
+
+Stattdessen werden Änderungen publiziert.
+
+---
+
+## Immutable Events
+
+Events dürfen nach Veröffentlichung nicht verändert werden.
+
+---
+
+## Auditability
+
+Jedes Event muss nachvollziehbar sein.
+
+---
+
+# 4. Architekturübersicht
+
+```text
+LifeLedger
+
+      ↓
+
+   Event Bus
+
+      ↓
+
+┌───────────────┐
+│ VitaFabric    │
+│ Plugins       │
+│ Integrationen │
+│ LifeWeaver    │
+└───────────────┘
+```
+
+---
+
+# 5. Event Struktur
+
+Jedes Event besitzt einen Standardaufbau.
+
+```json
+{
+  "event_id": "evt_001",
+  "event_type": "FHIR_CREATED",
+  "timestamp": "2027-01-01T10:00:00Z",
+  "source": "vitafabric",
+  "subject": "Observation/123",
+  "version": "1.0"
+}
+```
+
+---
+
+# 6. Event Kategorien
+
+Die Plattform definiert Standardkategorien.
+
+---
+
+# 7. Identity Events
+
+```text
+USER_CREATED
+USER_UPDATED
+USER_DISABLED
+USER_DELETED
+
+DEVICE_REGISTERED
+DEVICE_REMOVED
+```
+
+---
+
+# 8. Consent Events
+
+```text
+CONSENT_GRANTED
+
+CONSENT_UPDATED
+
+CONSENT_REVOKED
+```
+
+---
+
+# 9. Household Events
+
+```text
+HOUSEHOLD_CREATED
+
+MEMBER_ADDED
+
+MEMBER_REMOVED
+
+ROLE_CHANGED
+```
+
+---
+
+# 10. FHIR Events
+
+VitaFabric ist Owner dieser Events. 【1-d5c266】
+
+```text
+FHIR_CREATED
+
+FHIR_UPDATED
+
+FHIR_DELETED
+```
+
+---
+
+## Beispiel
+
+```text
+Observation erstellt
+
+↓
+
+FHIR_CREATED
+
+↓
+
+Dashboard aktualisiert
+```
+
+---
+
+# 11. Import Events
+
+```text
+IMPORT_STARTED
+
+IMPORT_COMPLETED
+
+IMPORT_FAILED
+
+IMPORT_CONFLICT
+```
+
+---
+
+# 12. Synchronisations Events
+
+```text
+SYNC_STARTED
+
+SYNC_COMPLETED
+
+SYNC_CONFLICT
+
+SYNC_FAILED
+```
+
+---
+
+# 13. Plugin Events
+
+```text
+PLUGIN_INSTALLED
+
+PLUGIN_ENABLED
+
+PLUGIN_DISABLED
+
+PLUGIN_UPDATED
+
+PLUGIN_REMOVED
+```
+
+---
+
+# 14. Security Events
+
+```text
+LOGIN_SUCCESS
+
+LOGIN_FAILED
+
+MFA_CHALLENGE
+
+EMERGENCY_ACCESS
+
+PERMISSION_DENIED
+```
+
+---
+
+# 15. AI Events
+
+LifeWeaver nutzt eigene Eventtypen. 【2-2c5173】
+
+```text
+AI_REQUEST
+
+AI_RESPONSE
+
+AI_PROVIDER_SELECTED
+
+AI_PROVIDER_FAILED
+```
+
+---
+
+# 16. Event Ownership
+
+## VitaFabric
+
+Verantwortlich für:
+
+```text
+FHIR
+
+Import
+
+Sync
+```
+
+---
+
+## LifeLedger
+
+Verantwortlich für:
+
+```text
+UI
+
+Workflow
+
+Navigation
+```
+
+---
+
+## LifeWeaver
+
+Verantwortlich für:
+
+```text
+AI
+
+MCP
+
+Provider Events
+```
+
+---
+
+## Platform Core
+
+Verantwortlich für:
+
+```text
+Identity
+
+Consent
+
+Audit
+
+Security
+```
+
+---
+
+# 17. Event Persistenz
+
+## Pflicht
+
+Events werden lokal gespeichert.
+
+---
+
+## Standard
+
+```text
+SQLite Event Store
+```
+
+---
+
+## Vorteile
+
+```text
+Replay
+
+Audit
+
+Recovery
+
+Debugging
+```
+
+---
+
+# 18. Event Replay
+
+Das System muss Events erneut abspielen können.
+
+---
+
+## Beispiele
+
+```text
+Plugin Neuinstallation
+
+Dashboard Wiederaufbau
+
+Sync Recovery
+```
+
+---
+
+# 19. Event Prioritäten
+
+## Critical
+
+```text
+CONSENT_REVOKED
+
+EMERGENCY_ACCESS
+```
+
+---
+
+## High
+
+```text
+FHIR_CREATED
+
+FHIR_UPDATED
+```
+
+---
+
+## Normal
+
+```text
+USER_UPDATED
+
+PLUGIN_UPDATED
+```
+
+---
+
+## Low
+
+```text
+UI_REFRESH
+```
+
+---
+
+# 20. Event Versionierung
+
+Jeder Eventtyp besitzt:
+
+```text
+Version
+Schema
+Migration
+```
+
+---
+
+## Beispiel
+
+```text
+FHIR_CREATED
+
+v1
+v2
+v3
+```
+
+---
+
+# 21. Event Security
+
+## Pflichtfelder
+
+```text
+Source
+Timestamp
+Version
+Event ID
+```
+
+---
+
+## Verboten
+
+Events dürfen niemals enthalten:
+
+```text
+Passwörter
+
+Recovery Keys
+
+Private Keys
+
+Secrets
+```
+
+---
+
+# 22. Event Berechtigungen
+
+Veröffentlichung und Konsum erfordern Capabilities.
+
+Beispiele:
+
+```text
+FHIR_CREATED
+
+READ_OBSERVATION
+```
+
+---
+
+```text
+CONSENT_REVOKED
+
+CONSENT_MANAGEMENT
+```
+
+---
+
+# 23. Plugin Integration
+
+Plugins abonnieren Events.
+
+---
+
+## Beispiel
+
+```text
+Medication Dashboard
+
+↓
+
+FHIR_CREATED
+
+↓
+
+Aktualisierung
+```
+
+---
+
+## Beispiel
+
+```text
+Garmin Connector
+
+↓
+
+IMPORT_COMPLETED
+
+↓
+
+Statistik aktualisieren
+```
+
+---
+
+# 24. Offline Verhalten
+
+Pflicht:
+
+```text
+Events funktionieren ohne Internet
+```
+
+---
+
+Nicht zulässig:
+
+```text
+Cloud Broker erforderlich
+```
+
+---
+
+# 25. Fehlerbehandlung
+
+## Retry
+
+Nicht kritische Events erhalten Retry.
+
+---
+
+## Dead Letter Queue
+
+Fehlgeschlagene Events werden separat gespeichert.
+
+```text
+Dead Letter Store
+```
+
+---
+
+# 26. Audit Anforderungen
+
+Jedes Event protokolliert:
+
+```text
+Quelle
+
+Ziel
+
+Zeit
+
+Status
+
+Korrelation
+```
+
+---
+
+# 27. Monitoring
+
+Bereitzustellende Kennzahlen:
+
+```text
+Events pro Minute
+
+Queue Länge
+
+Fehlerrate
+
+Replay Anzahl
+```
+
+---
+
+# 28. API
+
+## Publish
+
+```text
+publish(event)
+```
+
+---
+
+## Subscribe
+
+```text
+subscribe(type)
+```
+
+---
+
+## Replay
+
+```text
+replay(start,end)
+```
+
+---
+
+## Query
+
+```text
+query(filters)
+```
+
+---
+
+# 29. Sicherheitsanforderungen
+
+Pflicht:
+
+```text
+Offline Betrieb
+
+Persistenz
+
+Audit
+
+Replay
+
+Versionierung
+
+Dead Letter Queue
+```
+
+---
+
+# 30. Architekturentscheidung
+
+Dieses RFC legt fest:
+
+✅ Plattformweiter Event Bus
+
+✅ Local-First Betrieb
+
+✅ Persistenter Event Store
+
+✅ Event Replay
+
+✅ Event Versionierung
+
+✅ Audit Pflicht
+
+✅ Plugin Subscription Modell
+
+✅ VitaFabric Event Ownership
+
+✅ Consent Events
+
+✅ Security Events
+
+✅ Offline Funktionalität
