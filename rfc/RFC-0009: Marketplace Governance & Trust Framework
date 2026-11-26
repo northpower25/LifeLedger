@@ -1,0 +1,825 @@
+# RFC-0009: Marketplace Governance & Trust Framework
+
+Status: Draft  
+Type: Governance RFC  
+Owner: Platform Governance  
+Depends On: RFC-0003 Identity & Consent Framework  
+Depends On: RFC-0004 Capability & Permission Model  
+Depends On: RFC-0006 Plugin Runtime & Isolation  
+Depends On: RFC-0007 Application Framework
+
+Blocks:
+- Public Marketplace
+- Verified Listings
+- Official Listings
+- Community Ecosystem
+
+---
+
+# 1. Zusammenfassung
+
+Dieses RFC definiert Governance, Vertrauensmodell, Veröffentlichung, Review, Sperrung und Betrieb des LifeLedger Marketplace.
+
+Der Marketplace dient der:
+
+```text
+Entdeckung
+
+Verteilung
+
+Dokumentation
+
+Bewertung
+
+Versionierung
+```
+
+von Erweiterungen.
+
+Der Marketplace ist keine Sicherheitsgarantie.
+
+Ein Marketplace-Eintrag ersetzt niemals:
+
+```text
+Capability Enforcement
+
+Consent
+
+Audit
+
+Plugin Isolation
+```
+
+---
+
+# 2. Ziele
+
+## Ziele
+
+```text
+Offenes Ökosystem
+
+Vertrauensmodell
+
+Review-Prozesse
+
+Missbrauchserkennung
+
+Nachvollziehbarkeit
+
+Betriebsfähigkeit
+```
+
+---
+
+## Nichtziele
+
+```text
+App Store Monopol
+
+Pflichtinstallation
+
+Zwangssynchronisation
+
+Cloudzwang
+
+Sicherheitszertifizierung
+```
+
+---
+
+# 3. Grundprinzipien
+
+## Local First
+
+Plugins müssen lokal installierbar bleiben.
+
+Ein Marketplace darf niemals Voraussetzung sein.
+
+---
+
+## Security Through Architecture
+
+Sicherheit entsteht durch:
+
+```text
+Runtime
+
+Capabilities
+
+Consent
+
+Isolation
+```
+
+Nicht durch Marketplace-Badges.
+
+---
+
+## Transparenz
+
+Alle Prüfungen müssen nachvollziehbar sein.
+
+---
+
+# 4. Marketplace Architektur
+
+```text
+Developer
+
+↓
+
+Package
+
+↓
+
+Marketplace
+
+↓
+
+Review
+
+↓
+
+Installation
+
+↓
+
+Local Runtime
+```
+
+---
+
+# 5. Erweiterungstypen
+
+Der Marketplace unterstützt alle Plattformtypen. 【1-9e6141】
+
+```text
+Connector
+
+Integration
+
+Provider
+
+Storage
+
+UI
+
+Application
+```
+
+---
+
+# 6. Listing Kategorien
+
+Es existieren drei Kategorien.
+
+---
+
+# 7. Community
+
+Niedrigste Vertrauensebene.
+
+---
+
+## Anforderungen
+
+```text
+Manifest
+
+Signatur
+
+Lizenz
+
+Beschreibung
+```
+
+---
+
+## Prüfung
+
+Keine inhaltliche Prüfung.
+
+---
+
+## Vertrauensniveau
+
+```text
+Niedrig
+```
+
+---
+
+# 8. Verified
+
+Mittlere Vertrauensebene.
+
+---
+
+## Anforderungen
+
+```text
+Review
+
+Build erfolgreich
+
+Kompatibilität geprüft
+
+Capabilities bewertet
+
+Dokumentation vorhanden
+```
+
+---
+
+## Prüfung
+
+Mindestens ein Maintainer.
+
+---
+
+## Vertrauensniveau
+
+```text
+Mittel
+```
+
+---
+
+# 9. Official
+
+Höchste Vertrauensebene.
+
+---
+
+## Anforderungen
+
+```text
+Maintained by Project
+
+Automatische Tests
+
+Dokumentation
+
+Security Review
+```
+
+---
+
+## Signatur
+
+Projekt-Schlüssel.
+
+---
+
+## Vertrauensniveau
+
+```text
+Hoch
+```
+
+---
+
+# 10. Kein Sicherheitszertifikat
+
+Wichtige Regel:
+
+```text
+Official
+
+≠
+
+Sicher
+```
+
+---
+
+```text
+Verified
+
+≠
+
+Geprüft gegen alle Risiken
+```
+
+---
+
+```text
+Community
+
+≠
+
+Unsicher
+```
+
+---
+
+# 11. Manifest Anforderungen
+
+Pflichtfelder:
+
+```text
+Name
+
+Version
+
+Typ
+
+Autor
+
+Lizenz
+
+Capabilities
+
+Support URL
+```
+
+---
+
+# 12. Provenienz
+
+Jede Erweiterung besitzt:
+
+```text
+Publisher
+
+Signatur
+
+Build Hash
+
+Release Historie
+```
+
+---
+
+# 13. Paketverteilung
+
+## Unterstützt
+
+```text
+Marketplace
+
+Lokale Datei
+
+Direktinstallation
+```
+
+---
+
+## Nicht unterstützt
+
+```text
+Pflichtregistrierung
+
+Cloud Konto Pflicht
+```
+
+---
+
+# 14. Signaturmodell
+
+## Community
+
+```text
+Self Signed
+```
+
+---
+
+## Verified
+
+```text
+Maintainer bestätigt
+```
+
+---
+
+## Official
+
+```text
+Project Signed
+```
+
+---
+
+# 15. Review Prozess
+
+## Community
+
+Automatische Prüfung.
+
+---
+
+## Verified
+
+Manuelle Prüfung.
+
+---
+
+Prüfung umfasst:
+
+```text
+Manifest
+
+Capabilities
+
+Dokumentation
+
+Build
+```
+
+---
+
+## Official
+
+Zusätzliche Prüfungen:
+
+```text
+Code Review
+
+Security Review
+
+Regression Tests
+```
+
+---
+
+# 16. Delisting
+
+Marketplace Einträge können entfernt werden.
+
+---
+
+## Gründe
+
+```text
+Malware
+
+Datendiebstahl
+
+Identitätsmissbrauch
+
+Lizenzverstöße
+
+Schwere Sicherheitsmängel
+```
+
+---
+
+# 17. Soft Delisting
+
+Eintrag bleibt sichtbar.
+
+---
+
+Status:
+
+```text
+Deprecated
+```
+
+---
+
+## Gründe
+
+```text
+Keine Wartung
+
+Veraltete APIs
+
+Inkompatibilität
+```
+
+---
+
+# 18. Hard Delisting
+
+Eintrag wird entfernt.
+
+---
+
+## Gründe
+
+```text
+Malware
+
+Kompromittierung
+
+Missbrauch
+```
+
+---
+
+# 19. Appeals
+
+Entwickler dürfen Einspruch einlegen.
+
+---
+
+Ablauf:
+
+```text
+Issue
+
+↓
+
+Review
+
+↓
+
+Maintainer Entscheidung
+```
+
+---
+
+# 20. Incident Management
+
+Marketplace benötigt Security Workflow.
+
+---
+
+## Meldung
+
+```text
+Security Report
+```
+
+---
+
+## Bewertung
+
+```text
+Triaging
+```
+
+---
+
+## Maßnahmen
+
+```text
+Warnung
+
+Delisting
+
+Signaturwiderruf
+```
+
+---
+
+# 21. Signaturwiderruf
+
+Projekt muss kompromittierte Pakete sperren können.
+
+---
+
+Beispiel:
+
+```text
+Revoked Signature List
+```
+
+---
+
+# 22. Kompatibilität
+
+Jedes Listing enthält:
+
+```text
+Min Version
+
+Max Version
+
+Kompatibilitätsstatus
+```
+
+---
+
+# 23. Updates
+
+Pflicht:
+
+```text
+Versionshistorie
+
+Changelog
+
+Kompatibilitätsprüfung
+```
+
+---
+
+# 24. Bewertungen
+
+Optional.
+
+---
+
+Erlaubt:
+
+```text
+Sterne
+
+Feedback
+
+Nutzungshinweise
+```
+
+---
+
+Nicht erlaubt:
+
+```text
+Vertrauensersatz
+
+Sicherheitsversprechen
+```
+
+---
+
+# 25. Governance
+
+## Verantwortlich
+
+```text
+Marketplace Maintainer Team
+```
+
+---
+
+Aufgaben:
+
+```text
+Review
+
+Moderation
+
+Policies
+
+Delisting
+```
+
+---
+
+# 26. Community Governance
+
+Community kann Vorschläge einbringen.
+
+---
+
+Geeignete Formate:
+
+```text
+RFC
+
+Issue
+
+Discussion
+
+Proposal
+```
+
+---
+
+# 27. Lizenzanforderungen
+
+Pflicht:
+
+```text
+Klare Lizenzangabe
+```
+
+---
+
+Bevorzugt:
+
+```text
+AGPL
+
+MIT
+
+Apache 2.0
+```
+
+---
+
+Unklare Lizenzen:
+
+```text
+Kein Listing
+```
+
+---
+
+# 28. Dokumentation
+
+Jedes Listing benötigt:
+
+```text
+Beschreibung
+
+Installation
+
+Capabilities
+
+Datennutzung
+
+Support Informationen
+```
+
+---
+
+# 29. Accessibility
+
+Marketplace Informationen müssen unterstützen:
+
+```text
+Screen Reader
+
+Keyboard Navigation
+
+Mehrsprachigkeit
+```
+
+---
+
+# 30. Audit Anforderungen
+
+Marketplace Aktionen protokollieren:
+
+```text
+Listing
+
+Freigabe
+
+Delisting
+
+Signaturwiderruf
+
+Review
+```
+
+---
+
+# 31. Offline Strategie
+
+Pflicht:
+
+```text
+Lokale Installation
+
+Marketplace unabhängiger Betrieb
+```
+
+---
+
+Marketplace muss vollständig optional bleiben. 【1-9e6141】【2-02c4fe】
+
+---
+
+# 32. Nachhaltigkeit
+
+Langfristig benötigt der Marketplace:
+
+```text
+Hosting
+
+Code Signing
+
+Security Reviews
+
+Moderation
+```
+
+Diese Kosten müssen transparent finanziert werden. Die Betriebs- und Nachhaltigkeitsfragen werden auch in der Bestandsaufnahme als offene Governance-Themen beschrieben. 【3-36f3a1】
+
+---
+
+# 33. Architekturentscheidung
+
+Dieses RFC legt fest:
+
+✅ Drei Vertrauensebenen
+
+✅ Community Listings
+
+✅ Verified Listings
+
+✅ Official Listings
+
+✅ Lokale Installation bleibt möglich
+
+✅ Kein Sicherheitsversprechen durch Badges
+
+✅ Review Prozess
+
+✅ Delisting Prozess
+
+✅ Incident Management
+
+✅ Signaturwiderruf
+
+✅ Transparente Governance
+
+✅ Marketplace bleibt optional
+
+✅ Local-First Prinzip
