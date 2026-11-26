@@ -16,3 +16,17 @@ The project prioritizes:
 3. Interoperability
 4. User control
 5. Open standards
+
+## Internationalization
+
+LifeLedger is designed as a multilingual platform.
+
+All user-facing functionality must support:
+
+- multiple languages
+- locale specific formatting
+- timezone handling
+
+The platform shall never assume English-only usage.
+
+The first supported languages shall be English and German across the documentation, product, and all modules.
