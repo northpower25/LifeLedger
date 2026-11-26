@@ -1,10 +1,11 @@
-# Unique Selling Proposition
+# LifeLedger Platform: Differentiators
 
-## Core Differentiators
+## Proposed Platform Differentiators
 
 ### Local First
 
-No cloud required.
+Core functionality does not require cloud services; optional deployment
+scenarios remain subject to review.
 
 ### Privacy First
 
@@ -12,23 +13,26 @@ User owns all data.
 
 ### AI Agnostic
 
-Works with any AI provider.
+LifeWeaver is intended to support provider-neutral adapters. AI remains
+optional and is not part of the LifeLedger application or local core.
 
 ### FHIR Native
 
-FHIR is the canonical model.
+FHIR R4 is the canonical health-data model, mediated by VitaFabric.
 
 ### MCP Native
 
-Built for AI agents.
+LifeWeaver is intended to support MCP for optional AI and agent capabilities.
 
 ### Open Source
 
-Community governed.
+Open source with community participation as a goal; current governance is
+maintainer-led and future community decision processes remain to be defined.
 
 ### Lifetime Health Timeline
 
-Not focused on short-term wearable metrics only.
+The first reference application provides a lifetime health timeline, not only
+short-term wearable metrics.
 
 Provides:
 
@@ -37,7 +41,12 @@ Provides:
 - documents
 - medication
 - laboratory data
-- health twin
+- optional health-twin capabilities under LifeWeaver, subject to separate
+  purpose, privacy and safety review
+
+Applications and integrations are intended to use a secure plugin ecosystem.
+Plugin types, trust controls, and a possible Marketplace are proposals and
+must not be represented as implemented or certified.
 
 ## Internationalization
 

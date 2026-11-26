@@ -14,7 +14,8 @@ Architecture: LifeLedger, VitaFabric, and LifeWeaver.
 | VitaFabric (`platform/vitafabric/`) | VitaFabric maintainers own interoperability architecture, standards interpretation, and related specifications. |
 | LifeWeaver (`platform/lifeweaver/`) | LifeWeaver maintainers own AI, MCP, and agent architecture, including permission and data-boundary design. |
 | `plugins/` | Plugin maintainers own extension contracts, compatibility expectations, and plugin trust boundaries in coordination with security owners. |
-| `integrations/` | Integration maintainers own external-system connectors and their lifecycle, data exchange, and compatibility. |
+| `integrations/` | Integration maintainers own external-system integration scope, lifecycle, compatibility and coordination. Connector execution and FHIR mapping for health data are implemented and reviewed within VitaFabric; all health-data exchange uses VitaFabric contracts. |
+| Identity and consent | Cross-cutting platform capability proposed for authentication, user/family/delegate identities, roles, grants, emergency access and application/plugin/AI/cloud permissions. No implementation owner is assigned yet; maintainers coordinate cross-area design and security review until an ADR assigns ownership. Consent decisions must be enforced at the relevant data-access boundary, including VitaFabric. |
 | Security (`docs/security/`, `specifications/security/`, and `SECURITY.md`) | Security maintainers coordinate threat modeling, security requirements, vulnerability handling, and cross-component review. |
 | Roadmap (`docs/roadmap/`) | Roadmap maintainers coordinate priorities and communicate proposals; changes with architectural impact follow the RFC and ADR processes. |
 
@@ -25,6 +26,12 @@ owner. Security-sensitive changes require security review; standards or
 interoperability changes require VitaFabric and specification review. Where no
 specialized owner has been assigned, repository maintainers provide the
 interim review and record significant decisions through an ADR or RFC.
+
+Plugin category does not change component ownership: health-data connectors
+and storage adapters remain VitaFabric responsibilities, AI-provider adapters
+belong to LifeWeaver, and product UI/application extensions belong to LifeLedger.
+Integration owners may coordinate and maintain an external integration without
+moving health-data processing outside VitaFabric.
 
 Owners are expected to keep their area documentation current, identify
 privacy, safety, and interoperability impacts, and avoid representing planned

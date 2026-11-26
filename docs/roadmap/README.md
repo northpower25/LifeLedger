@@ -18,3 +18,9 @@ require community review through an [RFC](../../rfc/) and lasting decisions
 through [ADRs](../../adr/); normative contracts belong in
 [`specifications/`](../../specifications/). Roadmap ordering is not a release
 commitment.
+
+The proposed platform framing, Identity & Consent layer, six plugin types,
+Marketplace and deployment scenarios are described in the
+[architecture overview](../architecture/README.md), [draft RFC](../../rfc/0001-platform-direction.md)
+and [proposed ADR](../../adr/0002-platform-direction.md). They are not yet
+accepted decisions or implemented capabilities.

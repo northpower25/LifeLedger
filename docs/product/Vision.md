@@ -1,12 +1,22 @@
-# LifeLedger Vision
+# LifeLedger Platform Vision
 
 ## Vision
 
-LifeLedger becomes the open-source standard for privacy-first personal health intelligence.
+LifeLedger becomes an open-source, local-first personal health platform.
 
 Users own, control and understand their health data throughout their lifetime.
 
-LifeLedger connects:
+The personal health record is the first reference application, not the limit
+of the platform. Applications, integrations and AI capabilities should be
+delivered through secure, reviewed plugin contracts. The vision is inspired by
+Home Assistant's integration platform, with VitaFabric as the trusted health
+data bus and LifeWeaver providing optional AI capabilities. The exact
+platform boundaries and plugin model remain under review in the
+[platform proposal](../../rfc/0001-platform-direction.md); none of these
+capabilities is implied to exist.
+
+The platform is intended to connect, through VitaFabric and appropriate
+consent:
 
 - Wearables
 - Medical documents
@@ -16,7 +26,8 @@ LifeLedger connects:
 - Personal observations
 - Health AI systems
 
-into a single trusted health timeline.
+into applications such as a trusted health timeline. AI access is mediated by
+LifeWeaver and is optional.
 
 ---
 
@@ -29,12 +40,17 @@ Create a user-controlled health ecosystem where:
 - cloud services are optional
 - interoperability is based on FHIR
 - personal health knowledge can evolve over decades
+- additional applications and integrations can be developed against stable,
+  secure platform contracts
 
 ---
 
 ## Success Definition
 
-LifeLedger becomes for personal health data what Home Assistant became for Smart Home.
+LifeLedger becomes an open-source local-first personal health platform,
+inspired by Home Assistant, with VitaFabric as the trusted health data bus and
+applications, integrations and optional AI capabilities delivered through a
+secure plugin ecosystem.
 
 ## Internationalization
 
