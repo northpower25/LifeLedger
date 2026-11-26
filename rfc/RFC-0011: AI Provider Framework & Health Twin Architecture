@@ -1,0 +1,774 @@
+# RFC-0011: AI Provider Framework & Health Twin Architecture
+
+Status: Draft  
+Type: Architecture RFC  
+Owner: LifeWeaver  
+Depends On: RFC-0003 Identity & Consent Framework  
+Depends On: RFC-0004 Capability Model  
+Depends On: RFC-0005 Event Bus Architecture  
+Depends On: RFC-0006 Plugin Runtime & Isolation  
+Depends On: RFC-0010 Zero Knowledge Sync
+
+Blocks:
+- RAG
+- MCP Integration
+- Provider Plugins
+- Health Twin
+- Agent Runtime
+- AI Marketplace
+
+---
+
+# 1. Zusammenfassung
+
+Dieses RFC definiert:
+
+```text
+AI Provider Framework
+
+MCP Integration
+
+RAG Architektur
+
+Embedding Verwaltung
+
+Knowledge Twin
+
+Health Twin
+
+Predictive Twin
+```
+
+für LifeWeaver.
+
+LifeWeaver bleibt eine optionale Plattformfunktion.
+
+Der lokale Kern von LifeLedger benötigt LifeWeaver nicht. Die Roadmaps definieren AI explizit als optionalen Teil der Plattform. 【1-0732ae】【2-b3dfc4】
+
+---
+
+# 2. Ziele
+
+## Ziele
+
+```text
+Providerneutralität
+
+Lokale Modelle
+
+Optionale Cloud Provider
+
+RAG
+
+MCP
+
+Health Twin
+
+Mehrere Provider
+```
+
+---
+
+## Nichtziele
+
+```text
+Diagnose
+
+Therapieempfehlung
+
+Medizinische Entscheidungen
+
+Klinische Bewertung
+```
+
+Diese Funktionen bleiben ausdrücklich außerhalb des Projektumfangs. 【1-0732ae】【3-97bb12】
+
+---
+
+# 3. Grundprinzipien
+
+## Provider Neutrality
+
+Kein Provider darf fest eingebaut sein.
+
+---
+
+## AI Optional
+
+Alle Kernfunktionen funktionieren ohne KI.
+
+---
+
+## Consent First
+
+AI erhält niemals ungeprüft Daten.
+
+---
+
+## Local First
+
+Lokale Modelle haben Vorrang.
+
+---
+
+## Explainability
+
+Der Nutzer muss erkennen:
+
+```text
+Welche Daten verwendet wurden
+
+Welcher Provider genutzt wurde
+
+Welche Quellen eingeflossen sind
+```
+
+---
+
+# 4. LifeWeaver Architektur
+
+```text
+Applications
+
+↓
+
+LifeWeaver
+
+├── Provider Layer
+├── MCP Layer
+├── RAG Layer
+├── Twin Layer
+└── Consent Gateway
+
+↓
+
+VitaFabric
+```
+
+---
+
+# 5. Provider Taxonomie
+
+Es existieren drei Providerklassen.
+
+---
+
+# 6. Local Provider
+
+Beispiele:
+
+```text
+Ollama
+
+LM Studio
+
+vLLM
+
+llama.cpp
+```
+
+---
+
+## Vorteile
+
+```text
+Keine Datenübertragung
+
+Offline Betrieb
+
+Volle Kontrolle
+```
+
+---
+
+# 7. Remote Provider
+
+Beispiele:
+
+```text
+OpenAI
+
+Anthropic
+
+Google
+
+Mistral
+```
+
+---
+
+## Voraussetzungen
+
+```text
+Explizite Zustimmung
+
+Provider Plugin
+
+Capability
+
+Audit
+```
+
+---
+
+# 8. Managed Provider
+
+Zukünftige Option.
+
+---
+
+Beispiele:
+
+```text
+LifeLedger Managed AI
+```
+
+---
+
+Erfordert separates Architekturreview.
+
+---
+
+# 9. Provider Plugins
+
+Provider werden über Plugins angebunden. 【4-767e2a】
+
+---
+
+Pflicht:
+
+```text
+Provider Interface
+```
+
+---
+
+Beispiel:
+
+```text
+complete()
+
+embed()
+
+chat()
+
+tool_call()
+```
+
+---
+
+# 10. Capability Anforderungen
+
+Lokale Modelle:
+
+```text
+AI_LOCAL_MODEL
+```
+
+---
+
+Remote Modelle:
+
+```text
+AI_REMOTE_PROVIDER
+```
+
+---
+
+RAG:
+
+```text
+AI_RAG
+```
+
+---
+
+Agenten:
+
+```text
+AI_AGENT
+```
+
+---
+
+# 11. MCP Architektur
+
+MCP wird als standardisierte Tool-Schicht betrachtet. 【1-0732ae】
+
+---
+
+## Rollen
+
+```text
+MCP Client
+
+MCP Server
+```
+
+---
+
+## Toolzugriff
+
+Nur über:
+
+```text
+Capabilities
+
+Consent
+
+Audit
+```
+
+---
+
+# 12. Tool Isolation
+
+MCP Tools dürfen niemals:
+
+```text
+Consent umgehen
+
+Capabilities umgehen
+
+VitaFabric umgehen
+```
+
+---
+
+# 13. RAG Architektur
+
+## Ziel
+
+Quellengebundene Antworten.
+
+---
+
+## Datenquellen
+
+```text
+FHIR Ressourcen
+
+Dokumente
+
+Timeline
+
+Freigegebene Daten
+```
+
+---
+
+# 14. Embedding Modell
+
+Embedding Speicherung erfolgt getrennt.
+
+---
+
+```text
+Embeddings
+
+≠
+
+FHIR Datensatz
+```
+
+---
+
+# 15. Embedding Speicher
+
+MVP:
+
+```text
+Lokal
+```
+
+---
+
+Nicht:
+
+```text
+automatisch in Cloud
+```
+
+---
+
+# 16. Embedding Widerruf
+
+Bei:
+
+```text
+Consent Widerruf
+
+Dokument Löschung
+
+Profil Löschung
+```
+
+müssen Embeddings entfernt werden.
+
+---
+
+# 17. Quellenmodell
+
+Jede Antwort enthält:
+
+```text
+Quelle
+
+Referenz
+
+Zeitpunkt
+```
+
+---
+
+Beispiel:
+
+```text
+Dokument A
+
+Observation B
+
+Medication C
+```
+
+---
+
+# 18. Knowledge Twin
+
+Erste Umsetzungsstufe.
+
+---
+
+Kann:
+
+```text
+Suchen
+
+Zusammenfassen
+
+Verknüpfen
+
+Erklären
+```
+
+---
+
+Darf nicht:
+
+```text
+Diagnostizieren
+```
+
+---
+
+# 19. Health Twin
+
+Zweite Ausbaustufe.
+
+---
+
+Kann:
+
+```text
+Zeitreihen analysieren
+
+Korrelationen erkennen
+
+Veränderungen darstellen
+```
+
+---
+
+Beispiele:
+
+```text
+Gewicht
+
+Blutdruck
+
+Aktivität
+```
+
+---
+
+# 20. Predictive Twin
+
+Dritte Ausbaustufe.
+
+---
+
+Kann:
+
+```text
+Trends schätzen
+
+Risiken berechnen
+
+Prognosen erzeugen
+```
+
+---
+
+Erfordert separate regulatorische Prüfung. 【1-0732ae】
+
+---
+
+# 21. AI Agenten
+
+Agenten sind optional.
+
+---
+
+Agenten dürfen:
+
+```text
+Lesen
+
+Zusammenfassen
+
+Arbeiten koordinieren
+```
+
+---
+
+Agenten dürfen nicht:
+
+```text
+Freigaben ändern
+
+Consent vergeben
+
+Rollen ändern
+```
+
+---
+
+# 22. Datenübertragung
+
+Remote Provider erhalten nur:
+
+```text
+freigegebene Daten
+```
+
+---
+
+Nie:
+
+```text
+gesamtes Profil
+```
+
+---
+
+# 23. Consent Modell
+
+Vor jeder Übertragung:
+
+```text
+Consent Check
+```
+
+---
+
+Nutzer müssen sehen:
+
+```text
+Welche Daten
+
+Welcher Provider
+
+Welcher Zweck
+```
+
+---
+
+# 24. Audit Anforderungen
+
+Audit speichern:
+
+```text
+Provider
+
+Prompt
+
+Datenmenge
+
+Zeitpunkt
+
+Antwortstatus
+```
+
+---
+
+Keine Speicherung von Geheimnissen.
+
+---
+
+# 25. Event Bus Integration
+
+Events nach RFC-0005.
+
+---
+
+Beispiele:
+
+```text
+AI_REQUEST
+
+AI_RESPONSE
+
+EMBEDDING_CREATED
+
+EMBEDDING_DELETED
+
+PROVIDER_CHANGED
+```
+
+---
+
+# 26. Health Data Protection
+
+Pflicht:
+
+```text
+Consent
+
+Capability
+
+Audit
+
+Data Minimization
+```
+
+---
+
+# 27. Halluzinationen
+
+System muss deutlich kennzeichnen:
+
+```text
+KI Antwort
+
+≠
+
+medizinische Tatsache
+```
+
+---
+
+# 28. Benutzeroberfläche
+
+Nutzer müssen erkennen:
+
+```text
+Quelle
+
+Provider
+
+Vertrauensniveau
+
+Lokales Modell oder Cloud Modell
+```
+
+---
+
+# 29. Sicherheitsanforderungen
+
+Pflicht:
+
+```text
+Provider Isolation
+
+Consent Enforcement
+
+Capability Enforcement
+
+Audit Logging
+
+Data Minimization
+```
+
+---
+
+# 30. Nicht zulässig
+
+```text
+Diagnose Automatisierung
+
+Therapievorschläge
+
+Versteckte Cloud Nutzung
+
+Stiller Provider Wechsel
+
+Nicht dokumentierte Datenübertragung
+```
+
+---
+
+# 31. Entwicklungsreihenfolge
+
+## Phase 1
+
+```text
+Local Provider
+
+Knowledge Twin
+```
+
+---
+
+## Phase 2
+
+```text
+Remote Provider
+
+RAG
+```
+
+---
+
+## Phase 3
+
+```text
+Health Twin
+```
+
+---
+
+## Phase 4
+
+```text
+Predictive Twin
+```
+
+---
+
+# 32. Architekturentscheidung
+
+Dieses RFC legt fest:
+
+✅ Providerneutrale Architektur
+
+✅ Lokale Modelle zuerst
+
+✅ MCP Unterstützung
+
+✅ RAG Unterstützung
+
+✅ Quellengebundene Antworten
+
+✅ Knowledge Twin als erste Ausbaustufe
+
+✅ Health Twin als zweite Ausbaustufe
+
+✅ Predictive Twin separat bewertet
+
+✅ Consent First
+
+✅ Audit Pflicht
+
+✅ Embedding Widerruf
+
+✅ Kein AI-Zwang für Kernfunktionen
