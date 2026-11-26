@@ -24,14 +24,17 @@ und ungelöste Zielkonflikte werden nicht durch diese Roadmap entschieden.
 ## Plattformperspektive und Deployment
 
 Die Gesundheitsakte ist als erste Referenzanwendung einer erweiterbaren
-Plattform vorgeschlagen. Gemeinsame Fähigkeiten für Laufzeit, Sicherheit und
-einen Identity-&-Consent-Layer sind zunächst zu spezifizieren. Dieser Layer
-soll Nutzer, Familienmitglieder, Vertreter, Freigaben, Rollen, Notfallzugriff
-sowie Plugin-, AI- und Sync-Rechte abdecken; Authentifizierung, Autorisierung
-und Consent sind getrennte Belange. Ownership und Durchsetzung an den
-jeweiligen Datenzugriffen sind vor Umsetzung zu entscheiden. VitaFabric und
-LifeWeaver behalten ihre verbindlichen Daten- bzw. AI-Verantwortungen. Der
-[RFC](../../rfc/0001-platform-direction.md) und der
+Plattform vorgeschlagen. Draft [RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture)
+beschreibt einen Core Runtime mit Identity & Consent, Security Services,
+Event Bus, Plugin Host, Secret Store und Audit Service. Er schlägt explizite,
+technisch durchzusetzende Capabilities und WASM First als Plugin-Runtime vor;
+der Core Runtime soll keine Geschäftslogik, Gesundheitsmodelle oder AI
+enthalten. Diese Entscheidungen sind noch nicht angenommen oder implementiert.
+Authentifizierung, Autorisierung und Consent sind getrennte Belange;
+Ownership, Richtlinien, Verträge und Durchsetzung an den Datenzugriffen sind
+vor Umsetzung zu reviewen. VitaFabric und LifeWeaver behalten ihre
+verbindlichen Daten- bzw. AI-Verantwortungen. Der
+[Plattform-RFC](../../rfc/0001-platform-direction.md) und der
 [ADR](../../adr/0002-platform-direction.md) sind noch nicht angenommen.
 
 | Szenario | Planung und zusätzliches Gate |
@@ -47,16 +50,18 @@ optionaler Szenarien sind nicht entschieden.
 
 ### Erweiterungen und Marketplace
 
-Die Vision schlägt sechs Plugin-Typen vor: Connector, Integration, Provider,
-Storage, UI und Application. Sie sind nach Zuständigkeit zu trennen:
+Die Vision und RFC-0002 schlagen sechs Plugin-Typen vor: Connector,
+Integration, Provider, Storage, UI und Application. Sie sind nach
+Zuständigkeit zu trennen:
 VitaFabric verantwortet Gesundheitsdaten-Connectoren, FHIR und kontrollierte
 Storage-Adapter; LifeWeaver optionale AI-Provider; LifeLedger UI- und
 Produktanwendungen. Integrationen dürfen keine Gesundheitsdaten direkt
 speichern oder an VitaFabric vorbei übertragen. Eine Marketplace-Oberfläche
 mit Community-, Verified- und Official-Listings ist eine Option für eine
 spätere Ausbaustufe, keine Registry-/Cloud-Pflicht und keine Sicherheits- oder
-Consent-Garantie. Kriterien, Governance und Umsetzungsnachweise sind vor
-einem solchen Schritt zu entscheiden.
+Consent-Garantie. Community-, Verified- und Official-Einstufungen benötigen
+vorher Kriterien, Governance und Umsetzungsnachweise. Storage-Adapter erhalten
+laut RFC-0002 nur verschlüsselte Daten, niemals Klartext oder Schlüssel.
 
 ## Stufen und Gates
 

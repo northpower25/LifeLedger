@@ -19,13 +19,27 @@ LifeLedger Platform
 └── Applications — personal health record first, then other apps
 ```
 
-This framing does not merge or reassign component responsibilities:
-LifeLedger owns product experiences and applications; VitaFabric owns health
-data integration, FHIR mapping, provenance and storage abstraction; LifeWeaver
-owns AI providers, agents and MCP. Identity and consent are proposed as a
-shared platform layer, with service ownership and enforcement interfaces still
-to be decided. Every health-data operation must pass through VitaFabric and
-respect consent; plugins must not access the database directly.
+Draft [RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture) proposes
+that the shared Core Runtime provide identity and consent, security services,
+an event bus, a plugin host, a secret store and audit services. It contains no
+business logic, health models or AI. The runtime's service contracts and
+implementation ownership remain subject to review; no such services are
+implemented or accepted by this draft.
+
+The proposal does not merge or reassign component responsibilities: LifeLedger
+owns product experiences and applications; VitaFabric owns health-data
+integration, FHIR mapping, provenance and storage abstraction; LifeWeaver owns
+AI providers, agents and MCP. VitaFabric remains a required platform component.
+Every health-data operation must pass through VitaFabric and respect consent;
+applications have no separate health-data database, and plugins must not
+access a database directly.
+
+The proposed capability model grants no implicit plugin rights: requested
+capabilities must be explicitly granted and technically enforced. Consent
+enforcement, audit, authentication, the FHIR core model and capability
+enforcement are platform responsibilities, not plugins. The RFC proposes a
+WASM-first plugin runtime, with a Python connector runtime only as a possible
+later extension. These are draft choices, not implemented runtime guarantees.
 
 The proposal names connector, integration, provider, storage, UI and
 application plugins. Their contracts and responsibility boundaries are not yet
@@ -33,11 +47,13 @@ specified: connectors and health-data storage adapters belong within
 VitaFabric's controlled interfaces; provider adapters belong to LifeWeaver;
 presentation and application extensions belong to LifeLedger. Any extension
 that handles health data must use VitaFabric contracts. The proposed
-Marketplace and its Community, Verified and Official labels require governance
-and security review; labels must not imply a guarantee or replace user consent.
-The [draft RFC](../../rfc/0001-platform-direction.md) and
+Marketplace distinguishes proposed Community, Verified and Official
+categories; governance and review criteria remain open, and labels must not
+imply a security guarantee or replace user consent. The
+[platform-direction RFC](../../rfc/0001-platform-direction.md) and
 [proposed ADR](../../adr/0002-platform-direction.md) seek review before these
-boundaries or choices are accepted.
+boundaries or choices are accepted. RFC-0002 also proposes that storage
+adapters receive encrypted data only, never plaintext or keys.
 
 ## Proposed deployment modes
 

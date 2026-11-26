@@ -1,5 +1,10 @@
 # RFC 0001: Platform direction and deployment scenarios
 
+See the related [draft RFC-0002: Platform Core Architecture](RFC-0002%20Platform%20Core%20Architecture)
+for the proposed Core Runtime, capability, event-bus, plugin-runtime, and
+application model. Its draft status does not make those proposals accepted
+architecture.
+
 - Status: draft
 - Author(s): To be assigned
 - Date: 2026-11-26
