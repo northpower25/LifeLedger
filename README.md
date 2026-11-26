@@ -2,59 +2,55 @@
 
 **Your Health. Your Data. Your Timeline.**
 
-LifeLedger is a planned local-first, privacy-first personal health platform. It
-aims to help people keep and understand their health records while retaining
-control over their data.
+LifeLedger is a planned local-first, privacy-first personal health platform.
+This repository is an architectural foundation, not a working product. It does
+not yet provide applications, services, deployments, FHIR conformance, AI
+capabilities, or a security guarantee. Do not use it to store real health data
+or make medical decisions.
 
-This repository is an early project bootstrap, not a working product. No
-application, deployment, FHIR implementation, AI integration, or security
-guarantee is provided yet. Do not use it to store real health data or make
-medical decisions.
+## LifeLedger Platform Architecture
 
-## Platform
+The platform has three first-class parts:
 
-- **LifeLedger**: the personal health record platform.
-- **VitaFabric**: the planned FHIR R4 interoperability and data integration layer.
-- **LifeWeaver**: the planned AI, Model Context Protocol (MCP), and agent framework.
+- **LifeLedger** is the personal health record platform.
+- **VitaFabric** is the interoperability platform for health data exchange,
+  including planned FHIR standards support.
+- **LifeWeaver** is the AI, Model Context Protocol (MCP), and agent platform.
 
-## Principles
+The architecture is design intent, not a statement of implemented features.
 
-- **Local first:** design for local ownership and useful offline operation.
-- **Privacy first:** minimize collection and disclosure of sensitive data.
-- **Open source:** licensed under AGPL-3.0-only; see [LICENSE](LICENSE).
-- **Interoperable:** target FHIR R4 for health data exchange.
-- **AI agnostic:** support multiple models and providers rather than depending
-  on a single vendor; use MCP where appropriate.
+## Repository layout
 
-These are design goals, not claims about implemented capabilities.
-
-## Repository map
-
-| Path | Intended purpose |
+| Path | Purpose |
 | --- | --- |
-| [backend](backend/) | Python/FastAPI services, PostgreSQL and TimescaleDB |
-| [frontend-web](frontend-web/) | React, TypeScript and Tailwind web client |
-| [frontend-mobile](frontend-mobile/) | Flutter mobile client |
-| [frontend-desktop](frontend-desktop/) | Tauri desktop client |
-| [modules/vitafabric](modules/vitafabric/) | FHIR R4 and integration layer |
-| [modules/lifeweaver](modules/lifeweaver/) | AI, MCP and agent framework |
-| [plugins](plugins/) | Extension points and plugins |
-| [homeassistant](homeassistant/) | Home Assistant integration |
-| [infrastructure](infrastructure/) | Deployment and operational configuration, including OpenSearch |
-| [tests](tests/) | Cross-component tests |
-| [docs](docs/) | Project and user documentation |
-| [architecture](architecture/) | Architecture overview and design placeholders |
-| [adr](adr/) | Architecture decision records |
-| [rfc](rfc/) | Requests for comments |
-| [roadmap](roadmap/) | Proposed project milestones |
-| [governance](governance/) | Project decision-making |
-| [security](security/) | Security design and resources |
+| `.github/` | Repository templates and workflows |
+| `backend/` | Planned backend services |
+| `frontend-web/` | Planned web client |
+| `frontend-mobile/` | Planned mobile client |
+| `frontend-desktop/` | Planned desktop client |
+| `platform/vitafabric/` | VitaFabric platform |
+| `platform/lifeweaver/` | LifeWeaver platform |
+| `plugins/` | Future extension ecosystem |
+| `integrations/` | External integrations, including Home Assistant |
+| `docs/` | Project documentation and guidance |
+| `specifications/` | Authoritative technical standards and design specifications |
+| `tests/` | Cross-component test organization |
+| `tools/` | Reserved for future developer tooling |
+| `docker/`, `kubernetes/` | Reserved deployment configuration locations |
+| `infrastructure/` | Infrastructure and operational architecture |
+| `branding/` | Brand identity resources |
+| `assets/` | Shared diagrams, images, screenshots, and presentations |
+| `adr/`, `rfc/` | Architecture decisions and community proposals |
+
+See the [architecture overview](docs/architecture/README.md), the
+[repository migration report](docs/architecture/repository_migration_report.md),
+and [CONTRIBUTING](CONTRIBUTING.md) to learn more.
 
 ## Get involved
 
-There are no runnable services or installation instructions yet. See the
-[roadmap](roadmap/README.md) for proposed work, [CONTRIBUTING](CONTRIBUTING.md)
-to contribute, [governance](governance/README.md) for decisions, and
+There are no runnable services or installation instructions yet. Proposed
+direction and decisions are documented through [ADRs](adr/) and [RFCs](rfc/).
+See [governance](docs/governance/README.md) for decision-making and
 [SECURITY](SECURITY.md) for private vulnerability reporting.
 
 ## License

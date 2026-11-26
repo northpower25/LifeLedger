@@ -17,4 +17,4 @@ reproduction steps using synthetic data. Maintainers should acknowledge the
 report, coordinate investigation and remediation privately, and agree on a
 disclosure plan with the reporter. Response times cannot yet be guaranteed.
 
-See [security/](security/) for security design work.
+See the [security documentation](docs/security/) for security design work.

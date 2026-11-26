@@ -22,7 +22,7 @@ jobs:
             test -s "$file" || { echo "Missing or empty: $file"; exit 1; }
           done
           for dir in frontend-web frontend-mobile frontend-desktop backend \
-            modules/vitafabric modules/lifeweaver plugins homeassistant docs \
-            architecture adr rfc roadmap governance security tests infrastructure; do
+            platform/vitafabric platform/lifeweaver plugins integrations/homeassistant docs \
+            docs/architecture adr rfc docs/roadmap docs/governance docs/security tests infrastructure; do
             test -s "$dir/README.md" || { echo "Missing or empty: $dir/README.md"; exit 1; }
           done
