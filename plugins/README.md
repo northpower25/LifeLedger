@@ -1,8 +1,11 @@
 # Plugin ecosystem
 
 The platform vision proposes a secure extension ecosystem for applications,
-integrations and optional AI capabilities. No plugin API, runtime, marketplace,
-or security boundary is implemented or accepted yet.
+integrations and optional AI capabilities. Draft
+[RFC-0002](../rfc/RFC-0002%20Platform%20Core%20Architecture) proposes a
+WASM-first plugin runtime (with a possible later Python connector runtime),
+but no plugin API, runtime, marketplace, or security boundary is implemented
+or accepted yet.
 
 The following plugin types are proposals; ownership follows the platform's
 existing component responsibilities:
@@ -29,4 +32,10 @@ replace user review and consent. Local installation and core functionality
 must not depend on a central Marketplace.
 
 See the [plugin roadmap](../docs/roadmap/plugins.md) and
-[platform proposal](../rfc/0001-platform-direction.md).
+[platform-direction RFC](../rfc/0001-platform-direction.md).
+RFC-0002 additionally proposes that plugins request explicit capabilities,
+with no implicit rights; Consent Enforcement, Audit, authentication, the
+FHIR core model and Capability Enforcement remain platform responsibilities
+and cannot be delegated to plugins. Applications have no separate health-data
+database, and storage adapters must never receive plaintext health data or
+keys. These are draft requirements pending review and implementation.

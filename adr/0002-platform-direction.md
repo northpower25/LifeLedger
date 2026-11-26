@@ -3,7 +3,8 @@
 - Status: proposed
 - Date: 2026-11-26
 - Decision makers: pending architecture and community review
-- Related issues or RFCs: [RFC 0001](../rfc/0001-platform-direction.md)
+- Related issues or RFCs: [RFC 0001](../rfc/0001-platform-direction.md),
+  [RFC-0002](../rfc/RFC-0002%20Platform%20Core%20Architecture)
 
 ## Context
 
@@ -33,10 +34,15 @@ extension has direct database access. A possible Marketplace may use
 Community, Verified and Official listing classes only after governance and
 evidence criteria are agreed; listings do not imply safety or consent.
 
-Design shared capabilities and optional deployment scenarios through reviewed
-RFCs and versioned specifications rather than assuming implementation. Local
-operation remains mandatory; no deployment mode may bypass consent, VitaFabric,
-FHIR or the other accepted principles in
+Draft RFC-0002 further proposes a Core Runtime containing identity and consent,
+security services, an event bus, a plugin host, a secret store and audit
+services. It proposes explicit capabilities and a WASM-first plugin runtime.
+These remain draft choices pending review; normative contracts and
+implementation ownership are not established. Design shared capabilities and
+optional deployment scenarios through reviewed RFCs and versioned
+specifications rather than assuming implementation. Local operation remains
+mandatory; no deployment mode may bypass consent, VitaFabric, FHIR or the
+other accepted principles in
 [ADR 0001](0001-project-principles.md).
 
 ## Alternatives considered

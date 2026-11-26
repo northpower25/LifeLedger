@@ -28,15 +28,26 @@ ist der Datenpfad für Gesundheitsdaten fest: Plugin oder Anwendung ->
 VitaFabric-Vertrag → FHIR-R4-Modell → kontrollierte Speicherabstraktion.
 Direkter Datenbankzugriff durch Erweiterungen ist ausgeschlossen.
 
+Draft [RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture)
+schlägt WASM First als Standard-Laufzeit vor; eine Python Connector Runtime
+ist nur als spätere optionale Erweiterung genannt. Es ordnet Identity &
+Consent, Audit, Authentifizierung, FHIR-Kernmodell und Capability Enforcement
+dem Core Runtime zu, nicht Plugins. Storage-Adapter erhalten nur
+verschlüsselte Daten, niemals Klartext oder Schlüssel. Das sind Draft-Vorgaben,
+keine bereits implementierten Eigenschaften.
+
 Ein Plugin ist **nicht automatisch vertrauenswürdig**, auch nicht bei lokaler
-Installation. Vorschlag für den RFC: signiertes Paket und Manifest mit
+Installation. Der RFC-Entwurf schlägt signierte Pakete und Manifeste mit
 Versionen, Capabilities, minimalen Rechten, expliziter Consent-Freigabe,
 Widerruf, Provenienz, Isolation und kontrollierter Kommunikation. Signatur
 weist allenfalls Integrität/Quelle nach und ist keine Sicherheitsbewertung;
 Capabilities sind nur wirksam, wenn sie technisch erzwungen werden. Ob und
 wie Isolation auf unterstützten Plattformen nachweisbar ist, muss vor
-Drittanbieter-Ausführung geklärt sein. Keine versteckte Telemetrie, keine
-Cloud-Pflicht und kein direkter Zugriff auf ungeschützte Gesundheitsdaten.
+Drittanbieter-Ausführung geklärt sein. RFC-0002 schlägt Community
+(self-signed), Verified (Maintainer-Review) und Official (LifeLedger-Signatur)
+als Vertrauenseinstufungen für Pakete vor, nicht als Sicherheitsgarantie.
+Keine versteckte Telemetrie, keine Cloud-Pflicht und kein direkter Zugriff auf
+ungeschützte Gesundheitsdaten.
 
 ### Marketplace
 

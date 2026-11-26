@@ -83,6 +83,16 @@ Responsibilities:
 
 No AI implementation belongs inside LifeLedger.
 
+## Proposed Core Runtime
+
+Draft [RFC-0002](../rfc/RFC-0002%20Platform%20Core%20Architecture) proposes
+shared identity and consent, security services, an event bus, plugin hosting,
+a secret store, and audit services, with explicit capabilities and a
+WASM-first plugin runtime. The Core Runtime must not contain product business
+logic, health models, or AI. These remain draft proposals, not implemented
+services or accepted component ownership; do not assume their interfaces or
+security guarantees exist.
+
 ---
 
 # Immutable Principles
