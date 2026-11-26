@@ -1,0 +1,170 @@
+# LifeLedger Platform Vision
+
+## Architektur-Neuausrichtung
+
+Ganz ehrlich: Ich glaube, dass du gerade einen wichtigen Architektur-Sprung gemacht hast.
+
+Die bisherigen Dokumente behandeln LifeLedger im Kern noch als persönliche Gesundheitsakte mit Erweiterungen. Gleichzeitig tauchen in mehreren Stellen bereits Plugin-Ökosystem, Integrationen, Community-Connectoren, AI-Provider, Home Assistant und externe Systeme auf. Die Roadmaps diskutieren bereits Erweiterbarkeit, Vertrauensgrenzen, Plugin-Verträge und Integrationen als zentrale Bausteine.
+
+Ich würde deshalb sogar sagen:
+
+> Das eigentliche Produkt ist nicht die Gesundheitsakte.
+>
+> Das eigentliche Produkt ist die Plattform.
+>
+> Die Gesundheitsakte ist die erste Referenz-Anwendung auf dieser Plattform.
+
+Das ist ein fundamentaler Unterschied.
+
+---
+
+# Was mir an deiner Idee gefällt
+
+Home Assistant ist nicht erfolgreich weil es Lampen schalten kann.
+
+Home Assistant ist erfolgreich weil es eine Integrationsplattform ist.
+
+Dasselbe Prinzip könnte für Gesundheitsdaten funktionieren.
+
+Statt:
+
+```text
+LifeLedger
+├── Gesundheitsakte
+├── Dokumente
+├── Medikamente
+└── AI
+```
+
+würde ich künftig eher denken:
+
+```text
+LifeLedger Platform
+├── Core Runtime
+├── VitaFabric
+├── Plugin Framework
+├── Identity & Consent
+├── Security Layer
+├── Local Cloud Sync Layer
+└── Marketplace / Registry
+
+Anwendungen:
+├── Health Record
+├── Family Health
+├── Medication Manager
+├── Emergency Card
+├── Health Dashboard
+└── weitere Community Apps
+```
+
+Das passt erstaunlich gut zu den bereits vorhandenen Roadmaps für Plugins, VitaFabric und Integrationen.
+
+---
+
+# Was ich ändern würde
+
+## Der Plattformgedanke muss über LifeLedger gestellt werden
+
+Aktuell hast du:
+
+```text
+LifeLedger
+VitaFabric
+LifeWeaver
+```
+
+als drei gleichrangige Komponenten.
+
+Ich würde künftig eher modellieren:
+
+```text
+LifeLedger Platform
+
+├── Core Runtime
+├── Security Framework
+├── Identity & Consent
+├── Plugin Host
+
+├── VitaFabric
+│   └── Data Layer
+
+├── LifeWeaver
+│   └── AI Layer
+
+└── Applications
+    ├── Personal Health Record
+    ├── Family Health
+    ├── Medication Manager
+    └── Emergency Profile
+```
+
+Dadurch wird klar:
+
+VitaFabric und LifeWeaver sind Plattformdienste.
+
+---
+
+# Cloud-Modell neu strukturieren
+
+Deine Idee „Lokal oder Cloud“ würde ich weiter aufteilen.
+
+Nicht:
+
+```text
+Local
+Cloud
+```
+
+sondern:
+
+```text
+Deployment Modes
+```
+
+### Mode 1 – Local Only
+
+```text
+Mini-PC
+NAS
+Docker
+Home Server
+```
+
+Keine Cloud.
+
+### Mode 2 – Local + Relay
+
+Cloud speichert:
+
+```text
+Push Events
+Notifications
+Device Discovery
+Remote Access
+```
+
+Keine Klartextdaten.
+
+### Mode 3 – Local + Zero Knowledge Sync
+
+Cloud speichert:
+
+```text
+verschlüsselte Daten
+Backups
+Synchronisation
+```
+
+Aber keine Schlüssel.
+
+### Mode 4 – Managed Cloud
+
+Cloud verarbeitet Daten.
+
+Optional.
+
+Nicht Standard.
+
+---
+
+# Der wichtigste neue Baustein: Consent &
