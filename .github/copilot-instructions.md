@@ -164,3 +164,55 @@ If any answer is YES:
 Stop and document the architectural impact.
 
 Do not proceed automatically.
+
+# Pull Request Validation Rules
+
+Every PR must answer:
+
+□ Does this bypass VitaFabric?
+
+□ Does this introduce a second health model?
+
+□ Does this violate FHIR?
+
+□ Does this create provider lock-in?
+
+□ Does this introduce non-local dependencies?
+
+□ Does this reduce user ownership?
+
+□ Does this bypass consent checks?
+
+□ Does this bypass provenance tracking?
+
+□ Does this introduce hardcoded UI strings?
+
+□ Does this violate internationalization?
+
+□ Does this store health data unencrypted?
+
+□ Does this introduce telemetry?
+
+□ Does this create AI-provider dependencies?
+
+If yes:
+
+PR must be rejected.
+
+Reject PR when:
+
+- hardcoded secrets detected
+
+- plaintext health data stored
+
+- telemetry added
+
+- untranslated UI strings added
+
+- AI provider abstractions bypassed
+
+- FHIR bypassed
+
+- consent checks bypassed
+
+- provenance tracking bypassed
