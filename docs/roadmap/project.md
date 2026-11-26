@@ -94,24 +94,250 @@ werden mit konkreten Kommandos dokumentiert, sobald sie existieren.
 - [Plugins](plugins.md): herstellerneutrale Community-Verträge und Vertrauensmodell.
 - [Integrationen](integrations.md): externe Systeme einschließlich Home Assistant.
 
-## Vor Entwicklung zu entscheiden
+## Getroffene Architekturentscheidungen für den ersten Durchstich
 
-1. Wer ist die erste Zielgruppe und welcher konkrete lokale Arbeitsablauf
-   definiert den kleinsten wertvollen Durchstich?
-2. Welches Gerät und welcher Client werden zuerst unterstützt, und welches
-   lokale Laufzeit- und Speichermodell ist dafür praktikabel?
-3. Wie werden Nutzer, Familienmitglieder, Vertreter, Rollen, Notfallzugriff,
-   Einwilligung und Widerruf rechtlich und technisch modelliert? Wer gibt das
-   Modell frei und darf welche Freigaben erteilen?
-4. Welche FHIR-R4-Ressourcen, Profile und Datenarten gelten zuerst, und wie
-   werden manuelle Eingaben und Dokumente mit Herkunft erfasst?
-5. Welche Sicherheits- und regulatorischen Voraussetzungen gelten vor einem
-   Einsatz mit realen Daten? Wer verantwortet Freigabe und Incident Response?
-6. Wie werden Community-Entscheidungen, Finanzierung, Wartung und Übersetzungen
-   langfristig getragen?
-7. Welche gemeinsamen Fähigkeiten und Vertrauensgrenzen braucht die Plattform
-   tatsächlich, und wo liegen deren Ownership und technische Durchsetzung?
-8. Welche Kriterien, Verantwortlichen und Einspruchswege sollen Community-,
-   Verified- und Official-Marketplace-Listings definieren?
-9. Welche optionalen Deployment-Szenarien sind mit lokalen Alternativen,
-    Einwilligung, Schlüsselbesitz und regulatorischen Pflichten vereinbar?
+## Getroffene Architekturentscheidungen für den ersten Durchstich
+
+Die folgenden Entscheidungen gelten als Arbeitsgrundlage für die Architektur-, Spezifikations- und Prototypenphase.
+
+### Zielgruppe und erster Anwendungsfall
+
+Die erste Zielgruppe sind Privatpersonen und Familien mit Interesse an einer langfristigen, lokalen Gesundheitsdatenverwaltung.
+
+Der erste wertvolle Durchstich besteht aus:
+
+1. Installation von LifeLedger auf einem lokalen Gerät
+2. Import eines synthetischen oder realen Gesundheitsdatensatzes
+3. Import eines medizinischen Dokuments
+4. Darstellung aller Daten in einer gemeinsamen Timeline
+5. Lokale verschlüsselte Speicherung
+6. Lokale Sicherung und Wiederherstellung
+
+Die persönliche Gesundheitsakte dient als erste Referenzanwendung der Plattform.
+
+---
+
+### Erstes Zielsystem
+
+Unterstützt wird zunächst:
+
+```text
+Desktop
+  └─ Windows
+```
+
+Weitere Plattformen folgen nach erfolgreichem Abschluss des ersten vertikalen Durchstichs.
+
+Die erste Client-Anwendung basiert auf:
+
+```text
+Tauri Desktop
+```
+
+---
+
+### Lokales Speicher- und Laufzeitmodell
+
+Die Standardinstallation verwendet:
+
+```text
+SQLite
+```
+
+als lokale persistente Datenbank.
+
+Die Daten werden durch VitaFabric verschlüsselt gespeichert.
+
+Storage-Adapter erhalten niemals unverschlüsselte Gesundheitsdaten.
+
+PostgreSQL, Cloud-Speicher oder andere Storage-Systeme sind spätere optionale Erweiterungen.
+
+---
+
+### Identität, Rollen und Einwilligung
+
+Die Plattform verwendet folgende Rollen:
+
+```text
+Primary Owner
+Guardian
+Caregiver
+Proxy
+Emergency Contact
+```
+
+Nur Primary Owner, Guardian und Proxy dürfen Berechtigungen delegieren.
+
+Freigaben werden ressourcenbasiert vergeben und können jederzeit widerrufen werden.
+
+Authentifizierung, Autorisierung und Einwilligung werden als unabhängige Komponenten des Identity-&-Consent-Layers behandelt.
+
+---
+
+### Erste FHIR-Ressourcen
+
+Der MVP unterstützt zunächst:
+
+```text
+Patient
+Observation
+Condition
+MedicationStatement
+AllergyIntolerance
+DocumentReference
+```
+
+Weitere Ressourcen werden erst nach erfolgreichem MVP ergänzt.
+
+---
+
+### Herkunft und Provenienz
+
+Jeder Datensatz muss mindestens folgende Informationen besitzen:
+
+```text
+Quelle
+Connector
+Importzeitpunkt
+Original-ID
+Version
+```
+
+Dokumente werden grundsätzlich über DocumentReference modelliert.
+
+---
+
+### Sicherheitsvoraussetzungen für reale Daten
+
+Vor Verarbeitung realer Gesundheitsdaten müssen mindestens folgende Anforderungen erfüllt sein:
+
+```text
+AES-256-GCM
+Argon2
+Audit Logging
+Consent Management
+Backup & Recovery
+MFA-Unterstützung
+Incident Response Prozess
+Security Disclosure Prozess
+```
+
+Ein Security-Maintainer-Team verantwortet Freigaben und Incident-Management.
+
+---
+
+### Community und Finanzierung
+
+Phase 1:
+
+```text
+Community
+GitHub
+AGPL
+```
+
+Phase 2:
+
+```text
+GitHub Sponsors
+OpenCollective
+```
+
+Phase 3:
+
+```text
+Managed Cloud Services
+Marketplace Infrastruktur
+Relay Services
+```
+
+Übersetzungen erfolgen über eine Community-Plattform wie Weblate oder Crowdin.
+
+---
+
+### Gemeinsame Plattformfähigkeiten
+
+Zum verpflichtenden Plattformkern gehören:
+
+```text
+Identity Service
+Consent Service
+Plugin Host
+Event Bus
+Secret Store
+Audit Service
+VitaFabric
+```
+
+Nicht zum Plattformkern gehören:
+
+```text
+Connectoren
+Integrationen
+Provider
+Anwendungen
+Dashboards
+```
+
+Diese werden über das Erweiterungsmodell bereitgestellt.
+
+---
+
+### Marketplace Governance
+
+Marketplace-Kategorien:
+
+```text
+Community
+Verified
+Official
+```
+
+Community:
+- Keine Projektprüfung
+
+Verified:
+- Maintainer Review
+- Grundlegende Tests
+
+Official:
+- Offiziell durch das Projekt betreut
+- Signiert mit Projekt-Schlüsseln
+
+Marketplace-Listings stellen keine Sicherheitszertifizierung dar.
+
+---
+
+### Deployment-Szenarien
+
+Der lokale Betrieb ist verpflichtende Grundlage aller Kernfunktionen.
+
+Unterstützte Szenarien:
+
+```text
+Local Only
+Local + Relay
+Local + Zero-Knowledge Sync
+Managed Cloud
+```
+
+Dabei gilt:
+
+- Kein Szenario darf lokalen Betrieb ersetzen
+- Benutzer behalten die Kontrolle über ihre Schlüssel
+- Cloud-Komponenten bleiben optional
+- Zero-Knowledge Sync darf keine Entschlüsselungsschlüssel besitzen
+
+---
+
+### Offene Restfragen
+
+Nach den bisherigen Architekturentscheidungen verbleiben insbesondere folgende Themen:
+
+- Detaillierte Capability-Matrix
+- Konkrete WASM Plugin Runtime
+- Family Data Model
+- Event Bus Spezifikation
+- Marketplace Governance Details
+- Zero-Knowledge Recovery Verfahren
+- Health-Twin Architektur
