@@ -1,21 +1,20 @@
-# Roadmap
+# Roadmaps
 
-This is a directional, unordered set of proposed milestones, not a release
-schedule or commitment. Work may change after community review.
+These documents are planning proposals, not accepted architecture, release
+dates, or claims of implemented functionality. They are currently in German;
+English documentation is an open internationalization task.
 
-The roadmap covers the LifeLedger Platform Architecture: LifeLedger,
-VitaFabric, and LifeWeaver. It is planning guidance, not an implementation
+- [Repository and documentation assessment](assessment.md)
+- [Overall project roadmap](project.md)
+- [LifeLedger product, backend and clients](lifeledger.md)
+- [VitaFabric interoperability and data](vitafabric.md)
+- [LifeWeaver AI and MCP](lifeweaver.md)
+- [Plugin and community ecosystem](plugins.md)
+- [External integrations and Home Assistant](integrations.md)
+
+The overall roadmap defines shared gates and dependencies; the component
+roadmaps add scope, tests, proposals and open decisions. Significant changes
+require community review through an [RFC](../../rfc/) and lasting decisions
+through [ADRs](../../adr/); normative contracts belong in
+[`specifications/`](../../specifications/). Roadmap ordering is not a release
 commitment.
-
-1. **Foundation:** establish governance, threat modeling, architecture decisions,
-   development tooling, and contribution workflows.
-2. **Local-first core:** design data ownership, persistence, offline behavior,
-   synchronization, backup, and recovery; build a minimal personal record flow.
-3. **Interoperability:** design and implement VitaFabric integrations targeting
-   FHIR R4, with validation and conformance testing.
-4. **Clients and integrations:** develop web, mobile, and desktop experiences,
-   plus a secure extension model and integrations such as Home Assistant.
-5. **LifeWeaver:** design consent-aware, AI-agnostic model and MCP integration,
-   including explicit permission and data-sharing boundaries.
-6. **Hardening:** expand security review, accessibility, testing, operational
-   guidance, and release processes before considering production use.
