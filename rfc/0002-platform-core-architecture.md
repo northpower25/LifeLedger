@@ -604,9 +604,8 @@ Nutzerreise umfasst Arztbriefimport, Medikationserfassung, Timeline und
 Backup (RFC-0007). Vor der Freigabe für echte Gesundheitsdaten gelten die
 Sicherheits-Gates der Roadmap.
 
-Start und Beendigung des Dienstes, Absicherung der lokalen Kommunikation
-sowie Ressourcen- und Startzeitkosten sind für jede Zielplattform noch zu
-spezifizieren und zu prüfen.
+Die vorgeschlagene lokale Laufzeittopologie und ihre offenen Nachweise stehen
+in „Runtime Topology“ unten.
 
 Als erste externe Integration ist Nextcloud vor Home Assistant vorgesehen;
 der lokale Kern benötigt keine dieser Integrationen. Datenrichtung und
@@ -715,14 +714,74 @@ RFC-0003 Identity & Consent
 
 RFC-0004 Capability Model
 
-RFC-0005 Marketplace Governance
+RFC-0005 Event Bus
 
-RFC-0006 Deployment Modes
+RFC-0006 Plugin Runtime
 
 RFC-0007 Application Model
 
 RFC-0008 Family Model
+
+RFC-0009 Marketplace Governance
 ```
+
+---
+
+## Runtime Topology
+
+Für den ersten Windows-Offline-Durchstich wird folgende Topologie
+vorgeschlagen; RFC-0014 definiert weiterhin die Verantwortungsgrenzen, nicht
+die Prozessaufteilung:
+
+```text
+Tauri Desktop Host → lokales IPC → FastAPI + Core → VitaFabric → SQLite
+```
+
+Core und VitaFabric können im selben lokalen Dienst laufen, bleiben aber
+getrennte Verantwortlichkeiten; die SQLite-Schnittstelle ist ausschließlich
+über VitaFabric für Gesundheitsdaten erreichbar. SQLite und alle zugehörigen
+Dateien, Indizes, temporären Dateien und Backups müssen vor Speicherung
+geschützt sein. Normales SQLite allein bietet keine Verschlüsselung.
+Eine genaue Verschlüsselungs- und Schlüsselarchitektur ist noch offen.
+
+### Startup Sequence
+
+1. Tauri startet genau einen eigenen Dienst und übergibt ihm einen
+   kurzlebiges, zufällig erzeugtes IPC-Authentisierungsgeheimnis über einen geschützten
+   lokalen Kanal, nicht über URL, Kommandozeile, Log oder Umgebungsvariable.
+2. Der Dienst bindet ausschließlich an den freigegebenen lokalen Endpunkt,
+   validiert Host/Origin und authentisiert jede Anfrage; er akzeptiert keine
+   externe Netzwerkverbindung. Der Host prüft die Identität des Dienstes.
+3. Nach Bereitschaft von Identity, Policy, Audit und VitaFabric erfolgt
+   die Owner-Entsperrung und Einrichtung einer eigenen Benutzersitzung; vor
+   erfolgreicher Prüfung bleiben Daten gesperrt.
+   Ein bereits belegter Endpunkt oder fehlgeschlagene Gegenprüfung führt zum
+   Abbruch, nicht zu einem Vertrauen auf einen fremden Dienst.
+
+### Shutdown Sequence
+
+Neue Anfragen stoppen, laufende Transaktionen abschließen oder rückrollen,
+Audit und Änderungen dauerhaft sichern, Sitzungen und Schlüssel im Speicher
+invalidieren und den eigenen Dienst beenden. Bei Absturz erfolgt beim
+Neustart Recovery vor neuer Datenfreigabe. Bereits exportierte Daten werden
+durch den Shutdown nicht zurückgerufen.
+
+### Failure Modes und Trust Boundaries
+
+UI, Host, Dienst, Dateisystem und externe Prozesse sind getrennte
+Vertrauensbereiche; ein anderer Prozess desselben Nutzers ist nicht
+automatisch vertrauenswürdig. Audit-, Policy-, Validierungs-, Schlüssel- oder
+Speicherfehler verhindern den geschützten Zugriff; ein schreibender Vorgang
+gilt erst nach atomarer Speicherung von Änderung und Audit als erfolgreich.
+Ein Audit-Ausfall darf keinen Erfolg vortäuschen. Zugriffskontrolle erfolgt
+auch bei internen Aufrufen am VitaFabric-Gateway.
+
+Die konkrete Windows-IPC-Technik, beidseitige Authentisierung, Schutz gegen
+lokale Mitbenutzer und Schadsoftware mit gleichen Rechten, Packaging,
+Mehrfachstarts und Prozessüberwachung sind nicht entschieden. Eine lokale
+HTTP-Loopback-Adresse ist für sich keine Authentisierung. Diese Punkte,
+das Bedrohungsmodell und Messbudgets benötigen vor Implementierungsstart
+einen geprüften Vertrag; siehe [Startfragen](../docs/review/offene-informationen-erste-testversion.md).
 
 ---
 

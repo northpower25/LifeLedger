@@ -387,6 +387,39 @@ Besitzübernahme
 
 ---
 
+## Guardian Verification
+
+Eine behauptete Guardian-Beziehung gewährt allein keinen Zugriff. Vor einer
+Vertretungsfreigabe müssen Identität der handelnden Person, betroffenes
+Profil, Art, Umfang und Gültigkeit der Vertretung anhand geeigneter Nachweise
+und des anwendbaren Rechts geprüft werden. Der prüfende Prozess dokumentiert
+Entscheidung, Zuständigkeit, Zeitpunkt, Gültigkeit und Nachweisreferenz;
+Originalnachweise sind nur soweit erforderlich separat verschlüsselt
+aufzubewahren. Entzug oder Ablauf sperrt abgeleitete Zugriffe. Ein lokal
+eingegebenes Dokument ist kein automatischer Rechtsnachweis.
+
+## Jurisdiction Model
+
+Version 1 unterscheidet Deutschland, übrige EU und international als
+Prüfbereiche, nicht als einheitliche Rechtsregeln. Land, relevante
+Rechtsordnung, Regelversion, Prüfer und Zeitpunkt müssen explizit erfasst
+werden; EU-Mitgliedschaft ersetzt keine Prüfung des nationalen Rechts.
+Unbekannte oder konfligierende Zuständigkeit führt zu manueller Prüfung und
+keiner automatischen Freigabe. Rechtsgrundlagen, Nachweise und Prüfinstanz
+sind vor Familienfunktionen durch qualifizierte Stellen festzulegen.
+
+## Age Transition Workflow
+
+`Minor` → `Transition` → `Adult Owner`: Bei Erreichen der nach geprüfter
+Rechtsordnung maßgeblichen Schwelle beginnt eine überprüfte Übergangsphase.
+Das Profil bleibt beim Betroffenen; bestehende Guardian-Grants werden
+gesperrt und nicht automatisch in Erwachsenenfreigaben umgewandelt. Nach
+Identitätsprüfung und sicherem Bootstrap entscheidet der erwachsene Owner
+über neue, begrenzte Grants. Ausnahmen durch fortbestehende gesetzliche
+Vertretung benötigen unabhängige Prüfung. Benachrichtigung, gescheiterte
+Identitätsprüfung und Offline-Geräte dürfen keine stillschweigende
+Rechteausweitung auslösen.
+
 ## 14. Trennung von Daten
 
 Jeder Nutzer besitzt:

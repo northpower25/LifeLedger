@@ -113,6 +113,20 @@ DocumentReference
 
 ---
 
+## MVP Resource Contract
+
+Das MVP beschränkt kanonische FHIR-R4-Ressourcen auf `Patient`, `Observation`,
+`Condition`, `MedicationStatement`, `AllergyIntolerance` und
+`DocumentReference`; weitere Ressourcentypen sind nicht Teil dieses MVP.
+Der erste Durchstich verwendet davon `Patient`, `Observation` und
+`DocumentReference` als vorgeschlagene Teilmenge. Eine vollständige erste
+Nutzerreise mit Medikation benötigt zusätzlich `MedicationStatement` und ist
+nicht automatisch Teil dieses kleineren Durchstichs. Das Dokumentoriginal
+bleibt separat geschützt und über die `DocumentReference` referenziert.
+Provenienz ist verpflichtende VitaFabric-Metadaten und erfordert im MVP keine
+zusätzliche FHIR-`Provenance`-Ressource. RFC-0015 beschreibt die noch zu
+veröffentlichenden Profile und Fixtures; diese Liste allein ist kein Profil.
+
 ## 5. FHIR Version
 
 Festgelegt:
@@ -271,6 +285,29 @@ Als Validator ist der HL7 FHIR Validator vorgesehen. Version, Profile,
 Terminologien und die Integration in den lokalen Datenpfad sind noch
 festzulegen. Laufzeit-, Speicher- und Startzeitkosten auf den unterstützten
 Geräten sind vor der Produktfreigabe zu prüfen.
+
+## Validation Failure Behaviour
+
+* `REJECT`: ungültiges JSON, nicht unterstützter Typ, fehlende Pflichtwerte,
+  gebrochene Referenz oder Verletzung einer verpflichtenden Profilregel.
+  Keine kanonische Änderung; ein datensparsam protokollierter Fehler wird
+  zurückgegeben.
+* `WARN`: ausschließlich nicht-blockierende, ausdrücklich im versionierten
+  Profil registrierte Warnungen. Speicherung nur nach expliziter Bestätigung;
+  Warnung und Validatorversion werden dem Vorgang zugeordnet.
+* `QUARANTINE`: bei Import, dessen Prüfung wegen fehlender Terminologie oder
+  unbestimmter Herkunft nicht abgeschlossen werden kann. Verschlüsselt,
+  getrennt vom kanonischen Bestand, nicht für regulären Zugriff freigegeben;
+  prüfberechtigte Person entscheidet über erneute Prüfung oder Löschung.
+  Quarantäne darf das Verbot der Ablage providerspezifischer Rohdaten nicht
+  umgehen; zulässige Datenform und Schutz bedürfen eines separaten Vertrags.
+
+Kein stilles Korrigieren. Quarantäne ist kein Fallback bei Ausfall von
+Verschlüsselung, Consent, Capability oder Audit: dann wird abgelehnt.
+Offline-Terminologie, Quarantänefristen, Größenlimits und konkrete Zuordnung
+der Validatorbefunde sind noch festzulegen. Für den ersten Slice ist ein
+reiner Reject-Pfad zulässig, sofern Warnung und Quarantäne nicht als
+implementiert behauptet werden.
 
 ---
 

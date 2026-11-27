@@ -34,3 +34,5 @@ and [open-question resolution](../docs/review/rfc-open-questions-resolution-V1.m
 are reflected in the affected RFC drafts; remaining implementation details
 stay open. The [implementation readiness and repository review](../docs/review/rfc-implementierungsreife-und-repository-review.md)
 records the remaining questions by RFC and compares the repository with the drafts.
+The [first-test-version readiness assessment](../docs/review/offene-informationen-erste-testversion.md)
+tracks the V2 remediation proposals, outstanding decisions and unmet start gates.

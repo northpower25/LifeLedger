@@ -645,9 +645,11 @@ Kompatibilitätsprüfung
 Verified-Listings werden mindestens alle zwölf Monate sowie bei jeder
 Änderung an Capabilities, Datenflüssen, Abhängigkeiten, Build-Prozess oder
 Signaturschlüssel rezertifiziert. Ein Minor-/Major-Release erhält erst nach
-erneuter Prüfung den Verified-Status; reine Patch-Releases dürfen nur dann
-automatisiert übernommen werden, wenn der verifizierte Build-Prozess und
-Digestvergleich unverändert bleiben. Bei ausbleibender Rezertifizierung
+erneuter Prüfung den Verified-Status. Auch ein Patch verändert im Allgemeinen
+den Digest: Sein neues Artefakt benötigt einen neu berechneten Digest, einen
+reproduzierbaren Vergleich mit dem geprüften Build und eine neue Signatur.
+Eine automatische Übernahme als Verified ist bis zur Entscheidung über den
+Reviewprozess nicht freigegeben. Bei ausbleibender Rezertifizierung
 wird das Listing auf Community herabgestuft und klar gekennzeichnet.
 
 ---
@@ -819,6 +821,32 @@ Marketplace unabhängiger Betrieb
 Marketplace muss vollständig optional bleiben.
 
 ---
+
+## Key Rotation
+
+Vertrauensanker und ihre Rollen, Gültigkeitsintervalle und Widerrufslisten
+werden versioniert und authentisch verteilt. Für geplante Rotation wird ein
+neuer Schlüssel unter Vier-Augen-Kontrolle erzeugt, seine Zuordnung vor Ablauf
+des alten Ankers über einen bereits vertrauenswürdigen Kanal veröffentlicht
+und das Übergangsintervall dokumentiert. Neue Pakete werden mit gültigem
+Schlüssel über ihrem exakten Digest signiert. Bei Kompromittierung wird der
+Schlüssel gesperrt, der Vorfall veröffentlicht und ein unabhängig
+authentisierter neuer Anker benötigt; Signaturen des kompromittierten
+Schlüssels begründen kein neues Vertrauen. Signaturalgorithmus, Trust-Bootstrap,
+Gültigkeitsfristen und Recovery-Verfahren sind noch nicht beschlossen.
+
+## Offline Trust Behaviour
+
+Installation und Update erfordern eine gültige Signatur und eine lokal
+verifizierte, nicht abgelaufene Widerrufs-/Trust-Metadatenversion. Bei
+abgelaufenem Schlüssel, bekannter Sperre, fehlender oder veralteter Sperrliste
+wird die Installation verweigert und der Grund angezeigt; kein stiller
+Override. Bereits installierte Plugins werden bei bekannter Sperre
+deaktiviert; bei fehlender aktueller Information ist deren Weiterbetrieb noch
+zu entscheiden und darf nicht als widerrufssicher gelten. Die Plattform
+selbst bleibt offline ohne Marketplace nutzbar. Neue Widerrufe können ein
+offline Gerät erst nach Aktualisierung erreichen: hohe Sicherheit kann daher
+offline Installation und Updates zeitweise verhindern.
 
 ## 32. Nachhaltigkeit
 

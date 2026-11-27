@@ -1,5 +1,9 @@
 # Review: Implementierungsreife der RFCs und Repository-Abgleich
 
+Für den neueren V2-Abgleich und weiterhin offene Startbedingungen siehe
+[Offene Informationen für die erste Testversion](offene-informationen-erste-testversion.md).
+Dieser Review bleibt eine zeitgebundene Bestandsaufnahme.
+
 **Stand:** 27.11.2026, Repository `main` bei Commit `7d8486a`.
 
 **Ergebnis:** Die RFCs 0001–0019 liefern eine brauchbare Richtung und mehrere
