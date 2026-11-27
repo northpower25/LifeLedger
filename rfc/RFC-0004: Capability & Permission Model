@@ -204,6 +204,8 @@ READ_ALLERGY
 READ_DOCUMENT
 
 READ_TIMELINE
+
+READ_PROVENANCE
 ```
 
 ---
@@ -308,7 +310,13 @@ AI_REMOTE_PROVIDER
 
 ```text
 AI_EMBEDDING
+
+READ_EMBEDDINGS
 ```
+
+`AI_EMBEDDING` betrifft die Embedding-Funktion; `READ_EMBEDDINGS`
+autorisiert das Lesen gespeicherter Embeddings. Auch dafür gelten Consent
+und die VitaFabric-Datenverträge für Derived Data gemäß RFC-0013.
 
 ---
 
@@ -329,6 +337,19 @@ AI_AGENT
 ---
 
 # 9. Administrative Capabilities
+
+## Consent und Household
+
+```text
+MANAGE_CONSENT
+
+MANAGE_HOUSEHOLD
+```
+
+Diese Capabilities ersetzen weder eine gültige Einwilligung noch die
+Prüfung der jeweiligen Identität und Vertretungsbefugnis.
+
+---
 
 ## Benutzerverwaltung
 

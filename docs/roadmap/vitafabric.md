@@ -21,17 +21,19 @@ erhalten; diese Anforderungen sind noch nicht implementiert.
 | V1 – Minimaler FHIR-Pfad | Ersten ausgewählten Datentyp validieren und über versionierten Vertrag bereitstellen; auch manuelle Eingaben passieren VitaFabric. Verschlüsselte Persistenz und Zugriffsschutz entsprechend freigegebenen Vorgaben. | Unit- und Vertragstests für gültiges/ungültiges FHIR, fehlende Herkunft, doppelte IDs, verweigerten Zugriff und Speicherfehler. |
 | V2 – Vertikaler Offline-Pfad | Zusammen mit LifeLedger den synthetischen End-to-End-Durchstich aus Gesamtstufe 2 liefern. | Offline-, FHIR-Profil-, Consent-, Audit-, Schlüssel- und Neustarttests; ungeprüfte oder unzulässige Datensätze gelangen nicht in den lesbaren Bestand. |
 | V3 – Lebenszyklus und Qualität | Nach Spezifikation Korrektur, Löschung, Versionierung, verschlüsselte Sicherung/Recovery und Datenqualitätsmeldungen ergänzen. | Migration, Integrität, Fehler beim Wiederherstellen, Rechteentzug und Datenqualitätsfälle testen; keine provider-spezifischen Rohdaten direkt speichern. |
-| V4 – Connector- und Sync-Verträge | Sichere VitaFabric-eigene Connector- und Storage-Erweiterungspunkte, synthetischen Referenz-Connector und später optionale externe Integration entwickeln; Abhängigkeit: freigegebene [Plugin-Verträge](plugins.md). Synchronisierung und Konfliktlösung separat entscheiden. | Konformitätssuite für Mapping, Validierung, Herkunft, idempotenten Import, Abbruch, Konflikte, Consent-Widerruf und Ausfälle; nachweisen, dass Erweiterungen Datenbank und Consent-Prüfungen nicht umgehen. Offline-Verhalten testen. |
+| V4 – Connector- und Sync-Verträge | Sichere VitaFabric-eigene Connector- und Storage-Erweiterungspunkte, synthetischen Referenz-Connector und später optionale externe Integration entwickeln; Abhängigkeit: freigegebene [Plugin-Verträge](plugins.md). Hybrid-Sync und Konfliktlösung gemäß RFC-0010 konkretisieren. | Konformitätssuite für Mapping, Validierung, Herkunft, idempotenten Import, Abbruch, Konflikte, Consent-Widerruf und Ausfälle; nachweisen, dass Erweiterungen Datenbank und Consent-Prüfungen nicht umgehen. Offline-Verhalten testen. |
 | V5 – Interoperabilität erweitern | Weitere Ressourcen/Profile und standardisierte Exporte auf Grundlage konkreter Nutzerfälle und Kompatibilitätsregeln. | FHIR-Validierung gegen dokumentierte Profile, Roundtrip- und Regressionstests sowie unabhängige Interoperabilitätsprüfung vor entsprechenden Aussagen. |
 
 ## Offene Fragen und Vorschläge
 
-- Welche Ressourcen, Profile, Terminologien, Versionen und Validatoren gelten
+- Für die sechs Ressourcen gemäß RFC-0013 ist der HL7 FHIR Validator
+  vorgesehen. Welche Profile, Terminologien und Versionen gelten
   für den ersten Anwendungsfall? Wie werden fehlende bzw. unzulässige Werte
   behandelt, ohne sie stillschweigend zu verändern?
 - Wie wird Provenienz bei manueller Eingabe, Korrektur, Zusammenführung und
-  Löschung modelliert? Importherkunft ist obligatorisch; weitergehende Regeln
-  benötigen Spezifikation.
+  Löschung modelliert? Die Pflichtfelder gemäß RFC-0013 umfassen Quelle,
+  Connector, Zeitstempel, Original-ID, Version und Transformationsschritte;
+  ihre konkrete Repräsentation benötigt Spezifikation.
 - Welche lokalen Speicher- und Schlüsselmodelle erfüllen AES-256-GCM, Argon2,
   RBAC, Audit und sichere Wiederherstellung auf den gewählten Geräten?
 - Wo und wie werden Einwilligung, Rollen und Widerruf durchgesetzt, auch bei

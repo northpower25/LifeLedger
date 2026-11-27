@@ -8,6 +8,13 @@ erhalten Daten nur über freigegebene VitaFabric-Verträge und unter expliziter
 Einwilligung. Siehe
 [Gesamt-Roadmap](project.md).
 
+Der erste AI-Anwendungsfall ist die Dokumentenzusammenfassung. Die
+Twin-Ausbaustufen sind Knowledge Twin, Health Twin und Predictive Twin in
+dieser Reihenfolge. Embeddings gehören zu VitaFabrics Derived Data und sollen
+lokal, verschlüsselt und widerrufbar gespeichert werden (RFC-0011 und
+RFC-0013). Für jede Stufe bleiben Sicherheits- und Zweckbestimmungsprüfung
+erforderlich.
+
 ## Stufen
 
 | Stufe | Ergebnis und Abhängigkeiten | Tests und Abnahme |
@@ -20,8 +27,8 @@ Einwilligung. Siehe
 
 ## Offene Fragen und Vorschläge
 
-- Welcher konkrete lokale Nutzen rechtfertigt den ersten AI-Anwendungsfall,
-  und welche Leistung ist auf welchen Geräten offline realistisch?
+- Welche Qualität und Leistung sind für die Dokumentenzusammenfassung auf
+  welchen Geräten offline realistisch?
 - Wie werden Einwilligung und Widerruf für Prompts, Kontext, Embeddings,
   Caches und eventuell bereits an Dritte übertragene Daten durchgesetzt?
 - Welche MCP-Versionen, Tool-Rechte und Vertrauensgrenzen gelten? Wie werden

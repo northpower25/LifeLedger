@@ -8,5 +8,7 @@ VitaFabric, and LifeWeaver).
 
 Current platform proposals include [RFC-0001](0001-platform-direction.md) and
 [RFC-0002: Platform Core Architecture](RFC-0002%20Platform%20Core%20Architecture).
-Both are drafts, not accepted architecture or evidence of implemented
-capabilities.
+The RFCs remain drafts, not accepted architecture or evidence of implemented
+capabilities. The decisions in the [consistency review](../docs/review/rfc-consistency-review.md)
+and [open-question resolution](../docs/review/rfc-open-questions-resolution.md)
+are reflected in the affected RFC drafts; details not decided there remain open.

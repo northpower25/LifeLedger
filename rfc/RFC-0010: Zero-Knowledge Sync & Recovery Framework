@@ -353,13 +353,17 @@ Zwei Geräte
 
 # 13. Konfliktstrategie
 
-Standard:
+Last Writer Wins ist ausschließlich zulässig für:
 
 ```text
-Last Writer Wins
+Settings
+
+UI-Daten
+
+Preferences
 ```
 
-für einfache Daten.
+Für andere Datenklassen ist Last Writer Wins damit nicht freigegeben.
 
 ---
 
@@ -372,6 +376,9 @@ Conflict Resolution Workflow
 ---
 
 Manuelle Entscheidung möglich.
+
+Der Workflow muss vor seiner Implementierung insbesondere Versionierung,
+Provenienz sowie Konflikte zwischen Löschung und Änderung festlegen.
 
 ---
 
@@ -395,7 +402,7 @@ Client ← Sync Service
 
 ## Hybrid
 
-Empfohlen.
+Festgelegt als Sync-Architektur.
 
 ```text
 Push + Pull

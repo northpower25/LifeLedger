@@ -127,9 +127,9 @@ Alle Gesundheitsdaten laufen über VitaFabric. 【4-f0844a】
 
 # 4. Definition einer Application
 
-Eine Application ist:
-
-> Ein fachlicher Workflow mit eigener UI, Konfiguration und Capabilities, der Plattformdienste nutzt.
+Eine Application ist ein spezialisierter Plugin-Typ mit UI, Navigation,
+Workflows und Settings, der die gemeinsamen Plattformdienste nutzt.
+Ihre deklarierten Capabilities unterliegen den Plattformprüfungen.
 
 ---
 
@@ -227,6 +227,12 @@ Datenbank
 ```text
 Health Record
 ```
+
+Erste Nutzerreise: Arztbrief importieren, Medikation erfassen, die Timeline
+anzeigen und ein Backup erstellen. Der erste vertikale Durchstich umfasst
+Desktop, lokale Datenhaltung, ein Dokument, einen Datentyp und ein Backup.
+Bis zur Sicherheitsfreigabe werden dafür ausschließlich synthetische Daten
+verwendet.
 
 ---
 

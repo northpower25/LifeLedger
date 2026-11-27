@@ -145,6 +145,13 @@ FHIR JSON
 
 als kanonisches Format.
 
+Dieses Format gilt für FHIR-Ressourcen. Zusätzlich verwaltet VitaFabric die
+Datenklasse **Derived Data** für abgeleitete Daten, darunter Embeddings,
+Knowledge Graph, AI Summaries und Derived Metadata. Diese Daten sind nicht
+automatisch FHIR-Ressourcen; ihr Zugriff erfolgt ebenfalls ausschließlich
+über VitaFabric und unterliegt Identity, Consent und Capabilities. Konkrete
+Schemas, Quellenbezug und Lebenszyklus sind noch zu spezifizieren.
+
 ---
 
 Speicherung:
@@ -216,14 +223,19 @@ Pflichtfelder:
 ```text
 Quelle
 
-Importzeitpunkt
+Zeitstempel (bei Import: Importzeitpunkt)
 
 Connector
+
+Original ID
 
 Version
 
 Transformationsschritte
 ```
+
+Die Repräsentation dieser Felder bei manueller Eingabe ohne externen
+Connector oder Original-ID ist noch festzulegen.
 
 ---
 
@@ -254,6 +266,11 @@ Profile
 
 Business Rules
 ```
+
+Als Validator ist der HL7 FHIR Validator vorgesehen. Version, Profile,
+Terminologien und die Integration in den lokalen Datenpfad sind noch
+festzulegen. Laufzeit-, Speicher- und Startzeitkosten auf den unterstützten
+Geräten sind vor der Produktfreigabe zu prüfen.
 
 ---
 
@@ -307,6 +324,10 @@ Database Access
 ---
 
 # 15. Storage Verträge
+
+VitaFabric ist für die Verschlüsselung vor Übergabe an einen Storage-Adapter
+verantwortlich. Ein Storage-Plugin übernimmt diese Verschlüsselung nicht und
+erhält keine Schlüssel.
 
 Storage Adapter erhalten:
 
@@ -373,6 +394,11 @@ Backward Compatibility
 # 19. Synchronisation
 
 RFC-0010 bleibt maßgeblich.
+
+Last Writer Wins ist nur für Settings, UI-Daten und Preferences zulässig;
+FHIR-Ressourcen durchlaufen den Conflict Resolution Workflow aus RFC-0010.
+Ein konkretes Verfahren für andere Datenklassen, insbesondere Derived Data,
+ist noch festzulegen.
 
 ---
 

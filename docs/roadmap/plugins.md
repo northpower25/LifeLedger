@@ -21,7 +21,7 @@ Komponentenverantwortungen:
 | Provider | LifeWeaver-owned, providerneutral und optional. Adapter für lokale oder externe Modelle (z. B. Ollama oder externe Provider); keine provider-spezifische AI-Logik in LifeLedger und keine Übertragung ohne ausdrückliche Freigabe. |
 | Storage | VitaFabric-interne Storage-Abstraktion für lokale oder externe Backends, etwa SQLite, PostgreSQL, OneDrive, S3 oder Nextcloud. Beispiele, keine ausgewählten Anbieter. Kein Storage-Plugin erhält direkten, unkontrollierten Datenbankzugriff; Cloud-Backends benötigen separates Review. |
 | UI | LifeLedger-owned Präsentations-Erweiterungen wie Dashboards, Widgets und Ansichten mit eingeschränkten UI-Verträgen; Datenzugriff nur über genehmigte Plattform-APIs. |
-| Application | Unabhängige Apps wie Medication Manager, Schlaftagebuch, Ernährungstracker oder Sportanalyse über versionierte Plattform-APIs; Gesundheitsdatenzugriff immer über VitaFabric und Consent. |
+| Application | Spezialisierter Plugin-Typ mit UI, Navigation, Workflows und Settings, z. B. Medication Manager; Plattformdienste über versionierte APIs, Gesundheitsdatenzugriff immer über VitaFabric und Consent. |
 
 Das ist eine vorgeschlagene Taxonomie, kein freigegebener Vertrag. Insbesondere
 ist der Datenpfad für Gesundheitsdaten fest: Plugin oder Anwendung ->
@@ -43,8 +43,9 @@ Widerruf, Provenienz, Isolation und kontrollierter Kommunikation. Signatur
 weist allenfalls Integrität/Quelle nach und ist keine Sicherheitsbewertung;
 Capabilities sind nur wirksam, wenn sie technisch erzwungen werden. Ob und
 wie Isolation auf unterstützten Plattformen nachweisbar ist, muss vor
-Drittanbieter-Ausführung geklärt sein. RFC-0002 schlägt Community
-(self-signed), Verified (Maintainer-Review) und Official (LifeLedger-Signatur)
+Drittanbieter-Ausführung geklärt sein; ohne durchsetzbare Isolation wird ein
+Plugin nicht ausgeführt. RFC-0002 schlägt Community
+(self-signed), Verified (Maintainer Sign-Off) und Official (LifeLedger-Signatur)
 als Vertrauenseinstufungen für Pakete vor, nicht als Sicherheitsgarantie.
 Keine versteckte Telemetrie, keine Cloud-Pflicht und kein direkter Zugriff auf
 ungeschützte Gesundheitsdaten.
@@ -73,7 +74,8 @@ voraussetzen.
 
 - Welche Isolation ist auf Desktop, Mobile und Web tatsächlich verfügbar und
   wie werden Netzwerk, Dateien, Secrets, Ressourcenverbrauch und Plugin-zu-
-  Plugin-Kommunikation technisch begrenzt? Was geschieht bei fehlender Isolation?
+  Plugin-Kommunikation technisch begrenzt? Bei fehlender Isolation wird das
+  Plugin nicht ausgeführt.
 - Wer vergibt und widerruft Fähigkeiten; wie wirken sich Consent-Widerruf,
   Deinstallation und bereits exportierte Daten auf den Lebenszyklus aus?
 - Wie werden SDK/API-Versionen, Protokolle, Kompatibilität, Migration und

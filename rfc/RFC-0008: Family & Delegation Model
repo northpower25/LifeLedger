@@ -160,154 +160,34 @@ Pflegebedürftige Angehörige
 
 # 5. Rollenmodell
 
-## Primary Owner
-
-Eigentümer des Gesundheitsprofils.
-
-Darf:
-
-```text
-Lesen
-Schreiben
-Exportieren
-Freigeben
-Widerrufen
-Löschen
-```
+RFC-0003 §6 ist die maßgebliche Quelle für Primary Owner, Guardian,
+Caregiver, Proxy und Emergency Contact. Dieses RFC definiert die Rollen
+nicht erneut, sondern beschreibt ihre Anwendung auf Haushalte und
+Delegationen.
 
 ---
 
 # 6. Guardian
 
-Gesetzlicher Vertreter.
-
-Typische Beispiele:
-
-```text
-Eltern
-
-Vormund
-```
-
----
-
-## Guardian Rechte
-
-```text
-Lesen
-
-Schreiben
-
-Freigeben
-
-Widerrufen
-```
-
----
-
-## Einschränkung
-
-Guardian verliert Rechte automatisch:
-
-```text
-bei Entzug
-
-bei Volljährigkeit
-
-per Widerruf
-```
-
-soweit rechtlich zulässig.
+Definition und Rechte: RFC-0003 §6.
 
 ---
 
 # 7. Caregiver
 
-Pflegeperson.
-
-Typische Beispiele:
-
-```text
-Angehörige
-
-Pflegedienst
-
-Betreuungsperson
-```
-
----
-
-## Caregiver Rechte
-
-```text
-Lesen
-
-Teilweise Schreiben
-```
-
----
-
-## Verboten
-
-```text
-Besitz übertragen
-
-Neue Vertreter ernennen
-
-Notfalldefinition ändern
-```
+Definition und Rechte: RFC-0003 §6.
 
 ---
 
 # 8. Proxy
 
-Bevollmächtigte Person.
-
-Beispiele:
-
-```text
-Vorsorgevollmacht
-
-Generalvollmacht
-
-Betreuer
-```
-
----
-
-## Proxy Rechte
-
-Werden individuell vergeben.
-
-Können nahezu vollständig sein.
+Definition und Rechte: RFC-0003 §6.
 
 ---
 
 # 9. Emergency Contact
 
-Notfallkontakt.
-
----
-
-## Rechte
-
-Nur Zugriff auf:
-
-```text
-Emergency Profile
-```
-
----
-
-## Niemals Zugriff auf
-
-```text
-volles Gesundheitsprofil
-
-Dokumentenarchiv
-
-Historie
-```
+Definition und Rechte: RFC-0003 §6.
 
 ---
 
@@ -512,9 +392,9 @@ Guardian = Eltern
 
 ## Zugriff
 
-Guardian besitzt Verwaltungsrechte.
-
-Kind besitzt Profilidentität.
+Die Anwendung der Guardian-Rolle richtet sich nach RFC-0003 und den
+rechtlich zulässigen Vertretungsbefugnissen. Das Kind besitzt die
+Profilidentität.
 
 ---
 
@@ -618,7 +498,7 @@ Beispiele:
 ```text
 MEMBER_ADDED
 
-ROLE_ASSIGNED
+ROLE_GRANTED
 
 ROLE_REVOKED
 
@@ -725,15 +605,7 @@ Dieses RFC legt fest:
 
 ✅ Household Modell
 
-✅ Primary Owner
-
-✅ Guardian Rolle
-
-✅ Caregiver Rolle
-
-✅ Proxy Rolle
-
-✅ Emergency Contact
+✅ Rollen gemäß RFC-0003
 
 ✅ Ressourcenbasierte Freigaben
 

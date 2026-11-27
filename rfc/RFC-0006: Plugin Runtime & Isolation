@@ -71,6 +71,10 @@ WASM First
 
 als primäre Plugin Runtime.
 
+Kann die erforderliche Isolation auf einer Plattform nicht durchgesetzt
+werden, wird das Plugin dort nicht ausgeführt. Eine nicht isolierte
+Ausführung als Fallback ist ausgeschlossen.
+
 ---
 
 ## Begründung
@@ -164,6 +168,9 @@ UI
 
 Application
 ```
+
+Eine Application ist ein spezialisierter Plugin-Typ mit UI, Navigation,
+Workflows und Settings, der die gemeinsamen Plattformdienste nutzt.
 
 ---
 
@@ -578,8 +585,11 @@ Self Signed
 ## Verified
 
 ```text
-Maintainer Review
+Maintainer Sign-Off
 ```
+
+Das Sign-Off bestätigt die Maintainer-Freigabe; das genaue Signatur- und
+Prüfverfahren bleibt zu spezifizieren.
 
 ---
 
