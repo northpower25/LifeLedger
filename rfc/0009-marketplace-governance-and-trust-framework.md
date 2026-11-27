@@ -646,8 +646,9 @@ Verified-Listings werden mindestens alle zwölf Monate sowie bei jeder
 Änderung an Capabilities, Datenflüssen, Abhängigkeiten, Build-Prozess oder
 Signaturschlüssel rezertifiziert. Ein Minor-/Major-Release erhält erst nach
 erneuter Prüfung den Verified-Status. Auch ein Patch verändert im Allgemeinen
-den Digest: Sein neues Artefakt benötigt einen neu berechneten Digest, einen
-reproduzierbaren Vergleich mit dem geprüften Build und eine neue Signatur.
+den Digest: Jede Paketänderung, auch ein Patch, benötigt einen neu
+berechneten Digest und eine neue Signatur. Das neue Artefakt benötigt außerdem
+einen reproduzierbaren Vergleich mit dem geprüften Build.
 Eine automatische Übernahme als Verified ist bis zur Entscheidung über den
 Reviewprozess nicht freigegeben. Bei ausbleibender Rezertifizierung
 wird das Listing auf Community herabgestuft und klar gekennzeichnet.

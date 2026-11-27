@@ -119,11 +119,14 @@ Der erste wertvolle Durchstich besteht aus:
 3. Erfassung einer Medikation
 4. Anzeige in einer gemeinsamen Timeline
 5. Lokale verschlüsselte Speicherung
-6. Lokales Backup und Wiederherstellung
+6. Lokales Backup; Wiederherstellung als Abnahmekriterium noch bestätigen
 
-Der erste vertikale Durchstich umfasst Desktop, lokale Datenhaltung, ein
-Dokument, einen Datentyp und ein Backup. Bis zum Freigabe-Gate gemäß Stufe 6
-werden ausschließlich synthetische Daten verwendet.
+Der erste Windows-Offline-Durchstich umfasst `Patient`, `DocumentReference`
+und `MedicationStatement`, Dokumentimport, Timeline und lokales Backup.
+`Observation`, Integrationen, externe Plugins, AI und Synchronisierung gehören
+nicht dazu. Bis zum Freigabe-Gate gemäß Stufe 6 werden ausschließlich
+synthetische Daten verwendet. Die erfolgreiche Wiederherstellung bleibt ein
+vorgeschlagenes, noch zu bestätigendes Abnahmekriterium.
 
 Die persönliche Gesundheitsakte dient als erste Referenzanwendung der Plattform.
 

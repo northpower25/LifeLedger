@@ -41,6 +41,7 @@ consent
 household
 fhir
 import
+backup
 sync
 plugin
 security
@@ -82,8 +83,9 @@ JSON-Schema, Producer, berechtigte Consumer und Retentionzweck zu.
 Vor Nutzung sind maschinenlesbare JSON-Schemas mit festgelegtem Dialekt,
 Formatprüfung und synthetischen Positiv-/Negativfixtures unter
 `specifications/` zu veröffentlichen. Die obige Illustration ist kein Schema;
-das konkrete ID-Format, Pflicht-Korrelationsfelder und die Eventtypen des
-Slices sind noch zu beschließen.
+das konkrete ID-Format und Pflicht-Korrelationsfelder sind noch zu beschließen.
+Die sechs Slice-Eventtypen sind in RFC-0005 benannt, ihre ausführbaren Schemas
+und Producer-/Consumer-Verträge fehlen.
 
 ## Compatibility Rules
 

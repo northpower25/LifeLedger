@@ -22,7 +22,8 @@ Sicherheitsinvarianten erhalten bleiben.
 - Gesundheitsdatenzugriff ausschließlich über VitaFabric
 - Erweiterbarkeit ohne Ersetzen oder Umgehen sicherheitskritischer Dienste
 - Klare Abgrenzung optionaler AI-Funktionen
-- Einheitliche Definition einer Application als spezialisierter Plugin-Typ
+- Erweiterbare Applications als spezialisierte Plugin-Typen; integrierter
+  Health Record im ersten Slice gemäß vorgeschlagenem ADR-0003
 
 ### Nichtziele
 
@@ -45,6 +46,11 @@ Plattformdienste bereit:
 - Plugin Host und technisch erzwungene Isolation
 - Secret- und Schlüsselzugriffsgrenzen
 - Plattform-API, Settings und Lifecycle-Verwaltung
+
+Der Plugin Host ist für den ersten Slice ohne Plugin-Ausführung gemäß
+ADR-0003 nicht erforderlich; sobald Plugins unterstützt werden, sind Host
+und Isolation zwingend. Alle übrigen relevanten Pflichtkontrollen bleiben
+auch im Slice verpflichtend.
 
 Diese Dienste dürfen intern aufgeteilt oder durch kompatible Implementierungen
 ersetzt werden. Sie dürfen weder durch Plugins überschrieben noch deaktiviert,
@@ -77,7 +83,10 @@ VitaFabric-Zugriffskontrolle selbst sind keine Plugins.
 
 ### Applications und Plugins
 
-Eine Application ist ein spezialisierter Plugin-Typ. Sie darf UI, Navigation,
+Erweiterbare Applications sind spezialisierte Plugin-Typen. Der erste Health
+Record wird gemäß [ADR-0003](../adr/0003-first-slice-application-boundary.md)
+als integrierter Anwendungsteil statt als Plugin vorgeschlagen; diese Ausnahme
+ändert keine Pflichtkontrollen. Eine Application darf UI, Navigation,
 Workflows und eigene nicht-gesundheitsbezogene Einstellungen bereitstellen,
 aber keine eigene Identität, Consent Engine, Sicherheitsrichtlinie,
 Gesundheitsdatenbank oder Audit-Autorität besitzen.
@@ -158,7 +167,8 @@ Audit-Eintrag erzeugt.
   und Derived Data.
 - LifeWeaver ist optional und bleibt an VitaFabric sowie Consent und
   Capabilities gebunden.
-- Applications sind spezialisierte Plugins; Storage-Backends, Connectoren,
+- Erweiterbare Applications sind spezialisierte Plugins; der erste integrierte
+  Health Record ist die in ADR-0003 vorgeschlagene Ausnahme. Storage-Backends, Connectoren,
   Integrationen und Provider sind kontrollierte Erweiterungspunkte.
 - Keine Signatur, Listing-Stufe oder Administratorrolle hebt diese Grenzen auf.
 

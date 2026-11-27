@@ -32,6 +32,28 @@ integration, FHIR mapping, provenance and storage abstraction; LifeWeaver owns
 AI, agents and MCP. All health data passes through VitaFabric and all access
 respects consent. The platform framing does not transfer these responsibilities.
 
+## Approved First Vertical Slice
+
+The project owner's [backlog](../docs/review/LifeLedger%20RFC%20Backlog.md)
+sets the first slice's product scope and technology direction: Health Power
+User, Windows desktop, Tauri with a local FastAPI backend, SQLite, and FHIR R4
+`Patient`, `MedicationStatement` and `DocumentReference`. The journey includes
+document import, patient and medication creation, timeline and backup. Use
+only synthetic data, including documents, logs, fixtures and backups.
+Integrations, external plugins, AI and synchronization are out of scope.
+`Observation` is not part of this slice. Backup restore remains a proposed
+acceptance requirement, pending confirmation. This scope decision is not
+acceptance of this draft RFC or security clearance to implement or release.
+
+## Platform Ownership
+
+The intended accountable teams are Platform Core → Core Maintainer Team,
+VitaFabric → Data Team, LifeWeaver → AI Team and Marketplace → Governance
+Team. These are role assignments, not evidence that teams exist or that
+individual decision-makers, security reviewers or approvers have been named.
+
+## Proposal details
+
 Design a shared runtime, security framework and **Identity & Consent** layer.
 The proposed layer covers users, family members, delegates, grants, roles,
 emergency access, plugin permissions, AI permissions and sync permissions.
@@ -110,8 +132,8 @@ data before the existing release gate.
 
 - How will the first reference application's defined journey and client
   architecture be implemented securely? See draft RFC-0002 and RFC-0007.
-- Who owns and enforces the shared runtime, security, Identity & Consent,
-  plugin-host and trust-boundary contracts?
+- Which named people or established teams enforce the proposed ownership,
+  review security and approve RFCs and implementation?
 - How are consent, identity, roles and revocation applied across applications
   and devices, including data already exported or synchronized?
 - How are keys recovered without disclosing them to a sync service, and what

@@ -118,10 +118,8 @@ DocumentReference
 Das MVP beschränkt kanonische FHIR-R4-Ressourcen auf `Patient`, `Observation`,
 `Condition`, `MedicationStatement`, `AllergyIntolerance` und
 `DocumentReference`; weitere Ressourcentypen sind nicht Teil dieses MVP.
-Der erste Durchstich verwendet davon `Patient`, `Observation` und
-`DocumentReference` als vorgeschlagene Teilmenge. Eine vollständige erste
-Nutzerreise mit Medikation benötigt zusätzlich `MedicationStatement` und ist
-nicht automatisch Teil dieses kleineren Durchstichs. Das Dokumentoriginal
+Der erste Durchstich verwendet davon `Patient`, `MedicationStatement` und
+`DocumentReference`; `Observation` gehört nicht zu diesem Slice. Das Dokumentoriginal
 bleibt separat geschützt und über die `DocumentReference` referenziert.
 Provenienz ist verpflichtende VitaFabric-Metadaten und erfordert im MVP keine
 zusätzliche FHIR-`Provenance`-Ressource. RFC-0015 beschreibt die noch zu

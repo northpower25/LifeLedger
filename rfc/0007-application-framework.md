@@ -127,9 +127,10 @@ Alle Gesundheitsdaten laufen über VitaFabric.
 
 ## 4. Definition einer Application
 
-Eine Application ist ein spezialisierter Plugin-Typ mit UI, Navigation,
-Workflows und Settings, der die gemeinsamen Plattformdienste nutzt.
-Ihre deklarierten Capabilities unterliegen den Plattformprüfungen.
+Erweiterbare Applications sind als spezialisierte Plugin-Typen mit UI,
+Navigation, Workflows und Settings vorgesehen. Der integrierte Health Record
+des ersten Slice ist die in [ADR-0003](../adr/0003-first-slice-application-boundary.md)
+vorgeschlagene Ausnahme. In beiden Fällen gelten die Plattformprüfungen.
 
 ---
 
@@ -228,11 +229,38 @@ Datenbank
 Health Record
 ```
 
-Erste Nutzerreise: Arztbrief importieren, Medikation erfassen, die Timeline
-anzeigen und ein Backup erstellen. Der erste vertikale Durchstich umfasst
-Desktop, lokale Datenhaltung, ein Dokument, einen Datentyp und ein Backup.
-Bis zur Sicherheitsfreigabe werden dafür ausschließlich synthetische Daten
-verwendet.
+## Health Record Execution Model
+
+Der erste Health Record ist ein integrierter Anwendungsteil der lokalen
+Distribution, kein externes oder isoliert auszuführendes Plugin. „Im Kern“
+bezeichnet hier die gemeinsame Distribution, nicht die Verlagerung von
+Produktlogik in den Platform Core. Zugriffe gehen weiterhin über Identity,
+Consent, Capability, Policy und VitaFabric. Ein späterer Plugin-Pfad benötigt
+eigene Verträge und Review; siehe ADR-0003.
+
+## First User Journey
+
+Dokument importieren → Patient anlegen → Medikation anlegen → Timeline
+anzeigen → Backup erstellen. Ein vor dem Patienten ausgewähltes Dokument
+muss bis zur gültigen Zuordnung sicher behandelt werden; Art der temporären
+Ablage und Abbruchverhalten sind noch offen. Alle Daten sind synthetisch.
+Die Ressourcen sind `Patient`, `DocumentReference` und
+`MedicationStatement`, nicht `Observation`. Details zu Dokumentformat,
+Größe und Timeline-Sortierung stehen noch aus.
+
+## Backup Scope
+
+Das lokale Backup muss für die Wiederherstellung des Slice konsistent
+Patient, MedicationStatement, DocumentReference, Dokumentoriginale,
+Provenienz sowie die zur Wiederherstellung benötigten Identity-, Consent-,
+Capability-, Audit- und Schema-/Versionsinformationen berücksichtigen.
+Es ist verschlüsselt und darf keine Klartextschlüssel oder Credentials
+enthalten. Backup und Restore unterliegen eigenen Zugriffsprüfungen; Wieder-
+herstellung darf Widerrufe oder Löschungen nicht stillschweigend rückgängig
+machen. Schlüssel-/Recovery-Verfahren, genaue Inhalte, atomare Konsistenz,
+Aufbewahrung und Umgang mit einem älteren Stand sind noch festzulegen.
+Ein erfolgreicher Restore ist vorgeschlagen, aber noch nicht als Abnahme
+bestätigt.
 
 ---
 

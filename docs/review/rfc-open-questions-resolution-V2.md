@@ -820,6 +820,14 @@ Compliance Tests
 
 # Definition of Done
 
+Historischer Arbeitsauftrag: Der spätere
+[Backlog](LifeLedger%20RFC%20Backlog.md) legt als Slice `Patient`,
+`MedicationStatement` und `DocumentReference` statt der unten genannten
+Observation-Teilmenge fest. Die untenstehenden ursprünglichen Gate-Anforderungen
+bleiben dokumentiert; ob der Backlog deren strengere Vollständigkeits- und
+Akzeptanzanforderungen ersetzt, ist nicht ausdrücklich entschieden. Aktueller
+Abgleich: [offene Informationen](offene-informationen-erste-testversion.md).
+
 Die erste Implementierungsphase darf beginnen wenn:
 
 ✅ RFC-0014 akzeptiert
