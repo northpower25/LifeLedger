@@ -180,6 +180,35 @@ Zugriff verweigert
 
 ---
 
+## Capability Evaluation Flow
+
+Für jeden geschützten Zugriff: authentisierte Identity und aktive Sitzung →
+gültiger Consent für Profil, Zweck, Ressource und Operation → aktive,
+passende Capability → weitere Policy einschließlich Rollen, Gerätestatus und
+Risikogrenzen → Zugriff über die zuständige Ressourcengrenze. Eine Capability
+ersetzt keine Einwilligung; eine Rolle ersetzt keine Capability. Fehlende,
+abgelaufene, unbekannte oder nicht prüfbare Angaben führen zu Deny und
+datensparsamem Audit, soweit der Auditdienst verfügbar ist. Auch bei internen
+Aufrufen wird am Datenzugriff erneut geprüft; Auditausfall verhindert den
+geschützten Vorgang und wird als solcher gemeldet, nicht als protokollierter
+Erfolg ausgegeben.
+
+Für den ersten Owner-Pfad sind insbesondere Lesen/Schreiben der gewählten
+FHIR-Typen und Dokumentoriginale sowie Backup/Restore separat zuzuordnen.
+Ein vollständiger maschinenlesbarer Katalog samt Policy-Matrix ist noch nicht
+vorhanden. Widerruf wirkt synchron am Zugriffspunkt, nicht erst nach
+Event-Zustellung; bereits übermittelte Kopien bleiben außerhalb der Kontrolle.
+
+## Capability Lifecycle
+
+`Requested` → `Approved` → `Active` → `Revoked` oder `Expired`.
+`Requested` und `Approved` gewähren keinen Zugriff; Aktivierung setzt eine
+gültige explizite Freigabe und unveränderten Scope voraus. Ablehnung beendet
+den Antrag ohne Grant. Widerruf kann auch vor Aktivierung erfolgen; `Revoked`
+und `Expired` sind terminal. Erneuerung bzw. Scope-Erweiterung benötigt einen
+neuen Antrag und eine neue Freigabe. Jede Transition ist versioniert und
+auditiert; der Host überprüft Gültigkeit und Consent bei jedem Zugriff.
+
 ## 5. Capability Ebenen
 
 Die Plattform verwendet vier Capability-Ebenen.

@@ -388,6 +388,42 @@ Rate Limits
 
 ---
 
+## WIT Interface Catalog
+
+Die folgenden versionierten Host-Imports sind Vertragsbereiche, noch keine
+veröffentlichten WIT-Dateien. RFC-0019 beschreibt Paket und Vertragsarbeit;
+WASI vermittelt ohne explizite Freigabe weder Datei- noch Netzwerkzugriff.
+
+| Interface | Zugang und Grenze |
+| --- | --- |
+| Filesystem | Host-vermittelter, pluginisolierter Speicher; kein Pfad zum Host-Dateisystem oder Gesundheitsdatenstore. |
+| Event | Registrierte Typen publizieren/abonnieren; Reautorisierung und minimale Payload. |
+| Identity | Nur für den Aufruf erforderliche opake Identitätskontexte, keine Credentials. |
+| Consent | Freigabestatus im eigenen Scope abfragen; keine Freigabe selbst ausstellen. |
+| VitaFabric | Autorisierte FHIR-Operationen über das Gateway, kein direkter Storage. |
+| Secret | Opake Handles und hostvermittelte Nutzung; keine Schlüssel oder Passwörter auslesen. |
+| Network | Hostproxy mit expliziter Ziel- und Methodenfreigabe; kein direkter Socket. |
+
+Die konkreten Signaturen, Datenformate, Fehler, Versionskompatibilität und
+Ausführungsgrenzen sind vor Plugin-Implementierung als WIT zu veröffentlichen.
+
+## Runtime Resource Limits
+
+Jede Instanz erhält durch den Host durchgesetzte Obergrenzen für RAM,
+CPU/Fuel, Wandzeit pro Aufruf, verschlüsselten Disk-Verbrauch, Netzwerkziele
+und -Bytes sowie gleichzeitige Events und Queue-Größe. Keine Ressource ist
+implizit unbegrenzt. Überschreitung beendet oder unterbricht den Aufruf,
+verhindert einen Teil-Commit, erzeugt einen datensparsamen Fehler und
+isoliert das Plugin; Limits dürfen nicht umgangen werden. Netzwerkproxy
+validiert auch DNS-Auflösung und jeden Redirect; private/lokale Ziele sind
+ohne gesonderte Freigabe gesperrt.
+
+Numerische Budgets, Betriebssystem-Durchsetzung und Abbruchsemantik sind für
+die jeweilige Zielplattform zu messen und vor Freigabe zu beschließen.
+Insbesondere sind Fuel und Timeout kein Nachweis einer vollständigen
+CPU-Isolation. Zu niedrige Limits können legitime Imports abbrechen; zu hohe
+beeinträchtigen Reaktionszeit und Speicher anderer Anwendungen.
+
 ## 11. Netzwerkmodell
 
 ### Standard

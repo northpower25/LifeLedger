@@ -654,7 +654,7 @@ Audit speichern:
 ```text
 Provider
 
-Prompt
+Prompt-Metadaten ohne Inhalt
 
 Datenmenge
 
@@ -666,6 +666,7 @@ Antwortstatus
 ---
 
 Keine Speicherung von Geheimnissen.
+Gesundheitsdaten, Prompt- und Antworttexte gehören nicht ins Audit.
 
 ---
 
@@ -805,6 +806,41 @@ Zulassungsbehauptung dar. Diagnose, Therapieempfehlung und medizinische
 Entscheidungen bleiben gemäß §2 und §30 ausgeschlossen.
 
 ---
+
+## Prompt Retention Policy
+
+Standardmäßig werden weder Prompts noch Antworten dauerhaft gespeichert;
+das Audit enthält nur datensparsame Metadaten wie Provider, Zweck, Zeitpunkt,
+Umfang und Ergebnis. Ein optionales Prompt-Protokoll setzt gesonderte,
+widerrufbare Einwilligung, Zweck und eine vorab festgelegte Frist voraus,
+liegt verschlüsselt und zugriffsgeschützt außerhalb des Audits und wird
+bei Widerruf oder Fristablauf gelöscht. Logs, Crash-Dumps und Diagnose dürfen
+keine Promptinhalte oder Secrets enthalten. Löschungen in externen Providern
+oder bereits exportierten Kopien können lokal nicht garantiert werden.
+Fristen und Provider-Verträge sind vor Aktivierung zu beschließen.
+
+## Embedding Retention Policy
+
+Erstellung nur mit gültigem Consent und Capability aus einer autorisierten
+VitaFabric-Quelle; Modell-, Quell- und Indexversion sind nachverfolgbar.
+Rebuild prüft diese Rechte erneut. Sperrung, Purge, 24-Stunden- und
+30-Tage-Vorschläge sowie Restore-Regeln folgen §16. Die Frist beginnt mit
+dem registrierten Widerruf/Löschauftrag auf dem jeweiligen erreichbaren
+System; offline Stores bleiben als ausstehend sichtbar und müssen vor
+erneuter Verarbeitung zuerst Löschaufträge anwenden. Externe Kopien sind
+nicht technisch rückholbar. Verschlüsselung, Schlüsselvernichtung und
+Auditnachweise sind vor Produktfreigabe technisch nachzuweisen.
+
+## Local AI Requirements
+
+Für lokale Modelle sind vor Freigabe Mindest- und Zielwerte für RAM,
+CPU/Instruktionssatz, optionalen GPU-Speicher und Treiber sowie freien
+verschlüsselten Modell-/Indexspeicher pro Modell und Gerät zu veröffentlichen.
+Keine GPU und keine Cloud sind implizite Voraussetzungen; ein Modell, das
+nicht in verfügbare Ressourcen passt, wird nicht gestartet. Timeouts,
+Speichergrenzen und explizite Nutzerrückmeldung verhindern stilles Remote-
+Fallback. Konkrete Werte hängen vom noch nicht gewählten Modell und den
+Zielgeräten ab und sind zu messen, nicht aus diesem RFC abzuleiten.
 
 ## 32. Architekturentscheidung
 
