@@ -1,8 +1,8 @@
-# RFC-0009: Marketplace Governance & Trust Framework
+# RFC 0009: Marketplace Governance & Trust Framework
 
-Status: Draft  
-Type: Governance RFC  
-Owner: Platform Governance  
+- Status: Draft
+- Type: Governance RFC
+- Owner: Platform Governance
 Depends On: RFC-0003 Identity & Consent Framework  
 Depends On: RFC-0004 Capability & Permission Model  
 Depends On: RFC-0006 Plugin Runtime & Isolation  
@@ -16,7 +16,7 @@ Blocks:
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 Dieses RFC definiert Governance, Vertrauensmodell, Veröffentlichung, Review, Sperrung und Betrieb des LifeLedger Marketplace.
 
@@ -52,9 +52,9 @@ Plugin Isolation
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 ```text
 Offenes Ökosystem
@@ -72,7 +72,7 @@ Betriebsfähigkeit
 
 ---
 
-## Nichtziele
+### Nichtziele
 
 ```text
 App Store Monopol
@@ -88,9 +88,9 @@ Sicherheitszertifizierung
 
 ---
 
-# 3. Grundprinzipien
+## 3. Grundprinzipien
 
-## Local First
+### Local First
 
 Plugins müssen lokal installierbar bleiben.
 
@@ -98,7 +98,7 @@ Ein Marketplace darf niemals Voraussetzung sein.
 
 ---
 
-## Security Through Architecture
+### Security Through Architecture
 
 Sicherheit entsteht durch:
 
@@ -116,13 +116,13 @@ Nicht durch Marketplace-Badges.
 
 ---
 
-## Transparenz
+### Transparenz
 
 Alle Prüfungen müssen nachvollziehbar sein.
 
 ---
 
-# 4. Marketplace Architektur
+## 4. Marketplace Architektur
 
 ```text
 Developer
@@ -150,9 +150,9 @@ Local Runtime
 
 ---
 
-# 5. Erweiterungstypen
+## 5. Erweiterungstypen
 
-Der Marketplace unterstützt alle Plattformtypen. 【1-9e6141】
+Der Marketplace unterstützt alle Plattformtypen.
 
 ```text
 Connector
@@ -170,7 +170,7 @@ Application
 
 ---
 
-# 6. Listing Kategorien
+## 6. Listing Kategorien
 
 Es existieren drei Kategorien.
 
@@ -180,13 +180,13 @@ Isolation und Capability- sowie Consent-Prüfungen gelten für alle Stufen.
 
 ---
 
-# 7. Community
+## 7. Community
 
 Niedrigste Vertrauensebene.
 
 ---
 
-## Anforderungen
+### Anforderungen
 
 ```text
 Manifest
@@ -200,13 +200,13 @@ Beschreibung
 
 ---
 
-## Prüfung
+### Prüfung
 
 Keine inhaltliche Prüfung.
 
 ---
 
-## Vertrauensniveau
+### Vertrauensniveau
 
 ```text
 Niedrig
@@ -214,13 +214,13 @@ Niedrig
 
 ---
 
-# 8. Verified
+## 8. Verified
 
 Mittlere Vertrauensebene.
 
 ---
 
-## Anforderungen
+### Anforderungen
 
 ```text
 Review
@@ -236,13 +236,29 @@ Dokumentation vorhanden
 
 ---
 
-## Prüfung
+### Prüfung und Sign-Off
 
-Mindestens ein Maintainer.
+Vor der Einstufung als Verified prüfen **mindestens zwei voneinander
+unabhängige Reviewer** Manifest, Quell- und Build-Provenienz,
+Capabilities/Datenflüsse, Dokumentation, Lizenz, Kompatibilität und die
+veröffentlichten Tests. Mindestens ein Reviewer muss für Security oder
+Plattform-Review zuständig sein. Autor, Paket-Publisher und direkte
+Interessenkonflikte schließen eine Person als Reviewer für dieses Listing
+aus.
+
+Beide Reviewer geben ein dokumentiertes Sign-Off mit geprüfter Version,
+Paket-Digest, Prüfumfang, offenen Einschränkungen und Datum. Eine Ablehnung
+enthält konkrete Gründe und erforderliche Abhilfen; das Listing bleibt
+Community oder wird nicht gelistet. Der Publisher kann Einspruch einlegen,
+der von anderen Reviewern entschieden wird. Keine Antwort gilt nicht als
+Freigabe.
+
+Die Marketplace-Review verleiht keine Sicherheitszertifizierung und ersetzt
+weder Capability-/Consent-Enforcement noch unabhängige Laufzeitisolation.
 
 ---
 
-## Vertrauensniveau
+### Vertrauensniveau
 
 ```text
 Mittel
@@ -250,13 +266,13 @@ Mittel
 
 ---
 
-# 9. Official
+## 9. Official
 
 Höchste Vertrauensebene.
 
 ---
 
-## Anforderungen
+### Anforderungen
 
 ```text
 Maintained by Project
@@ -265,18 +281,24 @@ Automatische Tests
 
 Dokumentation
 
-Security Review
+Security Review durch mindestens zwei unabhängige Reviewer
+
+Review von Capabilities, Datenflüssen und Abhängigkeiten
 ```
+
+Offizielle Erweiterungen müssen dieselben Signatur-, Digest- und
+Schlüsselwiderrufsregeln wie Verified-Pakete erfüllen. Der Official-Status
+beschreibt Projektverantwortung und Reviewumfang, keine Sicherheitsgarantie.
 
 ---
 
-## Signatur
+### Signatur
 
 Projekt-Schlüssel.
 
 ---
 
-## Vertrauensniveau
+### Vertrauensniveau
 
 ```text
 Hoch
@@ -284,7 +306,7 @@ Hoch
 
 ---
 
-# 10. Kein Sicherheitszertifikat
+## 10. Kein Sicherheitszertifikat
 
 Wichtige Regel:
 
@@ -318,7 +340,7 @@ Unsicher
 
 ---
 
-# 11. Manifest Anforderungen
+## 11. Manifest Anforderungen
 
 Pflichtfelder:
 
@@ -340,7 +362,7 @@ Support URL
 
 ---
 
-# 12. Provenienz
+## 12. Provenienz
 
 Jede Erweiterung besitzt:
 
@@ -356,9 +378,9 @@ Release Historie
 
 ---
 
-# 13. Paketverteilung
+## 13. Paketverteilung
 
-## Unterstützt
+### Unterstützt
 
 ```text
 Marketplace
@@ -370,7 +392,7 @@ Direktinstallation
 
 ---
 
-## Nicht unterstützt
+### Nicht unterstützt
 
 ```text
 Pflichtregistrierung
@@ -380,9 +402,9 @@ Cloud Konto Pflicht
 
 ---
 
-# 14. Signaturmodell
+## 14. Signaturmodell
 
-## Community
+### Community
 
 ```text
 Self Signed
@@ -390,17 +412,25 @@ Self Signed
 
 ---
 
-## Verified
+### Verified
 
 ```text
-Maintainer Sign-Off
+Zwei unabhängige Reviewer
 ```
 
-Das konkrete Signatur- und Prüfverfahren für Verified bleibt zu spezifizieren.
+Der Signaturworkflow ist: Paket bauen, Digest des finalen Artefakts
+berechnen, Digest und Prüfergebnisse von zwei unabhängigen Reviewern
+freigeben lassen und erst danach den Digest mit dem geschützten
+Marketplace-Signaturschlüssel signieren. Signaturen binden exakt an Paket,
+Version und Digest; Änderungen nach Freigabe erfordern eine neue Prüfung.
+Private Signaturschlüssel sind zugriffsbeschränkt, offline oder in einem
+Hardware-Sicherheitsmodul verwahrt und mit dokumentiertem Rotations- und
+Widerrufsverfahren zu betreiben. Ein Signaturstatus beweist Herkunft und
+Integrität, nicht Harmlosigkeit.
 
 ---
 
-## Official
+### Official
 
 ```text
 Project Signed
@@ -408,17 +438,17 @@ Project Signed
 
 ---
 
-# 15. Review Prozess
+## 15. Review Prozess
 
-## Community
+### Community
 
 Automatische Prüfung.
 
 ---
 
-## Verified
+### Verified
 
-Manuelle Prüfung.
+Manuelle Prüfung gemäß §8 mit zwei unabhängigen Reviewern.
 
 ---
 
@@ -436,7 +466,7 @@ Build
 
 ---
 
-## Official
+### Official
 
 Zusätzliche Prüfungen:
 
@@ -450,13 +480,13 @@ Regression Tests
 
 ---
 
-# 16. Delisting
+## 16. Delisting
 
 Marketplace Einträge können entfernt werden.
 
 ---
 
-## Gründe
+### Gründe
 
 ```text
 Malware
@@ -472,7 +502,7 @@ Schwere Sicherheitsmängel
 
 ---
 
-# 17. Soft Delisting
+## 17. Soft Delisting
 
 Eintrag bleibt sichtbar.
 
@@ -486,7 +516,7 @@ Deprecated
 
 ---
 
-## Gründe
+### Gründe
 
 ```text
 Keine Wartung
@@ -498,13 +528,13 @@ Inkompatibilität
 
 ---
 
-# 18. Hard Delisting
+## 18. Hard Delisting
 
 Eintrag wird entfernt.
 
 ---
 
-## Gründe
+### Gründe
 
 ```text
 Malware
@@ -516,7 +546,7 @@ Missbrauch
 
 ---
 
-# 19. Appeals
+## 19. Appeals
 
 Entwickler dürfen Einspruch einlegen.
 
@@ -538,13 +568,13 @@ Maintainer Entscheidung
 
 ---
 
-# 20. Incident Management
+## 20. Incident Management
 
 Marketplace benötigt Security Workflow.
 
 ---
 
-## Meldung
+### Meldung
 
 ```text
 Security Report
@@ -552,7 +582,7 @@ Security Report
 
 ---
 
-## Bewertung
+### Bewertung
 
 ```text
 Triaging
@@ -560,7 +590,7 @@ Triaging
 
 ---
 
-## Maßnahmen
+### Maßnahmen
 
 ```text
 Warnung
@@ -572,7 +602,7 @@ Signaturwiderruf
 
 ---
 
-# 21. Signaturwiderruf
+## 21. Signaturwiderruf
 
 Projekt muss kompromittierte Pakete sperren können.
 
@@ -586,7 +616,7 @@ Revoked Signature List
 
 ---
 
-# 22. Kompatibilität
+## 22. Kompatibilität
 
 Jedes Listing enthält:
 
@@ -600,7 +630,7 @@ Kompatibilitätsstatus
 
 ---
 
-# 23. Updates
+## 23. Updates
 
 Pflicht:
 
@@ -612,9 +642,17 @@ Changelog
 Kompatibilitätsprüfung
 ```
 
+Verified-Listings werden mindestens alle zwölf Monate sowie bei jeder
+Änderung an Capabilities, Datenflüssen, Abhängigkeiten, Build-Prozess oder
+Signaturschlüssel rezertifiziert. Ein Minor-/Major-Release erhält erst nach
+erneuter Prüfung den Verified-Status; reine Patch-Releases dürfen nur dann
+automatisiert übernommen werden, wenn der verifizierte Build-Prozess und
+Digestvergleich unverändert bleiben. Bei ausbleibender Rezertifizierung
+wird das Listing auf Community herabgestuft und klar gekennzeichnet.
+
 ---
 
-# 24. Bewertungen
+## 24. Bewertungen
 
 Optional.
 
@@ -642,9 +680,9 @@ Sicherheitsversprechen
 
 ---
 
-# 25. Governance
+## 25. Governance
 
-## Verantwortlich
+### Verantwortlich
 
 ```text
 Marketplace Maintainer Team
@@ -666,7 +704,7 @@ Delisting
 
 ---
 
-# 26. Community Governance
+## 26. Community Governance
 
 Community kann Vorschläge einbringen.
 
@@ -686,7 +724,7 @@ Proposal
 
 ---
 
-# 27. Lizenzanforderungen
+## 27. Lizenzanforderungen
 
 Pflicht:
 
@@ -716,7 +754,7 @@ Kein Listing
 
 ---
 
-# 28. Dokumentation
+## 28. Dokumentation
 
 Jedes Listing benötigt:
 
@@ -734,7 +772,7 @@ Support Informationen
 
 ---
 
-# 29. Accessibility
+## 29. Accessibility
 
 Marketplace Informationen müssen unterstützen:
 
@@ -748,7 +786,7 @@ Mehrsprachigkeit
 
 ---
 
-# 30. Audit Anforderungen
+## 30. Audit Anforderungen
 
 Marketplace Aktionen protokollieren:
 
@@ -766,7 +804,7 @@ Review
 
 ---
 
-# 31. Offline Strategie
+## 31. Offline Strategie
 
 Pflicht:
 
@@ -778,11 +816,11 @@ Marketplace unabhängiger Betrieb
 
 ---
 
-Marketplace muss vollständig optional bleiben. 【1-9e6141】【2-02c4fe】
+Marketplace muss vollständig optional bleiben.
 
 ---
 
-# 32. Nachhaltigkeit
+## 32. Nachhaltigkeit
 
 Langfristig benötigt der Marketplace:
 
@@ -796,11 +834,11 @@ Security Reviews
 Moderation
 ```
 
-Diese Kosten müssen transparent finanziert werden. Die Betriebs- und Nachhaltigkeitsfragen werden auch in der Bestandsaufnahme als offene Governance-Themen beschrieben. 【3-36f3a1】
+Diese Kosten müssen transparent finanziert werden. Die Betriebs- und Nachhaltigkeitsfragen werden auch in der Bestandsaufnahme als offene Governance-Themen beschrieben.
 
 ---
 
-# 33. Architekturentscheidung
+## 33. Architekturentscheidung
 
 Dieses RFC legt fest:
 

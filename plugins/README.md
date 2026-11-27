@@ -2,7 +2,7 @@
 
 The platform vision proposes a secure extension ecosystem for applications,
 integrations and optional AI capabilities. Draft
-[RFC-0002](../rfc/RFC-0002%20Platform%20Core%20Architecture) proposes a
+[RFC-0002](../rfc/0002-platform-core-architecture.md) proposes a
 WASM-first plugin runtime (with a possible later Python connector runtime),
 but no plugin API, runtime, marketplace, or security boundary is implemented
 or accepted yet.

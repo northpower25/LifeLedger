@@ -1,8 +1,8 @@
-# RFC-0007: Application Framework
+# RFC 0007: Application Framework
 
-Status: Draft  
-Type: Architecture RFC  
-Owner: LifeLedger Platform  
+- Status: Draft
+- Type: Architecture RFC
+- Owner: LifeLedger Platform
 Depends On: RFC-0002 Platform Core Architecture  
 Depends On: RFC-0003 Identity & Consent Framework  
 Depends On: RFC-0004 Capability & Permission Model  
@@ -17,7 +17,7 @@ Blocks:
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 Dieses RFC definiert das Anwendungsmodell der LifeLedger Plattform.
 
@@ -47,13 +47,13 @@ VitaFabric
 LifeWeaver
 ```
 
-Die Plattform entwickelt sich dadurch vom Einzelprodukt zur erweiterbaren Gesundheitsdatenplattform. Die Notwendigkeit eines eigenständigen Application Frameworks ergibt sich direkt aus der Plattformvision, dem Plugin-Modell und der Trennung zwischen Plattform und Referenzanwendung. 【1-063582】【2-3aa2be】【3-7bfa0a】
+Die Plattform entwickelt sich dadurch vom Einzelprodukt zur erweiterbaren Gesundheitsdatenplattform. Die Notwendigkeit eines eigenständigen Application Frameworks ergibt sich direkt aus der Plattformvision, dem Plugin-Modell und der Trennung zwischen Plattform und Referenzanwendung.
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 ```text
 Anwendungsunabhängigkeit
@@ -73,7 +73,7 @@ Gemeinsame Datenbasis
 
 ---
 
-## Nichtziele
+### Nichtziele
 
 ```text
 Eigene Gesundheitsdatenbanken
@@ -87,9 +87,9 @@ Parallele Consent Modelle
 
 ---
 
-# 3. Grundprinzipien
+## 3. Grundprinzipien
 
-## Plattform First
+### Plattform First
 
 Anwendungen sind Gäste der Plattform.
 
@@ -97,7 +97,7 @@ Nicht umgekehrt.
 
 ---
 
-## Shared Services
+### Shared Services
 
 Gemeinsame Plattformdienste:
 
@@ -119,13 +119,13 @@ VitaFabric
 
 ---
 
-## Data Through VitaFabric
+### Data Through VitaFabric
 
-Alle Gesundheitsdaten laufen über VitaFabric. 【4-f0844a】
+Alle Gesundheitsdaten laufen über VitaFabric.
 
 ---
 
-# 4. Definition einer Application
+## 4. Definition einer Application
 
 Eine Application ist ein spezialisierter Plugin-Typ mit UI, Navigation,
 Workflows und Settings, der die gemeinsamen Plattformdienste nutzt.
@@ -133,7 +133,7 @@ Ihre deklarierten Capabilities unterliegen den Plattformprüfungen.
 
 ---
 
-## Bestandteile
+### Bestandteile
 
 ```text
 UI
@@ -149,7 +149,7 @@ Capabilities
 
 ---
 
-# 5. Was eine Application NICHT besitzt
+## 5. Was eine Application NICHT besitzt
 
 Verboten:
 
@@ -167,7 +167,7 @@ Eigene Benutzerverwaltung
 
 ---
 
-# 6. Application Architektur
+## 6. Application Architektur
 
 ```text
 Application
@@ -182,7 +182,7 @@ Application
 
 ---
 
-# 7. Datenfluss
+## 7. Datenfluss
 
 Verpflichtender Pfad:
 
@@ -220,9 +220,9 @@ Datenbank
 
 ---
 
-# 8. Erste Referenzanwendungen
+## 8. Erste Referenzanwendungen
 
-## Phase 1
+### Phase 1
 
 ```text
 Health Record
@@ -236,7 +236,7 @@ verwendet.
 
 ---
 
-## Phase 2
+### Phase 2
 
 ```text
 Medication Manager
@@ -246,7 +246,7 @@ Emergency Profile
 
 ---
 
-## Phase 3
+### Phase 3
 
 ```text
 Family Health
@@ -256,7 +256,7 @@ Health Dashboard
 
 ---
 
-## Phase 4
+### Phase 4
 
 ```text
 Sleep Tracker
@@ -268,13 +268,13 @@ Fitness Analytics
 
 ---
 
-# 9. Navigation
+## 9. Navigation
 
 Die Plattform stellt globale Navigation bereit.
 
 ---
 
-## Jede App erhält
+### Jede App erhält
 
 ```text
 App Titel
@@ -290,7 +290,7 @@ Settings
 
 ---
 
-## Beispiel
+### Beispiel
 
 ```text
 LifeLedger
@@ -303,7 +303,7 @@ LifeLedger
 
 ---
 
-# 10. Routing
+## 10. Routing
 
 Anwendungen definieren eigene Routen.
 
@@ -323,7 +323,7 @@ Beispiel:
 
 ---
 
-# 11. Capability Modell
+## 11. Capability Modell
 
 Capabilities stammen ausschließlich aus RFC-0004.
 
@@ -348,7 +348,7 @@ Beispiel
 
 ---
 
-# 12. Consent Integration
+## 12. Consent Integration
 
 Anwendungen dürfen Consent nicht direkt prüfen.
 
@@ -364,13 +364,13 @@ Capability
 
 ---
 
-# 13. Event Bus Integration
+## 13. Event Bus Integration
 
-Anwendungen kommunizieren über den Event Bus. 【3-7bfa0a】【4-f0844a】
+Anwendungen kommunizieren über den Event Bus.
 
 ---
 
-## Subscribe
+### Subscribe
 
 ```text
 FHIR_CREATED
@@ -382,7 +382,7 @@ CONSENT_REVOKED
 
 ---
 
-## Publish
+### Publish
 
 ```text
 WORKFLOW_STARTED
@@ -392,7 +392,7 @@ WORKFLOW_COMPLETED
 
 ---
 
-# 14. Application Settings
+## 14. Application Settings
 
 Jede Anwendung besitzt:
 
@@ -420,7 +420,7 @@ FHIR Core Config
 
 ---
 
-# 15. Internationalisierung
+## 15. Internationalisierung
 
 Pflicht:
 
@@ -430,11 +430,11 @@ Deutsch
 Englisch
 ```
 
-wie in den Produktzielen vorgesehen. 【1-063582】【3-7bfa0a】【5-413ba4】
+wie in den Produktzielen vorgesehen.
 
 ---
 
-## Anforderungen
+### Anforderungen
 
 ```text
 i18n Ressourcen
@@ -448,7 +448,7 @@ Lokalisierbare Fehler
 
 ---
 
-# 16. Accessibility
+## 16. Accessibility
 
 Mindestanforderungen:
 
@@ -472,9 +472,9 @@ WCAG 2.2 AA
 
 ---
 
-# 17. Marketplace Integration
+## 17. Marketplace Integration
 
-Anwendungen sind Marketplace-fähig. 【2-3aa2be】【3-7bfa0a】
+Anwendungen sind Marketplace-fähig.
 
 ---
 
@@ -490,9 +490,9 @@ Official
 
 ---
 
-# 18. Application Lifecycle
+## 18. Application Lifecycle
 
-## Installation
+### Installation
 
 ```text
 Manifest prüfen
@@ -504,7 +504,7 @@ Registrieren
 
 ---
 
-## Aktivierung
+### Aktivierung
 
 ```text
 Navigation registrieren
@@ -516,7 +516,7 @@ UI laden
 
 ---
 
-## Update
+### Update
 
 ```text
 Kompatibilität prüfen
@@ -526,7 +526,7 @@ Migration ausführen
 
 ---
 
-## Entfernung
+### Entfernung
 
 ```text
 Routes entfernen
@@ -536,9 +536,51 @@ Subscriptions beenden
 Settings löschen
 ```
 
+### Dependency Management
+
+Eine Application deklariert direkte Abhängigkeiten auf versionierte
+Plattform-APIs und andere Applications. Abhängigkeiten müssen im Manifest
+aufgelistet und gegen einen veröffentlichten Kompatibilitätsbereich geprüft
+werden. Die Installation erzeugt ein Lockfile mit exakten Versionen und
+Paket-Digests; Laufzeitauflösung, transitive Zyklen und stiller Download
+fehlender Abhängigkeiten sind verboten. Optionale Abhängigkeiten müssen
+explizit gekennzeichnet sein und dürfen den sicheren Start ohne das Feature
+nicht verhindern.
+
+### Migration und Upgrade
+
+Jede persistente Application-Einstellung erhält eine Schema-Version.
+Migrationen sind versioniert, deterministisch, idempotent und werden lokal
+vor Aktivierung des neuen Pakets ausgeführt. Vor Migration oder Upgrade wird
+ein wiederherstellbarer Zustand gesichert. Schlägt Vorprüfung, Migration oder
+Health Check fehl, bleiben die alte Version und ihre Daten aktiv; ein
+automatischer Fallback auf eine nicht geprüfte Version ist ausgeschlossen.
+Eine Datenmigration wird erst nach erfolgreicher Validierung atomar
+übernommen. Rollback umfasst Paket, Manifest und Application-eigene
+Einstellungen; Plattformdaten bleiben VitaFabric zugeordnet und werden nicht
+durch App-Migrationen verändert.
+
+### Upgrade-Strategie und Kompatibilitätsmatrix
+
+Ein Upgrade durchläuft: Signatur- und Digest-Prüfung, Abhängigkeits- und
+Kompatibilitätsprüfung, Backup, Migration im isolierten Staging, Health
+Check, atomare Aktivierung. Ohne Netzwerk muss ein bereits bezogenes,
+verifiziertes Paket installierbar und rückrollbar bleiben.
+
+| Schnittstelle | Manifest deklariert | Upgrade-Regel |
+|---|---|---|
+| Application Manifest | Manifest-Schema-Version | Unbekannte Major-Version ablehnen |
+| Platform API | unterstützter API-Bereich | Nur tatsächlich unterstützte Version aktivieren |
+| Plugin ABI/WIT | ABI-Version | Inkompatible ABI erfordert neues Paket |
+| App-Daten | eigene Schema-Version | Migration vor Aktivierung; Rollback muss möglich sein |
+
+Die konkrete API-Unterstützungsmatrix wird pro Plattformrelease veröffentlicht.
+Ein Release darf nur Applications als kompatibel markieren, für die
+Konformitätstests mit dem deklarierten API-Bereich bestanden wurden.
+
 ---
 
-# 19. Versionsmodell
+## 19. Versionsmodell
 
 Jede Anwendung besitzt:
 
@@ -552,7 +594,7 @@ API Compatibility Version
 
 ---
 
-# 20. App Manifest
+## 20. App Manifest
 
 Beispiel:
 
@@ -571,7 +613,7 @@ Beispiel:
 
 ---
 
-# 21. Familienfähigkeit
+## 21. Familienfähigkeit
 
 Anwendungen müssen mehrbenutzerfähig sein.
 
@@ -593,9 +635,9 @@ Proxy
 
 ---
 
-# 22. Health-Twin Integration
+## 22. Health-Twin Integration
 
-Anwendungen dürfen optionale LifeWeaver Funktionen nutzen. 【6-7dee74】
+Anwendungen dürfen optionale LifeWeaver Funktionen nutzen.
 
 ---
 
@@ -611,7 +653,7 @@ Provider Freigabe
 
 ---
 
-# 23. Sicherheitsanforderungen
+## 23. Sicherheitsanforderungen
 
 Pflicht:
 
@@ -629,7 +671,7 @@ Event Bus Integration
 
 ---
 
-# 24. Testanforderungen
+## 24. Testanforderungen
 
 Jede Anwendung benötigt:
 
@@ -647,7 +689,7 @@ Localization Tests
 
 ---
 
-# 25. Architekturentscheidung
+## 25. Architekturentscheidung
 
 Dieses RFC legt fest:
 

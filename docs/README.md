@@ -8,7 +8,7 @@ The proposed **LifeLedger Platform** has a personal health record as its first
 reference application. Its component responsibilities remain distinct:
 **LifeLedger** owns product experiences, **VitaFabric** owns health-data
 integration and FHIR, and **LifeWeaver** owns optional AI, MCP and agents.
-Draft [RFC-0002](../rfc/RFC-0002%20Platform%20Core%20Architecture) proposes a
+Draft [RFC-0002](../rfc/0002-platform-core-architecture.md) proposes a
 shared Core Runtime with identity and consent, security services, an event bus,
 plugin hosting, and capability-based access. It does not assign business
 logic, health models, or AI to the Core Runtime. These capabilities remain

@@ -19,7 +19,7 @@ LifeLedger Platform
 └── Applications — personal health record first, then other apps
 ```
 
-Draft [RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture) proposes
+Draft [RFC-0002](../../rfc/0002-platform-core-architecture.md) proposes
 that the shared Core Runtime provide identity and consent, security services,
 an event bus, a plugin host, a secret store and audit services. It contains no
 business logic, health models or AI. The runtime's service contracts and

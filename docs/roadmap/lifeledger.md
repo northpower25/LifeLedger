@@ -9,7 +9,7 @@ Die persönliche Gesundheitsakte ist als erste Plattform-Referenzanwendung
 vorgesehen; weitere Anwendungen sind erst nach bestätigten Verträgen und
 Nutzerbedarf zu priorisieren. Gemeinsame Identitäts- und Consent-Funktionen
 sollen Nutzer, Familienmitglieder, Vertreter und app-/pluginbezogene
-Freigaben unterstützen. Draft [RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture)
+Freigaben unterstützen. Draft [RFC-0002](../../rfc/0002-platform-core-architecture.md)
 ordnet Identity & Consent dem vorgeschlagenen Core Runtime zu; Richtlinien,
 Verträge und technische Durchsetzung stehen noch zur Review. Die
 Plattformneuausrichtung ist Gegenstand der

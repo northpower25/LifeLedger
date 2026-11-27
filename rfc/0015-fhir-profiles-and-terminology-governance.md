@@ -1,6 +1,7 @@
-# RFC-0015: FHIR Profiles & Terminology Governance
+# RFC 0015: FHIR Profiles & Terminology Governance
 
-Status: Draft
+- Status: Draft
+- Depends On: [RFC-0013 VitaFabric Data Contracts & FHIR Governance](0013-vitafabric-data-contracts-and-fhir-governance.md)
 
 ## Ziel
 

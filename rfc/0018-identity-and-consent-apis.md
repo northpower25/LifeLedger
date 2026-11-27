@@ -1,6 +1,7 @@
-# RFC-0018: Identity & Consent APIs
+# RFC 0018: Identity & Consent APIs
 
-Status: Draft
+- Status: Draft
+- Depends On: [RFC-0003 Identity & Consent Framework](0003-identity-and-consent-framework.md), [RFC-0004 Capability & Permission Model](0004-capability-and-permission-model.md)
 
 ## Ziel
 

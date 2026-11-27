@@ -1,10 +1,8 @@
-# RFC-0013: VitaFabric Data Contracts & FHIR Governance
+# RFC 0013: VitaFabric Data Contracts & FHIR Governance
 
-Status: Draft
-
-Type: Architecture RFC
-
-Owner: VitaFabric
+- Status: Draft
+- Type: Architecture RFC
+- Owner: VitaFabric
 
 Depends On:
 - RFC-0002 Platform Core Architecture
@@ -22,7 +20,7 @@ Blocks:
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 Dieses RFC definiert die verbindlichen Datenverträge
 der Plattform.
@@ -38,9 +36,9 @@ an VitaFabric vorbei lesen oder schreiben.
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 ```text
 FHIR First
@@ -56,7 +54,7 @@ Versionsstabilität
 Connector Unabhängigkeit
 ```
 
-## Nichtziele
+### Nichtziele
 
 ```text
 FHIR Vollabdeckung
@@ -68,34 +66,34 @@ Provider-spezifische Rohdaten
 
 ---
 
-# 3. Architekturprinzipien
+## 3. Architekturprinzipien
 
-## Single Source of Truth
+### Single Source of Truth
 
 Alle Gesundheitsdaten leben logisch
 in VitaFabric.
 
 ---
 
-## Canonical Data Model
+### Canonical Data Model
 
 FHIR R4 ist das interne Referenzmodell.
 
 ---
 
-## Provenance Required
+### Provenance Required
 
 Jeder Datensatz besitzt Herkunft.
 
 ---
 
-## Validation First
+### Validation First
 
 Keine Daten ohne Validierung.
 
 ---
 
-# 4. Erste unterstützte FHIR Ressourcen
+## 4. Erste unterstützte FHIR Ressourcen
 
 MVP Umfang:
 
@@ -115,7 +113,7 @@ DocumentReference
 
 ---
 
-# 5. FHIR Version
+## 5. FHIR Version
 
 Festgelegt:
 
@@ -135,7 +133,7 @@ für den Erstaufbau.
 
 ---
 
-# 6. Canonical Storage Modell
+## 6. Canonical Storage Modell
 
 Entscheidung:
 
@@ -150,7 +148,9 @@ Datenklasse **Derived Data** für abgeleitete Daten, darunter Embeddings,
 Knowledge Graph, AI Summaries und Derived Metadata. Diese Daten sind nicht
 automatisch FHIR-Ressourcen; ihr Zugriff erfolgt ebenfalls ausschließlich
 über VitaFabric und unterliegt Identity, Consent und Capabilities. Konkrete
-Schemas, Quellenbezug und Lebenszyklus sind noch zu spezifizieren.
+Schemas folgen RFC-0011; Quellenbezug, Modell-/Indexversion, Widerruf,
+Reindex und Löschlebenszyklus müssen die dort festgelegten Anforderungen
+erfüllen.
 
 ---
 
@@ -170,7 +170,7 @@ Materialisierte Views
 
 ---
 
-# 7. Datenfluss
+## 7. Datenfluss
 
 ```text
 Connector
@@ -198,7 +198,7 @@ Storage
 
 ---
 
-# 8. Import Modell
+## 8. Import Modell
 
 Jeder Import benötigt:
 
@@ -216,7 +216,7 @@ Version
 
 ---
 
-# 9. Provenance
+## 9. Provenance
 
 Pflichtfelder:
 
@@ -239,7 +239,7 @@ Connector oder Original-ID ist noch festzulegen.
 
 ---
 
-# 10. Datenqualität
+## 10. Datenqualität
 
 Qualitätsstufen:
 
@@ -255,7 +255,7 @@ REVIEWED
 
 ---
 
-# 11. Validierung
+## 11. Validierung
 
 FHIR Ressourcen werden geprüft gegen:
 
@@ -274,7 +274,7 @@ Geräten sind vor der Produktfreigabe zu prüfen.
 
 ---
 
-# 12. Dokumentenmodell
+## 12. Dokumentenmodell
 
 Dokumente werden als:
 
@@ -290,7 +290,7 @@ Originaldatei bleibt erhalten.
 
 ---
 
-# 13. Manueller Dateneintrag
+## 13. Manueller Dateneintrag
 
 Manuelle Daten sind erlaubt.
 
@@ -305,7 +305,7 @@ MANUAL_ENTRY
 
 ---
 
-# 14. Connector Verträge
+## 14. Connector Verträge
 
 Connectoren erhalten:
 
@@ -323,7 +323,7 @@ Database Access
 
 ---
 
-# 15. Storage Verträge
+## 15. Storage Verträge
 
 VitaFabric ist für die Verschlüsselung vor Übergabe an einen Storage-Adapter
 verantwortlich. Ein Storage-Plugin übernimmt diese Verschlüsselung nicht und
@@ -349,7 +349,7 @@ Klartextprofile
 
 ---
 
-# 16. Event Integration
+## 16. Event Integration
 
 FHIR Events gemäß RFC-0005.
 
@@ -363,7 +363,7 @@ FHIR_DELETED
 
 ---
 
-# 17. Consent Durchsetzung
+## 17. Consent Durchsetzung
 
 Jeder Zugriff prüft:
 
@@ -377,7 +377,7 @@ Capability
 
 ---
 
-# 18. Versionierung
+## 18. Versionierung
 
 Jeder Ressourcentyp besitzt:
 
@@ -391,7 +391,7 @@ Backward Compatibility
 
 ---
 
-# 19. Synchronisation
+## 19. Synchronisation
 
 RFC-0010 bleibt maßgeblich.
 
@@ -399,6 +399,10 @@ Last Writer Wins ist nur für Settings, UI-Daten und Preferences zulässig;
 FHIR-Ressourcen durchlaufen den Conflict Resolution Workflow aus RFC-0010.
 Ein konkretes Verfahren für andere Datenklassen, insbesondere Derived Data,
 ist noch festzulegen.
+
+Derived Data dürfen bei einem Konflikt nicht unabhängig von ihrer autoritativen
+Quelle wiederhergestellt werden. Consent-Widerruf und Lösch-Tombstones sperren
+abgeleitete Zugriffe sofort; Reindex und Wiederherstellung folgen RFC-0011.
 
 ---
 
@@ -414,7 +418,7 @@ Konfliktinformationen
 
 ---
 
-# 20. Export
+## 20. Export
 
 Unterstützt:
 
@@ -428,7 +432,7 @@ JSON Export
 
 ---
 
-# 21. Sicherheitsanforderungen
+## 21. Sicherheitsanforderungen
 
 Pflicht:
 
@@ -446,7 +450,7 @@ Capability Enforcement
 
 ---
 
-# 22. Architekturentscheidung
+## 22. Architekturentscheidung
 
 ✅ FHIR R4 Canonical Model
 

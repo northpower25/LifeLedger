@@ -28,7 +28,7 @@ ist der Datenpfad für Gesundheitsdaten fest: Plugin oder Anwendung ->
 VitaFabric-Vertrag → FHIR-R4-Modell → kontrollierte Speicherabstraktion.
 Direkter Datenbankzugriff durch Erweiterungen ist ausgeschlossen.
 
-Draft [RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture)
+Draft [RFC-0002](../../rfc/0002-platform-core-architecture.md)
 schlägt WASM First als Standard-Laufzeit vor; eine Python Connector Runtime
 ist nur als spätere optionale Erweiterung genannt. Es ordnet Identity &
 Consent, Audit, Authentifizierung, FHIR-Kernmodell und Capability Enforcement

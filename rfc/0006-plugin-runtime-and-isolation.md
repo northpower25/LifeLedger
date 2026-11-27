@@ -1,8 +1,8 @@
-# RFC-0006: Plugin Runtime & Isolation
+# RFC 0006: Plugin Runtime & Isolation
 
-Status: Draft  
-Type: Architecture RFC  
-Owner: Platform Core  
+- Status: Draft
+- Type: Architecture RFC
+- Owner: Platform Core
 Depends On: RFC-0002 Platform Core Architecture  
 Depends On: RFC-0003 Identity & Consent Framework  
 Depends On: RFC-0004 Capability & Permission Model  
@@ -11,17 +11,17 @@ Blocks: RFC-0007, RFC-0009, RFC-0011
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 Dieses RFC definiert die Runtime, Isolation, Sicherheitsgrenzen und den Lebenszyklus aller Erweiterungen innerhalb der LifeLedger Plattform.
 
-Das Ziel ist ein Home-Assistant-ähnliches Erweiterungsmodell mit deutlich strengeren Sicherheitsanforderungen für Gesundheitsdaten. Erweiterungen dürfen niemals direkte Datenbank- oder Systemzugriffe erhalten und müssen vollständig durch Capability-, Consent- und VitaFabric-Grenzen kontrolliert werden. Die Anforderungen ergeben sich unmittelbar aus den Plattform-, Plugin-, VitaFabric- und Integrations-Roadmaps. 【1-2ea43f】【2-c76eab】【3-3d69f4】
+Das Ziel ist ein Home-Assistant-ähnliches Erweiterungsmodell mit deutlich strengeren Sicherheitsanforderungen für Gesundheitsdaten. Erweiterungen dürfen niemals direkte Datenbank- oder Systemzugriffe erhalten und müssen vollständig durch Capability-, Consent- und VitaFabric-Grenzen kontrolliert werden. Die Anforderungen ergeben sich unmittelbar aus den Plattform-, Plugin-, VitaFabric- und Integrations-Roadmaps.
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 ```text
 Isolierte Erweiterungen
@@ -43,7 +43,7 @@ Reproduzierbares Sicherheitsmodell
 
 ---
 
-## Nichtziele
+### Nichtziele
 
 ```text
 Beliebige Codeausführung
@@ -59,9 +59,9 @@ Vertrauensbasierte Plugins
 
 ---
 
-# 3. Architekturentscheidung
+## 3. Architekturentscheidung
 
-## Entscheidung
+### Entscheidung
 
 Die Plattform verwendet:
 
@@ -75,9 +75,29 @@ Kann die erforderliche Isolation auf einer Plattform nicht durchgesetzt
 werden, wird das Plugin dort nicht ausgeführt. Eine nicht isolierte
 Ausführung als Fallback ist ausgeschlossen.
 
+### Referenzruntime und Schnittstelle
+
+Die Referenzimplementierung verwendet **Wasmtime** mit dem **WebAssembly
+Component Model** und **WASI 0.2 (Preview 2)**. Plugin-Schnittstellen werden
+als versionierte WIT-Interfaces definiert; WASI stellt keine implizite
+Berechtigung für Plattformdaten, Dateien oder Netzwerk dar. Die Plattform
+stellt nur explizit capability-geprüfte Host-Imports bereit.
+
+Die Runtime-Version und die verwendeten WASI- und WIT-Abhängigkeiten werden
+pro Release exakt gepinnt, mit SBOM und reproduzierbarem Build veröffentlicht
+und nach Sicherheitsupdates aktualisiert. Andere Runtimes sind nicht
+automatisch kompatibel; ein Wechsel erfordert ein RFC und erneute
+Konformitäts- und Isolationstests.
+
+Die Component-Runtime kann gegenüber nativer Ausführung Startzeit- und
+Speicher-Overhead verursachen, besonders auf mobilen oder ressourcenarmen
+Geräten. Runtime-Versionen und Plugin-Limits müssen deshalb auf jeder
+Zielplattform gemessen werden; ein Performance-Fallback auf unisolierten Code
+ist ausgeschlossen.
+
 ---
 
-## Begründung
+### Begründung
 
 WASM bietet:
 
@@ -97,9 +117,9 @@ Kontrollierte Schnittstellen
 
 ---
 
-## Abgelehnte Alternativen
+### Abgelehnte Alternativen
 
-### Python Only
+#### Python Only
 
 Probleme:
 
@@ -113,7 +133,7 @@ Unkontrollierbare Abhängigkeiten
 
 ---
 
-### Container First
+#### Container First
 
 Probleme:
 
@@ -127,7 +147,7 @@ Schwierige Verteilung
 
 ---
 
-# 4. Runtime Architektur
+## 4. Runtime Architektur
 
 ```text
 Plugin
@@ -151,9 +171,9 @@ Event Bus
 
 ---
 
-# 5. Unterstützte Erweiterungstypen
+## 5. Unterstützte Erweiterungstypen
 
-Die Plattform unterstützt sechs Erweiterungstypen. 【1-2ea43f】
+Die Plattform unterstützt sechs Erweiterungstypen.
 
 ```text
 Connector
@@ -174,7 +194,7 @@ Workflows und Settings, der die gemeinsamen Plattformdienste nutzt.
 
 ---
 
-# 6. Plugin Paketstruktur
+## 6. Plugin Paketstruktur
 
 Jedes Plugin besteht aus:
 
@@ -192,7 +212,7 @@ README.md
 
 ---
 
-# 7. Plugin Manifest
+## 7. Plugin Manifest
 
 Beispiel:
 
@@ -212,9 +232,9 @@ Beispiel:
 
 ---
 
-# 8. Lebenszyklus
+## 8. Lebenszyklus
 
-## Installation
+### Installation
 
 ```text
 Signatur prüfen
@@ -234,7 +254,7 @@ Registrieren
 
 ---
 
-## Aktivierung
+### Aktivierung
 
 ```text
 Plugin laden
@@ -250,7 +270,7 @@ Capabilities anwenden
 
 ---
 
-## Deaktivierung
+### Deaktivierung
 
 ```text
 Runtime stoppen
@@ -266,7 +286,7 @@ Sessions schließen
 
 ---
 
-## Entfernung
+### Entfernung
 
 ```text
 Plugin deaktivieren
@@ -282,13 +302,13 @@ Capabilities widerrufen
 
 ---
 
-# 9. Isolationsmodell
+## 9. Isolationsmodell
 
 Plugins laufen isoliert.
 
 ---
 
-## Verboten
+### Verboten
 
 ```text
 Direkter Datenbankzugriff
@@ -304,7 +324,7 @@ Plugin-zu-Plugin Zugriff
 
 ---
 
-## Erlaubt
+### Erlaubt
 
 Nur über freigegebene APIs.
 
@@ -320,15 +340,23 @@ Consent API
 Event Bus API
 ```
 
+Datei- und Netzwerkzugriff bleiben standardmäßig deaktiviert. Erlaubte
+Dateizugriffe erfolgen ausschließlich auf plugin-eigenen Speicher über den
+Host; Netzwerkzugriffe laufen über einen kontrollierten Host-Proxy, der Ziele
+und Capability prüft. WASI-Interfaces dürfen keine weitergehenden Rechte
+freischalten. Die Plattform verweigert Plugin-Ausführung, wenn die jeweilige
+Host-Plattform Speicher-, CPU-, Zeit- und Import-Limits nicht durchsetzen
+kann.
+
 ---
 
-# 10. Ressourcenbegrenzung
+## 10. Ressourcenbegrenzung
 
 Jede Runtime besitzt Limits.
 
 ---
 
-## CPU
+### CPU
 
 ```text
 Max CPU Budget
@@ -336,7 +364,7 @@ Max CPU Budget
 
 ---
 
-## Speicher
+### Speicher
 
 ```text
 Max RAM Budget
@@ -344,7 +372,7 @@ Max RAM Budget
 
 ---
 
-## Laufzeit
+### Laufzeit
 
 ```text
 Timeouts
@@ -352,7 +380,7 @@ Timeouts
 
 ---
 
-## Event-Verarbeitung
+### Event-Verarbeitung
 
 ```text
 Rate Limits
@@ -360,9 +388,9 @@ Rate Limits
 
 ---
 
-# 11. Netzwerkmodell
+## 11. Netzwerkmodell
 
-## Standard
+### Standard
 
 ```text
 kein Netzwerkzugriff
@@ -370,7 +398,7 @@ kein Netzwerkzugriff
 
 ---
 
-## Voraussetzung
+### Voraussetzung
 
 Capability:
 
@@ -380,7 +408,7 @@ NETWORK_ACCESS
 
 ---
 
-## Netzwerk Audit
+### Netzwerk Audit
 
 Pflicht:
 
@@ -396,9 +424,9 @@ Ergebnis
 
 ---
 
-# 12. Dateisystemmodell
+## 12. Dateisystemmodell
 
-## Standard
+### Standard
 
 ```text
 kein Zugriff
@@ -406,7 +434,7 @@ kein Zugriff
 
 ---
 
-## Freigegeben
+### Freigegeben
 
 Nur Plugin Sandbox.
 
@@ -416,7 +444,7 @@ plugin_storage/
 
 ---
 
-## Verboten
+### Verboten
 
 ```text
 Systemordner
@@ -428,9 +456,9 @@ Secrets
 
 ---
 
-# 13. Datenzugriff
+## 13. Datenzugriff
 
-Alle Gesundheitsdaten laufen über VitaFabric. 【2-c76eab】
+Alle Gesundheitsdaten laufen über VitaFabric.
 
 Pflichtpfad:
 
@@ -468,13 +496,13 @@ Datenbank
 
 ---
 
-# 14. Event Bus Integration
+## 14. Event Bus Integration
 
-Plugins kommunizieren über den Event Bus. 【3-3d69f4】【2-c76eab】
+Plugins kommunizieren über den Event Bus.
 
 ---
 
-## Subscribe
+### Subscribe
 
 ```text
 FHIR_CREATED
@@ -486,13 +514,13 @@ CONSENT_REVOKED
 
 ---
 
-## Publish
+### Publish
 
 Nur definierte Eventtypen.
 
 ---
 
-# 15. Secret Management
+## 15. Secret Management
 
 Plugins erhalten niemals:
 
@@ -506,7 +534,7 @@ Recovery Keys
 
 ---
 
-## Zugriff
+### Zugriff
 
 Ausschließlich über:
 
@@ -516,7 +544,7 @@ Secret API
 
 ---
 
-# 16. Consent Integration
+## 16. Consent Integration
 
 Ein Plugin darf nie selbst entscheiden:
 
@@ -538,7 +566,7 @@ Capability
 
 ---
 
-# 17. Plugin Kommunikation
+## 17. Plugin Kommunikation
 
 Direkte Kommunikation verboten.
 
@@ -572,9 +600,9 @@ Plugin B
 
 ---
 
-# 18. Plugin Signaturen
+## 18. Plugin Signaturen
 
-## Community
+### Community
 
 ```text
 Self Signed
@@ -582,7 +610,7 @@ Self Signed
 
 ---
 
-## Verified
+### Verified
 
 ```text
 Maintainer Sign-Off
@@ -593,7 +621,7 @@ Prüfverfahren bleibt zu spezifizieren.
 
 ---
 
-## Official
+### Official
 
 ```text
 Project Signing Key
@@ -615,7 +643,7 @@ Sicherheitsgarantie
 
 ---
 
-# 19. Offline Support
+## 19. Offline Support
 
 Pflicht:
 
@@ -633,7 +661,7 @@ ohne Internet.
 
 ---
 
-# 20. Fehlerisolierung
+## 20. Fehlerisolierung
 
 Pluginfehler dürfen niemals:
 
@@ -651,7 +679,7 @@ Plugins dürfen ausschließlich ihre eigene Runtime beeinträchtigen.
 
 ---
 
-# 21. Logging
+## 21. Logging
 
 Pflichtfelder:
 
@@ -669,7 +697,7 @@ Fehler
 
 ---
 
-# 22. Audit Anforderungen
+## 22. Audit Anforderungen
 
 Jeder Zugriff protokolliert:
 
@@ -687,7 +715,7 @@ Erfolg
 
 ---
 
-# 23. SDK
+## 23. SDK
 
 Die Plattform stellt bereit:
 
@@ -703,7 +731,7 @@ Konformitätssuite
 
 ---
 
-# 24. Referenzimplementierung
+## 24. Referenzimplementierung
 
 Der erste Referenzplugin-Typ ist:
 
@@ -719,9 +747,9 @@ Synthetische Testdaten.
 
 ---
 
-# 25. Zukunft
+## 25. Zukunft
 
-## Phase 1
+### Phase 1
 
 ```text
 WASM Plugins
@@ -729,7 +757,7 @@ WASM Plugins
 
 ---
 
-## Phase 2
+### Phase 2
 
 ```text
 Python Connector Runtime
@@ -739,7 +767,7 @@ nur für ausgewählte Connectoren.
 
 ---
 
-## Phase 3
+### Phase 3
 
 ```text
 Remote Execution Worker
@@ -749,7 +777,7 @@ für optionale Spezialfälle.
 
 ---
 
-# 26. Sicherheitsanforderungen
+## 26. Sicherheitsanforderungen
 
 Pflicht:
 
@@ -785,7 +813,7 @@ Cloud-Zwang
 
 ---
 
-# 27. Architekturentscheidung
+## 27. Architekturentscheidung
 
 Dieses RFC legt fest:
 

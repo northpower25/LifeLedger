@@ -1,8 +1,8 @@
-# RFC-0011: AI Provider Framework & Health Twin Architecture
+# RFC 0011: AI Provider Framework & Health Twin Architecture
 
-Status: Draft  
-Type: Architecture RFC  
-Owner: LifeWeaver  
+- Status: Draft
+- Type: Architecture RFC
+- Owner: LifeWeaver
 Depends On: RFC-0003 Identity & Consent Framework  
 Depends On: RFC-0004 Capability Model  
 Depends On: RFC-0005 Event Bus Architecture  
@@ -19,7 +19,7 @@ Blocks:
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 Dieses RFC definiert:
 
@@ -45,13 +45,13 @@ Der erste AI-Anwendungsfall ist die Zusammenfassung eines Dokuments.
 
 LifeWeaver bleibt eine optionale Plattformfunktion.
 
-Der lokale Kern von LifeLedger benötigt LifeWeaver nicht. Die Roadmaps definieren AI explizit als optionalen Teil der Plattform. 【1-0732ae】【2-b3dfc4】
+Der lokale Kern von LifeLedger benötigt LifeWeaver nicht. Die Roadmaps definieren AI explizit als optionalen Teil der Plattform.
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 ```text
 Providerneutralität
@@ -71,7 +71,7 @@ Mehrere Provider
 
 ---
 
-## Nichtziele
+### Nichtziele
 
 ```text
 Diagnose
@@ -83,37 +83,37 @@ Medizinische Entscheidungen
 Klinische Bewertung
 ```
 
-Diese Funktionen bleiben ausdrücklich außerhalb des Projektumfangs. 【1-0732ae】【3-97bb12】
+Diese Funktionen bleiben ausdrücklich außerhalb des Projektumfangs.
 
 ---
 
-# 3. Grundprinzipien
+## 3. Grundprinzipien
 
-## Provider Neutrality
+### Provider Neutrality
 
 Kein Provider darf fest eingebaut sein.
 
 ---
 
-## AI Optional
+### AI Optional
 
 Alle Kernfunktionen funktionieren ohne KI.
 
 ---
 
-## Consent First
+### Consent First
 
 AI erhält niemals ungeprüft Daten.
 
 ---
 
-## Local First
+### Local First
 
 Lokale Modelle haben Vorrang.
 
 ---
 
-## Explainability
+### Explainability
 
 Der Nutzer muss erkennen:
 
@@ -127,7 +127,7 @@ Welche Quellen eingeflossen sind
 
 ---
 
-# 4. LifeWeaver Architektur
+## 4. LifeWeaver Architektur
 
 ```text
 Applications
@@ -149,13 +149,13 @@ VitaFabric
 
 ---
 
-# 5. Provider Taxonomie
+## 5. Provider Taxonomie
 
 Es existieren drei Providerklassen.
 
 ---
 
-# 6. Local Provider
+## 6. Local Provider
 
 Beispiele:
 
@@ -171,7 +171,7 @@ llama.cpp
 
 ---
 
-## Vorteile
+### Vorteile
 
 ```text
 Keine Datenübertragung
@@ -183,7 +183,7 @@ Volle Kontrolle
 
 ---
 
-# 7. Remote Provider
+## 7. Remote Provider
 
 Beispiele:
 
@@ -199,7 +199,7 @@ Mistral
 
 ---
 
-## Voraussetzungen
+### Voraussetzungen
 
 ```text
 Explizite Zustimmung
@@ -213,7 +213,7 @@ Audit
 
 ---
 
-# 8. Managed Provider
+## 8. Managed Provider
 
 Zukünftige Option.
 
@@ -231,9 +231,9 @@ Erfordert separates Architekturreview.
 
 ---
 
-# 9. Provider Plugins
+## 9. Provider Plugins
 
-Provider werden über Plugins angebunden. 【4-767e2a】
+Provider werden über Plugins angebunden.
 
 ---
 
@@ -257,9 +257,30 @@ chat()
 tool_call()
 ```
 
+### OpenAI-kompatible API-Klassifikation
+
+„OpenAI-kompatibel“ bezeichnet Protokoll-/API-Kompatibilität, nicht
+Vertrauenswürdigkeit, Datenschutz oder identisches Modellverhalten. Ein
+Adapter MUSS pro Provider und Modell deklarieren, welche Endpunkte und
+Funktionen tatsächlich getestet sind; nicht unterstützte Felder dürfen nicht
+still ignoriert werden. Basisschnittstellen sind Chat Completions und
+Embeddings mit OpenAI-kompatiblen JSON-Request-/Response-Schemas. Streaming,
+Tool Calls, strukturierte Ausgaben und provider-spezifische Endpunkte sind
+optionale, einzeln zu deklarierende Erweiterungen.
+
+| Klasse | Beispiele | Einordnung |
+|---|---|---|
+| Inference Server | vLLM, LM Studio | Lokal oder selbst betrieben; tatsächlicher Datenpfad hängt von Deployment und Konfiguration ab |
+| Router/Gateway | OpenRouter, LiteLLM | Vermittelt an einen oder mehrere Provider; Datenübertragung und Unterauftragsverarbeiter sind pro Ziel zu prüfen |
+| Cloud Provider | Anbieter mit OpenAI-kompatiblem Endpoint | Drittanbieter-Verarbeitung; erfordert Remote-Provider-Capability, zweckgebundene Zustimmung und Audit |
+
+Klassifiziert wird nach tatsächlichem Deployment und Datenempfänger, nicht
+nur nach Produktname oder API-Format. Die Kompatibilitätskennzeichnung
+erlaubt keine automatische Provider-Auswahl oder stillen Fallback.
+
 ---
 
-# 10. Capability Anforderungen
+## 10. Capability Anforderungen
 
 Lokale Modelle:
 
@@ -293,13 +314,13 @@ AI_AGENT
 
 ---
 
-# 11. MCP Architektur
+## 11. MCP Architektur
 
-MCP wird als standardisierte Tool-Schicht betrachtet. 【1-0732ae】
+MCP wird als standardisierte Tool-Schicht betrachtet.
 
 ---
 
-## Rollen
+### Rollen
 
 ```text
 MCP Client
@@ -309,7 +330,7 @@ MCP Server
 
 ---
 
-## Toolzugriff
+### Toolzugriff
 
 Nur über:
 
@@ -323,7 +344,7 @@ Audit
 
 ---
 
-# 12. Tool Isolation
+## 12. Tool Isolation
 
 MCP Tools dürfen niemals:
 
@@ -337,15 +358,15 @@ VitaFabric umgehen
 
 ---
 
-# 13. RAG Architektur
+## 13. RAG Architektur
 
-## Ziel
+### Ziel
 
 Quellengebundene Antworten.
 
 ---
 
-## Datenquellen
+### Datenquellen
 
 ```text
 FHIR Ressourcen
@@ -359,7 +380,7 @@ Freigegebene Daten
 
 ---
 
-# 14. Embedding Modell
+## 14. Embedding Modell
 
 Embedding Speicherung erfolgt getrennt.
 
@@ -380,7 +401,7 @@ FHIR Datensatz
 
 ---
 
-# 15. Embedding Speicher
+## 15. Embedding Speicher
 
 MVP:
 
@@ -390,36 +411,67 @@ Lokal
 Verschlüsselt
 ```
 
-Embeddings müssen widerrufbar sein; ihre Entfernung richtet sich nach §16.
-Das Speicher- und Löschprotokoll ist noch zu spezifizieren.
-
----
-
 Nicht:
 
 ```text
 automatisch in Cloud
 ```
 
----
+### Metadaten
 
-# 16. Embedding Widerruf
-
-Bei:
-
-```text
-Consent Widerruf
-
-Dokument Löschung
-
-Profil Löschung
-```
-
-müssen Embeddings entfernt werden.
+Embeddings und weitere Derived Data werden ausschließlich über VitaFabric
+verwaltet. Für jedes Objekt werden Quell-IDs und Quellversionen, Modell- und
+Indexversion, Erstellungszeitpunkt, Consent-Kontext sowie Speicherorte
+nachvollziehbar geführt.
 
 ---
 
-# 17. Quellenmodell
+## 16. Embedding Widerruf und Löschprotokoll
+
+#### Soft Delete
+
+Bei Consent-Widerruf, Quellenlöschung, Profil-Löschung oder explizitem
+Löschauftrag wird der Zugriff sofort gesperrt. Die betroffenen Embeddings
+werden als „zur Löschung vorgemerkt“ markiert und dürfen weder für Suche,
+RAG, Training noch Export verwendet werden. Nur opake Löschmetadaten und
+Tombstones dürfen zur Verteilung des Löschauftrags verbleiben.
+
+#### Hard Delete und Retention
+
+Ein Purge-Job entfernt innerhalb von 24 Stunden Embeddings, Vektorindex-
+Einträge, abgeleitete Caches und Replikate aus allen online verfügbaren
+Stores. Verschlüsselte Backups dürfen die Daten höchstens 30 Tage enthalten;
+für jedes Objekt ist, soweit technisch möglich, ein eigener Backup-
+Verschlüsselungsschlüssel vorzusehen, der bei Widerruf oder Löschauftrag
+sofort kryptografisch vernichtet wird. Enthalten nicht selektiv löschbare
+Backups noch verschlüsselte Kopien, bleiben diese bis zur Rotation/Expiration
+unzugänglich und dürfen nicht wiederhergestellt werden, ohne den Tombstone
+erneut anzuwenden. Bei Profil-/Kontolöschung werden ausschließlich dafür
+genutzte Backup-Schlüssel sofort kryptografisch vernichtet.
+Audit- und Sync-Tombstones dürfen keine Embedding-Inhalte oder rückführbaren
+Gesundheitsdaten enthalten und werden nach der festgelegten Audit- bzw.
+Tombstone-Retention entfernt.
+
+`EMBEDDING_PURGED` wird erst nach bestätigtem Purge aller registrierten
+Online-Stores publiziert und enthält nur opake Objekt-IDs, Modell-/Index-
+Versionen, Status und Zeit. Fehler oder offline Stores bleiben als ausstehend
+sichtbar und werden erneut bearbeitet; der Status darf keinen erfolgreichen
+Purge vortäuschen.
+
+#### Reindex
+
+Nach Modell-, Index- oder Schemawechsel werden Embeddings aus der autoritativen
+VitaFabric-Quelle neu aufgebaut. Vor Reindex werden Consent und Capability
+erneut geprüft. Widerrufene oder gelöschte Quellen werden nicht regeneriert.
+Während eines Reindex bleibt die bisherige gültige Indexversion verfügbar,
+bis die neue Version validiert und atomar aktiviert wurde; betroffene
+Löschungen sind davon ausgenommen und bleiben sofort gesperrt.
+
+---
+
+---
+
+## 17. Quellenmodell
 
 Jede Antwort enthält:
 
@@ -445,7 +497,7 @@ Medication C
 
 ---
 
-# 18. Knowledge Twin
+## 18. Knowledge Twin
 
 Erste Umsetzungsstufe.
 
@@ -473,7 +525,7 @@ Diagnostizieren
 
 ---
 
-# 19. Health Twin
+## 19. Health Twin
 
 Zweite Ausbaustufe.
 
@@ -503,7 +555,7 @@ Aktivität
 
 ---
 
-# 20. Predictive Twin
+## 20. Predictive Twin
 
 Dritte Ausbaustufe.
 
@@ -521,11 +573,11 @@ Prognosen erzeugen
 
 ---
 
-Erfordert separate regulatorische Prüfung. 【1-0732ae】
+Erfordert separate regulatorische Prüfung.
 
 ---
 
-# 21. AI Agenten
+## 21. AI Agenten
 
 Agenten sind optional.
 
@@ -555,7 +607,7 @@ Rollen ändern
 
 ---
 
-# 22. Datenübertragung
+## 22. Datenübertragung
 
 Remote Provider erhalten nur:
 
@@ -573,7 +625,7 @@ gesamtes Profil
 
 ---
 
-# 23. Consent Modell
+## 23. Consent Modell
 
 Vor jeder Übertragung:
 
@@ -595,7 +647,7 @@ Welcher Zweck
 
 ---
 
-# 24. Audit Anforderungen
+## 24. Audit Anforderungen
 
 Audit speichern:
 
@@ -617,7 +669,7 @@ Keine Speicherung von Geheimnissen.
 
 ---
 
-# 25. Event Bus Integration
+## 25. Event Bus Integration
 
 Events nach RFC-0005.
 
@@ -645,7 +697,7 @@ PROVIDER_CHANGED
 
 ---
 
-# 26. Health Data Protection
+## 26. Health Data Protection
 
 Pflicht:
 
@@ -661,7 +713,7 @@ Data Minimization
 
 ---
 
-# 27. Halluzinationen
+## 27. Halluzinationen
 
 System muss deutlich kennzeichnen:
 
@@ -675,7 +727,7 @@ medizinische Tatsache
 
 ---
 
-# 28. Benutzeroberfläche
+## 28. Benutzeroberfläche
 
 Nutzer müssen erkennen:
 
@@ -691,7 +743,7 @@ Lokales Modell oder Cloud Modell
 
 ---
 
-# 29. Sicherheitsanforderungen
+## 29. Sicherheitsanforderungen
 
 Pflicht:
 
@@ -709,7 +761,7 @@ Data Minimization
 
 ---
 
-# 30. Nicht zulässig
+## 30. Nicht zulässig
 
 ```text
 Diagnose Automatisierung
@@ -725,7 +777,7 @@ Nicht dokumentierte Datenübertragung
 
 ---
 
-# 31. Entwicklungsreihenfolge
+## 31. Entwicklungsreihenfolge
 
 Die Twin-Ausbaustufen sind unabhängig von der Reihenfolge einzelner
 Provider- und RAG-Funktionen:
@@ -743,7 +795,7 @@ setzt deren Sicherheits- und Zweckbestimmungsprüfung voraus.
 
 ---
 
-## Regulatorische Einordnung
+### Regulatorische Einordnung
 
 EU AI Act, EU-Medizinprodukteverordnung (MDR) und Anforderungen an Clinical
 Decision Support sind anhand der konkreten Zweckbestimmung, Funktionen und
@@ -754,7 +806,7 @@ Entscheidungen bleiben gemäß §2 und §30 ausgeschlossen.
 
 ---
 
-# 32. Architekturentscheidung
+## 32. Architekturentscheidung
 
 Dieses RFC legt fest:
 

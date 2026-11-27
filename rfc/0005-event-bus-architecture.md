@@ -1,8 +1,8 @@
-# RFC-0005: Event Bus Architecture
+# RFC 0005: Event Bus Architecture
 
-Status: Draft  
-Type: Architecture RFC  
-Owner: Platform Core  
+- Status: Draft
+- Type: Architecture RFC
+- Owner: Platform Core
 Depends On: RFC-0002 Platform Core Architecture  
 Depends On: RFC-0003 Identity & Consent Framework  
 Depends On: RFC-0004 Capability & Permission Model  
@@ -10,7 +10,7 @@ Blocks: RFC-0006, RFC-0007, RFC-0010, RFC-0011
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 Dieses RFC definiert den plattformweiten Event Bus der LifeLedger Plattform.
 
@@ -38,9 +38,9 @@ Er stellt sicher:
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 ```text
 Lose Kopplung
@@ -60,7 +60,7 @@ Plugin Integration
 
 ---
 
-## Nichtziele
+### Nichtziele
 
 ```text
 Message Broker Cluster
@@ -74,9 +74,9 @@ Externe MQ Pflicht
 
 ---
 
-# 3. Architekturprinzipien
+## 3. Architekturprinzipien
 
-## Local First
+### Local First
 
 Der Event Bus muss lokal funktionieren.
 
@@ -84,7 +84,7 @@ Keine Netzwerkverbindung erforderlich.
 
 ---
 
-## Event Driven
+### Event Driven
 
 Komponenten fragen nicht regelmäßig Daten ab.
 
@@ -92,19 +92,19 @@ Stattdessen werden Änderungen publiziert.
 
 ---
 
-## Immutable Events
+### Immutable Events
 
 Events dürfen nach Veröffentlichung nicht verändert werden.
 
 ---
 
-## Auditability
+### Auditability
 
 Jedes Event muss nachvollziehbar sein.
 
 ---
 
-# 4. Architekturübersicht
+## 4. Architekturübersicht
 
 ```text
 LifeLedger
@@ -125,30 +125,72 @@ LifeLedger
 
 ---
 
-# 5. Event Struktur
+## 5. Event Struktur
 
 Jedes Event besitzt einen Standardaufbau.
 
 ```json
 {
   "event_id": "evt_001",
-  "event_type": "FHIR_CREATED",
+  "event_category": "fhir",
+  "event_name": "created",
+  "event_version": 1,
+  "event_type": "fhir.created.v1",
   "timestamp": "2027-01-01T10:00:00Z",
   "source": "vitafabric",
-  "subject": "Observation/123",
-  "version": "1.0"
+  "subject": "opaque-resource-id"
 }
 ```
 
 ---
 
-# 6. Event Kategorien
+## 6. Event Kategorien und Namensschema
 
-Die Plattform definiert Standardkategorien.
+Jedes Event MUSS eine Kategorie, einen Namen und eine eigene Schema-Version
+angeben. Das kanonische Routing-Schema ist
+`<category>.<name>.v<version>`; alle Segmente sind kleingeschriebene
+ASCII-Bezeichner mit Punkttrennung. Diese Felder entsprechen den logischen
+Werten `EVENT_CATEGORY`, `EVENT_NAME` und `EVENT_VERSION`; im JSON-Envelope
+werden sie als `event_category`, `event_name` und `event_version` serialisiert.
+Eventnamen sind stabil und beschreiben vergangene Fakten, nicht Befehle.
+
+```json
+{
+  "event_category": "consent",
+  "event_name": "revoked",
+  "event_version": 1,
+  "event_type": "consent.revoked.v1"
+}
+```
+
+`event_type` wird deterministisch aus Kategorie, Name und Version gebildet.
+Die drei Quellfelder bleiben im Envelope verfügbar; die Versionierung eines
+Eventtyps ist unabhängig von der Event-Bus-Implementierung. Eine inkompatible
+Schemaänderung erfordert eine neue Version. Ein Consumer MUSS unbekannte
+Versionen sicher ablehnen oder in eine Dead-Letter-Queue leiten; er darf sie
+nicht stillschweigend als kompatibel behandeln.
+
+Standardkategorien sind `identity`, `consent`, `household`, `fhir`, `import`,
+`sync`, `plugin`, `security`, `ai` und `application`. Der jeweilige Owner aus
+§16 registriert Namen innerhalb seiner Kategorie. Die kanonischen Routen
+für bestehende Events sind:
+
+| Bestehender Name | Kanonischer Eventtyp |
+|---|---|
+| `ROLE_GRANTED` | `identity.role_granted.v1` |
+| `ROLE_REVOKED` | `identity.role_revoked.v1` |
+| `CONSENT_REVOKED` | `consent.revoked.v1` |
+| `PROVIDER_CONSENT_GRANTED` | `consent.provider_consent_granted.v1` |
+| `PROVIDER_CONSENT_REVOKED` | `consent.provider_consent_revoked.v1` |
+| `EMBEDDING_PURGED` | `ai.embedding_purged.v1` |
+
+Events enthalten keine Gesundheitsinhalte, Passwörter, Schlüssel oder
+Secrets. Ressourcenzugriffe referenzieren nur opake IDs und erfordern bei
+Auflösung erneut Identity-, Consent- und Capability-Prüfung.
 
 ---
 
-# 7. Identity Events
+## 7. Identity Events
 
 ```text
 USER_CREATED
@@ -165,7 +207,7 @@ ROLE_REVOKED
 
 ---
 
-# 8. Consent Events
+## 8. Consent Events
 
 ```text
 CONSENT_GRANTED
@@ -181,7 +223,7 @@ PROVIDER_CONSENT_REVOKED
 
 ---
 
-# 9. Household Events
+## 9. Household Events
 
 ```text
 HOUSEHOLD_CREATED
@@ -195,9 +237,9 @@ ROLE_CHANGED
 
 ---
 
-# 10. FHIR Events
+## 10. FHIR Events
 
-VitaFabric ist Owner dieser Events. 【1-d5c266】
+VitaFabric ist Owner dieser Events.
 
 ```text
 FHIR_CREATED
@@ -209,7 +251,7 @@ FHIR_DELETED
 
 ---
 
-## Beispiel
+### Beispiel
 
 ```text
 Observation erstellt
@@ -225,7 +267,7 @@ Dashboard aktualisiert
 
 ---
 
-# 11. Import Events
+## 11. Import Events
 
 ```text
 IMPORT_STARTED
@@ -239,7 +281,7 @@ IMPORT_CONFLICT
 
 ---
 
-# 12. Synchronisations Events
+## 12. Synchronisations Events
 
 ```text
 SYNC_STARTED
@@ -253,7 +295,7 @@ SYNC_FAILED
 
 ---
 
-# 13. Plugin Events
+## 13. Plugin Events
 
 ```text
 PLUGIN_INSTALLED
@@ -269,7 +311,7 @@ PLUGIN_REMOVED
 
 ---
 
-# 14. Security Events
+## 14. Security Events
 
 ```text
 LOGIN_SUCCESS
@@ -285,9 +327,9 @@ PERMISSION_DENIED
 
 ---
 
-# 15. AI Events
+## 15. AI Events
 
-LifeWeaver nutzt eigene Eventtypen. 【2-2c5173】
+LifeWeaver nutzt eigene Eventtypen.
 
 ```text
 AI_REQUEST
@@ -303,9 +345,9 @@ EMBEDDING_PURGED
 
 ---
 
-# 16. Event Ownership
+## 16. Event Ownership
 
-## VitaFabric
+### VitaFabric
 
 Verantwortlich für:
 
@@ -319,7 +361,7 @@ Sync
 
 ---
 
-## LifeLedger
+### LifeLedger
 
 Verantwortlich für:
 
@@ -333,7 +375,7 @@ Navigation
 
 ---
 
-## LifeWeaver
+### LifeWeaver
 
 Verantwortlich für:
 
@@ -347,7 +389,7 @@ Provider Events
 
 ---
 
-## Platform Core
+### Platform Core
 
 Verantwortlich für:
 
@@ -363,15 +405,15 @@ Security
 
 ---
 
-# 17. Event Persistenz
+## 17. Event Persistenz
 
-## Pflicht
+### Pflicht
 
 Events werden lokal gespeichert.
 
 ---
 
-## Standard
+### Standard
 
 ```text
 SQLite Event Store
@@ -379,7 +421,7 @@ SQLite Event Store
 
 ---
 
-## Vorteile
+### Vorteile
 
 ```text
 Replay
@@ -393,13 +435,13 @@ Debugging
 
 ---
 
-# 18. Event Replay
+## 18. Event Replay
 
 Das System muss Events erneut abspielen können.
 
 ---
 
-## Beispiele
+### Beispiele
 
 ```text
 Plugin Neuinstallation
@@ -411,9 +453,9 @@ Sync Recovery
 
 ---
 
-# 19. Event Prioritäten
+## 19. Event Prioritäten
 
-## Critical
+### Critical
 
 ```text
 CONSENT_REVOKED
@@ -423,7 +465,7 @@ EMERGENCY_ACCESS
 
 ---
 
-## High
+### High
 
 ```text
 FHIR_CREATED
@@ -433,7 +475,7 @@ FHIR_UPDATED
 
 ---
 
-## Normal
+### Normal
 
 ```text
 USER_UPDATED
@@ -443,7 +485,7 @@ PLUGIN_UPDATED
 
 ---
 
-## Low
+### Low
 
 ```text
 UI_REFRESH
@@ -451,7 +493,7 @@ UI_REFRESH
 
 ---
 
-# 20. Event Versionierung
+## 20. Event Versionierung
 
 Jeder Eventtyp besitzt:
 
@@ -463,7 +505,7 @@ Migration
 
 ---
 
-## Beispiel
+### Beispiel
 
 ```text
 FHIR_CREATED
@@ -475,9 +517,9 @@ v3
 
 ---
 
-# 21. Event Security
+## 21. Event Security
 
-## Pflichtfelder
+### Pflichtfelder
 
 ```text
 Source
@@ -488,7 +530,7 @@ Event ID
 
 ---
 
-## Verboten
+### Verboten
 
 Events dürfen niemals enthalten:
 
@@ -504,7 +546,7 @@ Secrets
 
 ---
 
-# 22. Event Berechtigungen
+## 22. Event Berechtigungen
 
 Veröffentlichung und Konsum erfordern Capabilities.
 
@@ -526,13 +568,13 @@ MANAGE_CONSENT
 
 ---
 
-# 23. Plugin Integration
+## 23. Plugin Integration
 
 Plugins abonnieren Events.
 
 ---
 
-## Beispiel
+### Beispiel
 
 ```text
 Medication Dashboard
@@ -548,7 +590,7 @@ Aktualisierung
 
 ---
 
-## Beispiel
+### Beispiel
 
 ```text
 Garmin Connector
@@ -564,7 +606,7 @@ Statistik aktualisieren
 
 ---
 
-# 24. Offline Verhalten
+## 24. Offline Verhalten
 
 Pflicht:
 
@@ -582,15 +624,15 @@ Cloud Broker erforderlich
 
 ---
 
-# 25. Fehlerbehandlung
+## 25. Fehlerbehandlung
 
-## Retry
+### Retry
 
 Nicht kritische Events erhalten Retry.
 
 ---
 
-## Dead Letter Queue
+### Dead Letter Queue
 
 Fehlgeschlagene Events werden separat gespeichert.
 
@@ -600,7 +642,7 @@ Dead Letter Store
 
 ---
 
-# 26. Audit Anforderungen
+## 26. Audit Anforderungen
 
 Jedes Event protokolliert:
 
@@ -618,7 +660,7 @@ Korrelation
 
 ---
 
-# 27. Monitoring
+## 27. Monitoring
 
 Bereitzustellende Kennzahlen:
 
@@ -634,9 +676,9 @@ Replay Anzahl
 
 ---
 
-# 28. API
+## 28. API
 
-## Publish
+### Publish
 
 ```text
 publish(event)
@@ -644,7 +686,7 @@ publish(event)
 
 ---
 
-## Subscribe
+### Subscribe
 
 ```text
 subscribe(type)
@@ -652,7 +694,7 @@ subscribe(type)
 
 ---
 
-## Replay
+### Replay
 
 ```text
 replay(start,end)
@@ -660,7 +702,7 @@ replay(start,end)
 
 ---
 
-## Query
+### Query
 
 ```text
 query(filters)
@@ -668,7 +710,7 @@ query(filters)
 
 ---
 
-# 29. Sicherheitsanforderungen
+## 29. Sicherheitsanforderungen
 
 Pflicht:
 
@@ -688,7 +730,7 @@ Dead Letter Queue
 
 ---
 
-# 30. Architekturentscheidung
+## 30. Architekturentscheidung
 
 Dieses RFC legt fest:
 

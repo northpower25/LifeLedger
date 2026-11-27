@@ -3,7 +3,7 @@
 Authoritative security and privacy requirements belong here. Operational
 vulnerability reporting guidance remains in the root `SECURITY.md`.
 
-Draft [RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture) proposes
+Draft [RFC-0002](../../rfc/0002-platform-core-architecture.md) proposes
 Core Runtime security services, Identity & Consent, audit logging, explicit
 capabilities, and a sandboxed plugin host. Normative specifications must define
 their policies, interfaces, failure behavior, and verifiable enforcement
