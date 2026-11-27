@@ -41,6 +41,8 @@ Predictive Twin
 
 für LifeWeaver.
 
+Der erste AI-Anwendungsfall ist die Zusammenfassung eines Dokuments.
+
 LifeWeaver bleibt eine optionale Plattformfunktion.
 
 Der lokale Kern von LifeLedger benötigt LifeWeaver nicht. Die Roadmaps definieren AI explizit als optionalen Teil der Plattform. 【1-0732ae】【2-b3dfc4】
@@ -361,6 +363,11 @@ Freigegebene Daten
 
 Embedding Speicherung erfolgt getrennt.
 
+Embeddings gehören zur VitaFabric-Datenklasse Derived Data gemäß RFC-0013,
+ebenso Knowledge Graph, AI Summaries und Derived Metadata. Sie sind von
+FHIR-Datensätzen getrennt, umgehen aber nicht VitaFabric, Consent oder
+Capability Enforcement.
+
 ---
 
 ```text
@@ -379,7 +386,12 @@ MVP:
 
 ```text
 Lokal
+
+Verschlüsselt
 ```
+
+Embeddings müssen widerrufbar sein; ihre Entfernung richtet sich nach §16.
+Das Speicher- und Löschprotokoll ist noch zu spezifizieren.
 
 ---
 
@@ -618,9 +630,15 @@ AI_REQUEST
 
 AI_RESPONSE
 
+PROVIDER_CONSENT_GRANTED
+
+PROVIDER_CONSENT_REVOKED
+
 EMBEDDING_CREATED
 
 EMBEDDING_DELETED
+
+EMBEDDING_PURGED
 
 PROVIDER_CHANGED
 ```
@@ -709,39 +727,30 @@ Nicht dokumentierte Datenübertragung
 
 # 31. Entwicklungsreihenfolge
 
-## Phase 1
+Die Twin-Ausbaustufen sind unabhängig von der Reihenfolge einzelner
+Provider- und RAG-Funktionen:
 
 ```text
-Local Provider
-
-Knowledge Twin
+Phase 1: Knowledge Twin
+Phase 2: Health Twin
+Phase 3: Predictive Twin
 ```
+
+Der erste Anwendungsfall ist die Dokumentenzusammenfassung. Lokale Provider
+haben Vorrang; Remote Provider bleiben optional und erfordern vor einer
+Übertragung eine ausdrückliche Zustimmung. Die Freigabe jeder Ausbaustufe
+setzt deren Sicherheits- und Zweckbestimmungsprüfung voraus.
 
 ---
 
-## Phase 2
+## Regulatorische Einordnung
 
-```text
-Remote Provider
-
-RAG
-```
-
----
-
-## Phase 3
-
-```text
-Health Twin
-```
-
----
-
-## Phase 4
-
-```text
-Predictive Twin
-```
+EU AI Act, EU-Medizinprodukteverordnung (MDR) und Anforderungen an Clinical
+Decision Support sind anhand der konkreten Zweckbestimmung, Funktionen und
+Einsatzorte vor einer Freigabe fachlich und rechtlich zu prüfen. Dieses RFC
+stellt weder eine rechtliche Einordnung noch eine Konformitäts- oder
+Zulassungsbehauptung dar. Diagnose, Therapieempfehlung und medizinische
+Entscheidungen bleiben gemäß §2 und §30 ausgeschlossen.
 
 ---
 

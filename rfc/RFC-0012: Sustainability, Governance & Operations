@@ -120,6 +120,11 @@ Sicherheit hat Vorrang vor Funktionserweiterungen.
 
 ## Governance Ebenen
 
+GitHub, RFC-Prozess und Maintainer-Modell bilden die vorgesehene
+Arbeitsgrundlage. OpenCollective ist für die Finanzierungsphase gemäß §24
+vorgesehen; daraus folgt keine bereits bestehende Organisation oder
+Infrastruktur.
+
 ```text
 Community
 
@@ -707,6 +712,18 @@ Keine Bindung an ein einzelnes Modell.
 ---
 
 # 33. Nachfolgeplanung
+
+## Maintainer Succession Process
+
+Für den geplanten Rückzug oder Ausfall eines Maintainers sind Zuständigkeiten,
+offene Arbeiten, Dokumentation und benötigte Zugänge für die Nachfolge zu
+erfassen. Die zuständigen Maintainer bestimmen im Governance-Verfahren eine
+Vertretung oder Nachfolge und dokumentieren Entscheidung und Übergabe. Zugänge
+und Signaturschlüssel sind kontrolliert zu übertragen bzw. zu widerrufen oder
+zu rotieren; Geheimnisse gehören nicht in die öffentliche Dokumentation.
+
+Verfahren für unbesetzte Entscheidungsgremien, Fristen, Quoren und konkrete
+Schlüsselübergabe bleiben vor einem produktiven Betrieb zu spezifizieren.
 
 Jede kritische Rolle benötigt:
 

@@ -108,7 +108,8 @@ data before the existing release gate.
 
 ## Open questions
 
-- Which user journey and client define the first reference application?
+- How will the first reference application's defined journey and client
+  architecture be implemented securely? See draft RFC-0002 and RFC-0007.
 - Who owns and enforces the shared runtime, security, Identity & Consent,
   plugin-host and trust-boundary contracts?
 - How are consent, identity, roles and revocation applied across applications

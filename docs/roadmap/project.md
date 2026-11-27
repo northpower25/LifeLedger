@@ -11,8 +11,10 @@ genannten Nachweise.
 
 ## Verbindliche Leitplanken
 
-Gesundheitsdaten passieren VitaFabric und werden in FHIR R4 modelliert;
-Importe benötigen Quelle, Connector, Importzeitpunkt und ursprüngliche ID.
+Gesundheitsdaten passieren VitaFabric; FHIR-Ressourcen verwenden FHIR R4,
+abgeleitete Daten die Datenklasse Derived Data gemäß RFC-0013. Für Provenienz
+sind Quelle, Connector, Zeitstempel, Original-ID, Version und
+Transformationsschritte vorgesehen.
 Zugriffe müssen Einwilligung beachten. Lokale Nutzung darf keine Cloud
 voraussetzen; AI ist für den Kern optional. Sicherheitsvorgaben einschließlich
 AES-256-GCM, Argon2, RBAC, Audit-Logging und MFA-Unterstützung sind in konkrete, überprüfbare
@@ -45,8 +47,9 @@ verbindlichen Daten- bzw. AI-Verantwortungen. Der
 | Managed Cloud | Nur als separat zu prüfende Option, nicht als Ersatz für lokale Funktion. Verarbeitung, Verantwortlichkeiten, Einwilligung, Datenstandort und Sicherheitsanforderungen benötigen vor Umsetzung und Freigabe eigenes Architektur-, Datenschutz- und Rechtsreview. |
 
 Keines dieser Szenarien außer dem geplanten lokalen Kern ist Voraussetzung für
-die erste Nutzerreise; keines ist bereits verfügbar. Reihenfolge und Aufwand
-optionaler Szenarien sind nicht entschieden.
+die erste Nutzerreise; keines ist bereits verfügbar. Die geplante Reihenfolge
+ist Mode 1 → Mode 2 → Mode 3 → Mode 4; der Aufwand und die Ausgestaltung
+optionaler Szenarien bleiben offen.
 
 ### Erweiterungen und Marketplace
 
@@ -68,10 +71,10 @@ laut RFC-0002 nur verschlüsselte Daten, niemals Klartext oder Schlüssel.
 | Stufe | Ergebnis und Abhängigkeit | Nachweis bzw. Gate |
 | --- | --- | --- |
 | 0 – Richtung und Schutz | Zielgruppe, erste Referenzanwendung, Plattformgrenzen und Verantwortlichkeiten für Core Runtime, Identity & Consent, Sicherheit und Plugins; Bedrohungsmodell, Rollen-/Consent-Modell, lokale Laufzeit, Deployment-Szenarien sowie FHIR- und Plugin-Verträge. | Authentifizierung, Autorisierung, Consent, Notfallzugriff und Widerruf getrennt spezifiziert; Datenzugriffsgrenzen, Annahmen und Blocker geprüft; benötigte ADRs akzeptiert und Spezifikationen versioniert, bevor entsprechende Funktionen entstehen. |
-| 1 – Entwicklungsgrundlage | Reproduzierbare lokale Entwicklungsumgebung und CI; synthetische Fixtures; Verträge und kleine, testbare Einheiten für VitaFabric, LifeLedger und die spezifizierten Identitäts-/Consent-Grenzen. Auswahl des ersten Clients nach Stufe 0. | Build, Lint, Unit- und negative Vertragstests laufen lokal und in CI. Fehlende Consent-Freigabe, widerrufene Rechte und ungültige Daten werden abgewiesen; keine echten Gesundheitsdaten. |
+| 1 – Entwicklungsgrundlage | Reproduzierbare lokale Entwicklungsumgebung und CI; synthetische Fixtures; Verträge und kleine, testbare Einheiten für VitaFabric, LifeLedger und die spezifizierten Identitäts-/Consent-Grenzen. Den vorgesehenen Tauri-Desktopclient nach Stufe 0 konkretisieren. | Build, Lint, Unit- und negative Vertragstests laufen lokal und in CI. Fehlende Consent-Freigabe, widerrufene Rechte und ungültige Daten werden abgewiesen; keine echten Gesundheitsdaten. |
 | 2 – Erster vertikaler Durchstich | Offline im gewählten Client einen begrenzten synthetischen Gesundheitsdatensatz über VitaFabric erfassen, validieren, geschützt speichern und in der Referenzanwendung anzeigen. Identität, Rollen, Consent, Verschlüsselung, Zugriffskontrolle, Audit und Herkunft gemäß freigegebenen Spezifikationen; AI nicht erforderlich. | Ende-zu-Ende-Test ohne Netzwerk; FHIR-Validierung, Berechtigungs-, Notfallzugriffs- und Einwilligungs-Negativfälle, Widerruf, falscher Schlüssel, Neustart sowie Locale/Zeitzone. Gate erst nach Security- und Architekturreview der implementierten Datenpfade. |
 | 3 – Belastbarer lokaler Kern | Lebenszyklus, Änderung und Löschung, verschlüsselte lokale Sicherung/Wiederherstellung, Interoperabilität und zugängliche Bedienung ausbauen. Weitere Clients erst auf gemeinsamen Verträgen aufsetzen; optionale Deployment-Szenarien getrennt prüfen. | Integrations-, Migrations-, Wiederherstellungs-, Fehler- und Zugänglichkeitstests; interoperabler FHIR-Test gegen dokumentierte Profile. Wiederherstellung darf keine unverschlüsselten Backups voraussetzen. |
-| 4 – Erweiterbarkeit und Integrationen | Freigegebene Plugin-Verträge und lokale Entwicklungswerkzeuge; synthetischer Referenz-Connector, anschließend eine nach Review ausgewählte optionale Integration. Abhängig von Stufen 0–3 und [Plugin-Roadmap](plugins.md). | Unabhängig entwickeltes Plugin gegen versioniertes SDK und Konformitätssuite; Consent-/Isolations-, Fehler-, Upgrade- und Offline-Tests. Gesundheitsdaten weiterhin ausschließlich über VitaFabric. |
+| 4 – Erweiterbarkeit und Integrationen | Freigegebene Plugin-Verträge und lokale Entwicklungswerkzeuge; synthetischer Referenz-Connector, anschließend Nextcloud als erste optionale Integration nach Review und vor Home Assistant. Abhängig von Stufen 0–3 und [Plugin-Roadmap](plugins.md). | Unabhängig entwickeltes Plugin gegen versioniertes SDK und Konformitätssuite; Consent-/Isolations-, Fehler-, Upgrade- und Offline-Tests. Gesundheitsdaten weiterhin ausschließlich über VitaFabric. |
 | 5 – Optionale Intelligenz | LifeWeaver lokal und providerneutral; MCP und ggf. externe Provider nur über explizit freigegebene Grenzen. Abhängig von Daten-, Sicherheits- und Einwilligungsverträgen. | Tests für verweigerten/widerrufenen Zugriff, Datenminimierung, Providerwechsel, lokale Nutzung und MCP-Kompatibilität; Sicherheits- und Zweckbestimmungsreview vor Nutzerfreigabe. |
 | 6 – Freigabe und nachhaltiger Ausbau | Erst nach vollständigem Scope- und Risikoreview: unterstützte Plattformen, Dokumentation, Support, sichere Updates und Betriebsmodell veröffentlichen. Danach weitere Produktbereiche und Integrationen inkrementell. | Dokumentierte Bedrohungs- und Datenschutzprüfung, externe Sicherheitsprüfung nach vereinbartem Umfang, behobene Freigabeblocker, Recovery-Übung, Barrierefreiheits- und Lokalisierungsprüfung, dokumentierte Restrisiken und explizite Freigabe. Kein Einsatz echter Daten vor diesem Gate. |
 
@@ -96,22 +99,25 @@ werden mit konkreten Kommandos dokumentiert, sobald sie existieren.
 
 ## Getroffene Architekturentscheidungen für den ersten Durchstich
 
-## Getroffene Architekturentscheidungen für den ersten Durchstich
-
 Die folgenden Entscheidungen gelten als Arbeitsgrundlage für die Architektur-, Spezifikations- und Prototypenphase.
 
 ### Zielgruppe und erster Anwendungsfall
 
-Die erste Zielgruppe sind Privatpersonen und Familien mit Interesse an einer langfristigen, lokalen Gesundheitsdatenverwaltung.
+Die erste Zielgruppe sind Privatpersonen, Familien und Health Power User mit
+Interesse an einer langfristigen, lokalen Gesundheitsdatenverwaltung.
 
 Der erste wertvolle Durchstich besteht aus:
 
 1. Installation von LifeLedger auf einem lokalen Gerät
-2. Import eines synthetischen oder realen Gesundheitsdatensatzes
-3. Import eines medizinischen Dokuments
-4. Darstellung aller Daten in einer gemeinsamen Timeline
+2. Import eines Arztbriefs
+3. Erfassung einer Medikation
+4. Anzeige in einer gemeinsamen Timeline
 5. Lokale verschlüsselte Speicherung
-6. Lokale Sicherung und Wiederherstellung
+6. Lokales Backup und Wiederherstellung
+
+Der erste vertikale Durchstich umfasst Desktop, lokale Datenhaltung, ein
+Dokument, einen Datentyp und ein Backup. Bis zum Freigabe-Gate gemäß Stufe 6
+werden ausschließlich synthetische Daten verwendet.
 
 Die persönliche Gesundheitsakte dient als erste Referenzanwendung der Plattform.
 
@@ -133,6 +139,11 @@ Die erste Client-Anwendung basiert auf:
 ```text
 Tauri Desktop
 ```
+
+mit einem lokalen FastAPI-Dienst eingebettet in Tauri. Nach Windows folgen
+Linux und macOS; für Mobile ist Flutter vorgesehen. Die genauen
+Prozessgrenzen und die Absicherung der Kommunikation sind noch zu
+spezifizieren.
 
 ---
 
@@ -201,6 +212,7 @@ Connector
 Importzeitpunkt
 Original-ID
 Version
+Transformationsschritte
 ```
 
 Dokumente werden grundsätzlich über DocumentReference modelliert.
@@ -298,6 +310,7 @@ Community:
 
 Verified:
 - Maintainer Review
+- Maintainer Sign-Off
 - Grundlegende Tests
 
 Official:

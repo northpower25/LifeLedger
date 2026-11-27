@@ -19,25 +19,25 @@ Plattformneuausrichtung ist Gegenstand der
 
 | Stufe | Ergebnis und Abhängigkeiten | Tests und Abnahme |
 | --- | --- | --- |
-| L0 – Produkt- und Clientkonzept | Zielgruppe, erste Nutzerreise, Identitäts-/Consent-Anforderungen, Zugänglichkeit, Sprach- und Zeitzonenverhalten sowie Bedrohungsmodell definieren. Ersten Client und Technologieentscheidungen gemeinsam mit lokaler Laufzeit und VitaFabric-Vertrag per RFC/ADR klären. | Review anhand konkreter Akzeptanzfälle, einschließlich Offline, Hilfsmittel, Familien-/Vertretungsrollen, Notfallzugriff und Consent-Widerruf. |
+| L0 – Produkt- und Clientkonzept | Festgelegte Zielgruppe, erste Nutzerreise und Client-Technologien konkretisieren; Identitäts-/Consent-Anforderungen, Zugänglichkeit, Sprach- und Zeitzonenverhalten sowie Bedrohungsmodell und VitaFabric-Vertrag per RFC/ADR klären. | Review anhand konkreter Akzeptanzfälle, einschließlich Offline, Hilfsmittel, Familien-/Vertretungsrollen, Notfallzugriff und Consent-Widerruf. |
 | L1 – Dünne lokale Anwendung | Ein Backend bzw. eine lokale Anwendung und ein ausgewählter Client nutzen versionierte VitaFabric-Verträge und die spezifizierten Identity-/Consent-Verträge für einen synthetischen Datensatz; keine direkte Gesundheitsdatenbank oder Mapping-Logik im Client. | Unit- und Vertragstests; ungültige Eingaben, fehlende/widerrufene Freigaben und abgelehnte Rechte sichtbar behandeln; lokalisierte Bedienung in Deutsch und Englisch prüfen. |
 | L2 – Timeline-Durchstich | Nach freigegebenen Sicherheits- und Datenspezifikationen Erfassung, Lesen und Anzeige eines begrenzten FHIR-basierten Datentyps offline; Herkunft, Datenzugriff und Freigabestatus verständlich darstellen. | E2E über Client, Identity/Consent und VitaFabric, Offline-Neustart, Rollen-/Consent-Negativfälle, Widerruf, Zeitzonen und Barrierefreiheit. Sicherheits-Gate aus Stufe 2 der Gesamt-Roadmap. |
-| L3 – Nutzbarer Kern | Dokumente, Medikations- und Familienfunktionen einzeln priorisieren; für jeden Bereich Datenmodell, Rechte und Risiken vor Implementierung spezifizieren. Geschützte Sicherung und Wiederherstellung über vereinbarte Datenverträge anbinden. | Pro Bereich FHIR-, Integrations-, Berechtigungs- und Migrationstests; Recovery- und Löschtests, inklusive gemeinsam genutzter Daten und Widerruf. |
+| L3 – Nutzbarer Kern | Erste Nutzerreise um Arztbriefimport, Medikationserfassung, Timeline und Backup vervollständigen; für jeden Bereich Datenmodell, Rechte und Risiken vor Implementierung spezifizieren. Familienfunktionen separat priorisieren. Geschützte Sicherung und Wiederherstellung über vereinbarte Datenverträge anbinden. | Pro Bereich FHIR-, Integrations-, Berechtigungs- und Migrationstests; Recovery- und Löschtests, inklusive gemeinsam genutzter Daten und Widerruf. |
 | L4 – Weitere Clients | Web, Mobile und Desktop inkrementell ergänzen, nicht automatisch parallel; gemeinsame Verträge und konsistente Bedienung, lokale Laufzeit und plattformspezifische Sicherheitsgrenzen dokumentieren. | Für jeden Client Offline-, Installations-, Update-, Accessibility-, Lokalisierungs- und E2E-Tests auf den tatsächlich unterstützten Plattformen. |
 | L5 – Erweiterte Abläufe | Notfallprofile, Datenfreigabe und optionale LifeWeaver-Funktionen erst nach eigener Risiko-, Einwilligungs- und Zweckbestimmungsprüfung. | Szenarien für minimale Freigabe, Ablehnung, Widerruf und Fehler; medizinische Fehlinterpretation und Datenabfluss in Review und Tests berücksichtigen. |
 
 ## Teilbereiche und offene Entscheidungen
 
-- **Backend:** Läuft es lokal als Dienst, eingebettet oder in anderer Form?
-  Wie werden Zugriff und Authentifizierung zwischen Prozessgrenzen geschützt?
-  Die genannten Backend-Technologien sind noch nicht als ADR nachgewiesen.
+- **Backend:** Vorgesehen ist ein lokaler FastAPI-Dienst eingebettet in
+  Tauri. Wie werden dessen Lebenszyklus, Zugriff und Authentifizierung
+  zwischen Prozessgrenzen geschützt? Ein akzeptiertes ADR fehlt.
 - **Web:** Wie ist lokaler Betrieb ohne verpflichtenden Remote-Server und ohne
   unsichere Browser-Datenspeicherung möglich?
 - **Mobile:** Welche Betriebssysteme, Offline-Grenzen, Schlüsselablage und
-  Hintergrundausführung sind zuerst unterstützt? Die Architektur-Checkliste
-  verlangt Flutter-Kompatibilität; ein begründetes Technologie-ADR fehlt.
-- **Desktop:** Welche lokalen Zielplattformen, Update- und Schlüsselprozesse
-  gelten? Tauri ist bisher Planung.
+  Hintergrundausführung sind zuerst unterstützt? Flutter ist vorgesehen;
+  ein akzeptiertes Technologie-ADR fehlt.
+- **Desktop:** Tauri und Windows First sind vorgesehen, danach Linux und
+  macOS. Welche Update- und Schlüsselprozesse gelten?
 - **Produkt:** Welche Angaben gehören zum ersten Datensatz und wie werden
   Herkunft, Datenqualität und Fehler ohne medizinische Schlussfolgerung erklärt?
   Wie unterscheiden sich eigene Daten von Familien- oder Vertretungsdaten?
@@ -51,6 +51,6 @@ Plattformneuausrichtung ist Gegenstand der
   Sprachwechsel, Übersetzungen, Datumsformate, Zeitzonen und RTL sollen früh
   überprüft werden; der genaue RTL-Umfang ist zu entscheiden.
 
-Vorschlag: Zuerst eine kleine vollständige Nutzerreise statt paralleler
-Oberflächen entwickeln; Schnittstellenstabilität und Bedienbarkeit vor
-zusätzlichen Datendomänen nachweisen.
+Die erste Nutzerreise umfasst Arztbriefimport, Medikationserfassung, Timeline
+und Backup. Schnittstellenstabilität und Bedienbarkeit sollen vor zusätzlichen
+Datendomänen nachgewiesen werden.

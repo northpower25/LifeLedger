@@ -21,6 +21,8 @@ LifeLedger soll eine erweiterbare, lokale und datenschutzorientierte Plattform f
 
 Die Gesundheitsakte ist die erste Referenzanwendung der Plattform.
 
+Die erste Zielgruppe umfasst Privatpersonen, Familien und Health Power User.
+
 Dieses RFC definiert:
 
 - Platform Core Runtime
@@ -480,6 +482,9 @@ Python Connector Runtime
 
 für Datenimporte.
 
+Kann die geforderte Isolation nicht durchgesetzt werden, wird ein Plugin
+nicht ausgeführt; ein unisolierter Fallback ist ausgeschlossen (RFC-0006).
+
 ---
 
 # 11. Plugin-Signierung
@@ -495,8 +500,10 @@ Self Signed
 ## Verified
 
 ```text
-Maintainer Review
+Maintainer Sign-Off
 ```
+
+Das konkrete Signatur- und Prüfverfahren bleibt zu spezifizieren.
 
 ---
 
@@ -550,6 +557,9 @@ Sicherheitsgarantie
 
 ## Grundsatz
 
+Eine Application ist ein spezialisierter Plugin-Typ mit UI, Navigation,
+Workflows und Settings, der die gemeinsamen Plattformdienste nutzt.
+
 Anwendungen besitzen keine eigene Datenbank.
 
 ---
@@ -573,7 +583,31 @@ VitaFabric
 
 ---
 
+## Erster Client und Durchstich
+
+Geplant sind ein lokaler FastAPI-Dienst eingebettet in Tauri für den
+Desktop-Client und Flutter für Mobile. Desktop beginnt mit Windows; Linux
+und macOS folgen. Der erste vertikale Durchstich umfasst Desktop, lokale
+Datenhaltung, ein Dokument, einen Datentyp und ein Backup. Die erste
+Nutzerreise umfasst Arztbriefimport, Medikationserfassung, Timeline und
+Backup (RFC-0007). Vor der Freigabe für echte Gesundheitsdaten gelten die
+Sicherheits-Gates der Roadmap.
+
+Start und Beendigung des Dienstes, Absicherung der lokalen Kommunikation
+sowie Ressourcen- und Startzeitkosten sind für jede Zielplattform noch zu
+spezifizieren und zu prüfen.
+
+Als erste externe Integration ist Nextcloud vor Home Assistant vorgesehen;
+der lokale Kern benötigt keine dieser Integrationen. Datenrichtung und
+Vertrauensgrenzen bleiben integrationsspezifisch zu klären.
+
+---
+
 # 14. Deployment Modelle
+
+Die geplante Reihenfolge ist Mode 1 → Mode 2 → Mode 3 → Mode 4.
+Optionale Modi benötigen jeweils ein eigenes Review und machen den lokalen
+Kern nicht von einem Cloud-Dienst abhängig.
 
 ## Mode 1
 

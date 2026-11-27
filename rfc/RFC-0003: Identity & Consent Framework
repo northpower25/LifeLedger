@@ -143,6 +143,10 @@ Household
 
 # 6. Rollenmodell
 
+Dieses RFC ist die maßgebliche Quelle für die Definitionen der folgenden
+Rollen. RFC-0008 beschreibt deren Anwendung im Familien- und
+Delegationsmodell und definiert die Rollen nicht erneut.
+
 ## Primary Owner
 
 Besitzer eines Gesundheitsprofils.
@@ -154,6 +158,7 @@ lesen
 schreiben
 löschen
 delegieren
+freigeben
 widerrufen
 exportieren
 ```
@@ -180,6 +185,9 @@ freigeben
 widerrufen
 ```
 
+Die Guardian-Befugnisse enden bei Entzug, Volljährigkeit oder Widerruf,
+soweit rechtlich zulässig.
+
 ---
 
 ## Caregiver
@@ -205,6 +213,8 @@ Nicht erlaubt:
 ```text
 Besitz übertragen
 Freigaben vergeben
+Neue Vertreter ernennen
+Notfalldefinition ändern
 ```
 
 ---
@@ -220,13 +230,17 @@ Vorsorgevollmacht
 gesetzliche Vertretung
 ```
 
-Kann dieselben Rechte erhalten wie Owner.
+Die Rechte werden individuell vergeben und können dieselben Rechte wie beim
+Owner umfassen.
 
 ---
 
 ## Emergency Contact
 
-Darf ausschließlich Notfallinformationen einsehen.
+Darf ausschließlich Notfallinformationen im Emergency Profile einsehen.
+
+Kein Zugriff auf das volle Gesundheitsprofil, Dokumentenarchiv oder die
+Historie.
 
 ---
 
