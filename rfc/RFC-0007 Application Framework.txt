@@ -1,0 +1,676 @@
+# RFC-0007: Application Framework
+
+Status: Draft  
+Type: Architecture RFC  
+Owner: LifeLedger Platform  
+Depends On: RFC-0002 Platform Core Architecture  
+Depends On: RFC-0003 Identity & Consent Framework  
+Depends On: RFC-0004 Capability & Permission Model  
+Depends On: RFC-0005 Event Bus Architecture  
+Depends On: RFC-0006 Plugin Runtime & Isolation
+
+Blocks:
+- RFC-0008 Family Model
+- RFC-0011 AI Provider & Health Twin
+- Referenzanwendungen
+- Marketplace Apps
+
+---
+
+# 1. Zusammenfassung
+
+Dieses RFC definiert das Anwendungsmodell der LifeLedger Plattform.
+
+Die Plattform unterscheidet zukünftig zwischen:
+
+```text
+Plattform
+
+und
+
+Anwendungen
+```
+
+LifeLedger Health Record ist die erste Referenzanwendung.
+
+Weitere Anwendungen dürfen unabhängig entstehen ohne Änderungen an:
+
+```text
+Core Runtime
+
+Identity
+
+Consent
+
+VitaFabric
+
+LifeWeaver
+```
+
+Die Plattform entwickelt sich dadurch vom Einzelprodukt zur erweiterbaren Gesundheitsdatenplattform. Die Notwendigkeit eines eigenständigen Application Frameworks ergibt sich direkt aus der Plattformvision, dem Plugin-Modell und der Trennung zwischen Plattform und Referenzanwendung. 【1-063582】【2-3aa2be】【3-7bfa0a】
+
+---
+
+# 2. Ziele
+
+## Ziele
+
+```text
+Anwendungsunabhängigkeit
+
+Erweiterbarkeit
+
+Wiederverwendbare Plattformdienste
+
+Pluginfähige Apps
+
+Einheitliches Berechtigungssystem
+
+Gemeinsame UI-Muster
+
+Gemeinsame Datenbasis
+```
+
+---
+
+## Nichtziele
+
+```text
+Eigene Gesundheitsdatenbanken
+
+Eigene Authentifizierung
+
+Direkte FHIR Implementierungen
+
+Parallele Consent Modelle
+```
+
+---
+
+# 3. Grundprinzipien
+
+## Plattform First
+
+Anwendungen sind Gäste der Plattform.
+
+Nicht umgekehrt.
+
+---
+
+## Shared Services
+
+Gemeinsame Plattformdienste:
+
+```text
+Identity
+
+Consent
+
+Audit
+
+Notifications
+
+Event Bus
+
+Secrets
+
+VitaFabric
+```
+
+---
+
+## Data Through VitaFabric
+
+Alle Gesundheitsdaten laufen über VitaFabric. 【4-f0844a】
+
+---
+
+# 4. Definition einer Application
+
+Eine Application ist ein spezialisierter Plugin-Typ mit UI, Navigation,
+Workflows und Settings, der die gemeinsamen Plattformdienste nutzt.
+Ihre deklarierten Capabilities unterliegen den Plattformprüfungen.
+
+---
+
+## Bestandteile
+
+```text
+UI
+
+Navigation
+
+Settings
+
+Workflows
+
+Capabilities
+```
+
+---
+
+# 5. Was eine Application NICHT besitzt
+
+Verboten:
+
+```text
+Eigene Gesundheitsdatenbank
+
+Eigene Authentifizierung
+
+Eigene Consent Engine
+
+Eigene Audit Logs
+
+Eigene Benutzerverwaltung
+```
+
+---
+
+# 6. Application Architektur
+
+```text
+Application
+
+├── UI
+├── Routes
+├── Settings
+├── Workflows
+├── Permissions
+└── Platform Integrations
+```
+
+---
+
+# 7. Datenfluss
+
+Verpflichtender Pfad:
+
+```text
+Application
+
+↓
+
+Capabilities
+
+↓
+
+Consent
+
+↓
+
+VitaFabric
+
+↓
+
+FHIR
+```
+
+---
+
+Nicht zulässig:
+
+```text
+Application
+
+↓
+
+Datenbank
+```
+
+---
+
+# 8. Erste Referenzanwendungen
+
+## Phase 1
+
+```text
+Health Record
+```
+
+Erste Nutzerreise: Arztbrief importieren, Medikation erfassen, die Timeline
+anzeigen und ein Backup erstellen. Der erste vertikale Durchstich umfasst
+Desktop, lokale Datenhaltung, ein Dokument, einen Datentyp und ein Backup.
+Bis zur Sicherheitsfreigabe werden dafür ausschließlich synthetische Daten
+verwendet.
+
+---
+
+## Phase 2
+
+```text
+Medication Manager
+
+Emergency Profile
+```
+
+---
+
+## Phase 3
+
+```text
+Family Health
+
+Health Dashboard
+```
+
+---
+
+## Phase 4
+
+```text
+Sleep Tracker
+
+Nutrition Tracking
+
+Fitness Analytics
+```
+
+---
+
+# 9. Navigation
+
+Die Plattform stellt globale Navigation bereit.
+
+---
+
+## Jede App erhält
+
+```text
+App Titel
+
+Icon
+
+Version
+
+Capabilities
+
+Settings
+```
+
+---
+
+## Beispiel
+
+```text
+LifeLedger
+
+├── Health Record
+├── Medication Manager
+├── Family Health
+└── Settings
+```
+
+---
+
+# 10. Routing
+
+Anwendungen definieren eigene Routen.
+
+---
+
+Beispiel:
+
+```text
+/health
+
+/medication
+
+/family
+
+/emergency
+```
+
+---
+
+# 11. Capability Modell
+
+Capabilities stammen ausschließlich aus RFC-0004.
+
+Eine Anwendung definiert:
+
+```text
+Benötigte Capabilities
+```
+
+---
+
+Beispiel
+
+```json
+{
+  "requiredCapabilities": [
+    "READ_PATIENT",
+    "READ_DOCUMENT"
+  ]
+}
+```
+
+---
+
+# 12. Consent Integration
+
+Anwendungen dürfen Consent nicht direkt prüfen.
+
+Die Plattform prüft:
+
+```text
+Identity
+
+Consent
+
+Capability
+```
+
+---
+
+# 13. Event Bus Integration
+
+Anwendungen kommunizieren über den Event Bus. 【3-7bfa0a】【4-f0844a】
+
+---
+
+## Subscribe
+
+```text
+FHIR_CREATED
+
+FHIR_UPDATED
+
+CONSENT_REVOKED
+```
+
+---
+
+## Publish
+
+```text
+WORKFLOW_STARTED
+
+WORKFLOW_COMPLETED
+```
+
+---
+
+# 14. Application Settings
+
+Jede Anwendung besitzt:
+
+```text
+Lokale Einstellungen
+
+Layout
+
+Filter
+
+Darstellung
+```
+
+---
+
+Nicht zulässig:
+
+```text
+Authentication Settings
+
+Consent Ownership
+
+FHIR Core Config
+```
+
+---
+
+# 15. Internationalisierung
+
+Pflicht:
+
+```text
+Deutsch
+
+Englisch
+```
+
+wie in den Produktzielen vorgesehen. 【1-063582】【3-7bfa0a】【5-413ba4】
+
+---
+
+## Anforderungen
+
+```text
+i18n Ressourcen
+
+Datumsformate
+
+Zeitzonen
+
+Lokalisierbare Fehler
+```
+
+---
+
+# 16. Accessibility
+
+Mindestanforderungen:
+
+```text
+Tastaturnavigation
+
+Screen Reader Unterstützung
+
+Kontrastanforderungen
+
+Skalierbarkeit
+```
+
+---
+
+Ziel:
+
+```text
+WCAG 2.2 AA
+```
+
+---
+
+# 17. Marketplace Integration
+
+Anwendungen sind Marketplace-fähig. 【2-3aa2be】【3-7bfa0a】
+
+---
+
+Verfügbare Kategorien:
+
+```text
+Community
+
+Verified
+
+Official
+```
+
+---
+
+# 18. Application Lifecycle
+
+## Installation
+
+```text
+Manifest prüfen
+
+Capabilities prüfen
+
+Registrieren
+```
+
+---
+
+## Aktivierung
+
+```text
+Navigation registrieren
+
+Events abonnieren
+
+UI laden
+```
+
+---
+
+## Update
+
+```text
+Kompatibilität prüfen
+
+Migration ausführen
+```
+
+---
+
+## Entfernung
+
+```text
+Routes entfernen
+
+Subscriptions beenden
+
+Settings löschen
+```
+
+---
+
+# 19. Versionsmodell
+
+Jede Anwendung besitzt:
+
+```text
+App Version
+
+Manifest Version
+
+API Compatibility Version
+```
+
+---
+
+# 20. App Manifest
+
+Beispiel:
+
+```json
+{
+  "id": "medication_manager",
+  "name": "Medication Manager",
+  "version": "1.0.0",
+  "type": "application",
+  "capabilities": [
+    "READ_MEDICATION",
+    "WRITE_MEDICATION"
+  ]
+}
+```
+
+---
+
+# 21. Familienfähigkeit
+
+Anwendungen müssen mehrbenutzerfähig sein.
+
+Vorbereitung für RFC-0008.
+
+---
+
+Unterstützte Bereiche:
+
+```text
+Owner
+
+Guardian
+
+Caregiver
+
+Proxy
+```
+
+---
+
+# 22. Health-Twin Integration
+
+Anwendungen dürfen optionale LifeWeaver Funktionen nutzen. 【6-7dee74】
+
+---
+
+Voraussetzungen:
+
+```text
+Consent
+
+Capability
+
+Provider Freigabe
+```
+
+---
+
+# 23. Sicherheitsanforderungen
+
+Pflicht:
+
+```text
+Capability Enforcement
+
+Consent Enforcement
+
+Audit Logging
+
+Keine Direktzugriffe
+
+Event Bus Integration
+```
+
+---
+
+# 24. Testanforderungen
+
+Jede Anwendung benötigt:
+
+```text
+Unit Tests
+
+UI Tests
+
+Capability Tests
+
+Consent Tests
+
+Localization Tests
+```
+
+---
+
+# 25. Architekturentscheidung
+
+Dieses RFC legt fest:
+
+✅ Anwendungen sind Erweiterungen der Plattform
+
+✅ Health Record ist Referenzanwendung
+
+✅ Keine eigene Gesundheitsdatenbank
+
+✅ Keine eigene Authentifizierung
+
+✅ Plattformnavigation
+
+✅ Plattformfähigkeiten
+
+✅ Event Bus Integration
+
+✅ Marketplace Unterstützung
+
+✅ Gemeinsame Consent Engine
+
+✅ Gemeinsame VitaFabric Nutzung
+
+✅ Mehrbenutzerfähigkeit
+
+✅ Lokalisierungspflicht
