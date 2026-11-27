@@ -171,7 +171,7 @@ Schemaänderung erfordert eine neue Version. Ein Consumer MUSS unbekannte
 Versionen sicher ablehnen oder in eine Dead-Letter-Queue leiten; er darf sie
 nicht stillschweigend als kompatibel behandeln.
 
-Standardkategorien sind `identity`, `consent`, `household`, `fhir`, `import`,
+Standardkategorien sind `identity`, `consent`, `household`, `fhir`, `import`, `backup`,
 `sync`, `plugin`, `security`, `ai` und `application`. Der jeweilige Owner aus
 §16 registriert Namen innerhalb seiner Kategorie. Die kanonischen Routen
 für bestehende Events sind:
@@ -181,6 +181,11 @@ für bestehende Events sind:
 | `ROLE_GRANTED` | `identity.role_granted.v1` |
 | `ROLE_REVOKED` | `identity.role_revoked.v1` |
 | `CONSENT_REVOKED` | `consent.revoked.v1` |
+| `CONSENT_GRANTED` | `consent.granted.v1` |
+| `FHIR_CREATED` | `fhir.created.v1` |
+| `FHIR_UPDATED` | `fhir.updated.v1` |
+| `USER_CREATED` | `identity.user_created.v1` |
+| `BACKUP_CREATED` | `backup.created.v1` |
 | `PROVIDER_CONSENT_GRANTED` | `consent.provider_consent_granted.v1` |
 | `PROVIDER_CONSENT_REVOKED` | `consent.provider_consent_revoked.v1` |
 | `EMBEDDING_PURGED` | `ai.embedding_purged.v1` |
@@ -402,6 +407,8 @@ Consent
 Audit
 
 Security
+
+Backup
 ```
 
 ---
@@ -438,8 +445,8 @@ Debugging
 
 ## Delivery Guarantees
 
-Für registrierte dauerhafte Events wird mindestens einmalige Zustellung
-vorgeschlagen: Änderung und Outbox-Eintrag werden in derselben Transaktion
+Für registrierte dauerhafte Events gilt als Entwurfsvertrag mindestens
+einmalige Zustellung: Änderung und Outbox-Eintrag werden in derselben Transaktion
 persistiert; der Dispatcher bestätigt erst nach dauerhaft gespeichertem
 Consumer-Ergebnis. Ein Absturz kann Duplikate verursachen. Consumer müssen
 `event_id` dauerhaft und transaktional deduplizieren und Seiteneffekte
@@ -465,10 +472,25 @@ Löschfristen und Zugriffsprüfung nicht umgehen; Backup-Restore wendet
 Löschmarkierungen vor Freigabe an. Sind Retention oder Löschpflichten nicht
 geklärt, wird die jeweilige Funktion nicht freigegeben.
 
+| Kategorie | Aufbewahrung, Archivierung und Löschung |
+| --- | --- |
+| Normale Events | Für benötigten Replay; Frist und geschütztes Archiv offen, danach kontrolliert löschen. |
+| Audit Events | Getrenntes verpflichtendes Audit; Frist und Löschverfahren offen, kein Ersatz durch normale Events. |
+| Sync Events | Erst für spätere Synchronisierung; Frist, Tombstones und Archivierung vor deren Freigabe festlegen. |
+| Security Events | Zweckgebunden und zugriffsbeschränkt; Frist, Archivierung und Löschung offen. |
+
 Konkrete Fristen, rechtliche Grundlage, Archivformat, Speicherobergrenzen,
 Tombstone-Lebensdauer und Verhalten bei offline Replikaten sind noch offen;
 keine unbegrenzte Speicherung aus dieser Skizze ableiten. Ausgelagerte
 Kopien können nicht zuverlässig zurückgerufen werden.
+
+## Slice Event Set
+
+Der erste Slice registriert `FHIR_CREATED`, `FHIR_UPDATED`, `CONSENT_GRANTED`,
+`CONSENT_REVOKED`, `USER_CREATED` und `BACKUP_CREATED` mit den kanonischen
+Typen aus §6. Schemas, Ereignisgrenzen, Consumer und atomare Verarbeitung sind
+noch auszuarbeiten; insbesondere ist ein Backup-Erfolg nicht gleichbedeutend
+mit einem erfolgreich geprüften Restore.
 
 ## 18. Event Replay
 

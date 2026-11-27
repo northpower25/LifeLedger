@@ -189,8 +189,9 @@ UI
 Application
 ```
 
-Eine Application ist ein spezialisierter Plugin-Typ mit UI, Navigation,
-Workflows und Settings, der die gemeinsamen Plattformdienste nutzt.
+Eine erweiterbare Application ist ein spezialisierter Plugin-Typ mit UI,
+Navigation, Workflows und Settings. Der integrierte erste Health Record ist
+die in ADR-0003 vorgeschlagene Ausnahme; er führt kein Plugin aus.
 
 ---
 
@@ -407,7 +408,7 @@ WASI vermittelt ohne explizite Freigabe weder Datei- noch Netzwerkzugriff.
 Die konkreten Signaturen, Datenformate, Fehler, Versionskompatibilität und
 Ausführungsgrenzen sind vor Plugin-Implementierung als WIT zu veröffentlichen.
 
-## Runtime Resource Limits
+## Resource Budget Policy
 
 Jede Instanz erhält durch den Host durchgesetzte Obergrenzen für RAM,
 CPU/Fuel, Wandzeit pro Aufruf, verschlüsselten Disk-Verbrauch, Netzwerkziele
@@ -423,6 +424,22 @@ die jeweilige Zielplattform zu messen und vor Freigabe zu beschließen.
 Insbesondere sind Fuel und Timeout kein Nachweis einer vollständigen
 CPU-Isolation. Zu niedrige Limits können legitime Imports abbrechen; zu hohe
 beeinträchtigen Reaktionszeit und Speicher anderer Anwendungen.
+
+## Host Compatibility Matrix
+
+Diese Matrix beschreibt den Planungsstand, keine getestete Unterstützung.
+Externe Plugins werden im ersten Windows-Slice nicht ausgeführt.
+
+| Host | Status für Plugin Runtime |
+| --- | --- |
+| Windows | Spätere Unterstützung vorgesehen; Isolation, Budgets und Kompatibilität ungeprüft. |
+| Linux | Spätere Unterstützung vorgesehen; ungeprüft. |
+| macOS | Spätere Unterstützung vorgesehen; ungeprüft. |
+| Android | Offen; Plattformrestriktionen und Isolation prüfen. |
+| iOS | Offen; Plattformrestriktionen und Isolation prüfen. |
+
+Ohne nachgewiesene sichere Isolation und passende Verträge wird ein Plugin
+auf dem jeweiligen Host nicht ausgeführt; es gibt keinen unisolierten Fallback.
 
 ## 11. Netzwerkmodell
 

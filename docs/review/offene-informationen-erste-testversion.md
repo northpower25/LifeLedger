@@ -1,15 +1,18 @@
 # Offene Informationen und Startfreigabe für die erste Testversion
 
-**Stand:** 27.11.2026. **Ergebnis: Noch keine Startfreigabe** für den
-ersten vollständigen Offline-Vertical-Slice nach der Definition of Done des
-[Arbeitsauftrags V2](rfc-open-questions-resolution-V2.md). Die Änderungen in
-diesem Arbeitsstand sind RFC-Entwürfe, keine angenommenen Entscheidungen und
-keine ausführbaren Verträge. Diese Bewertung ersetzt nicht den
+**Stand:** 27.11.2026, Abgleich mit dem
+[RFC-Backlog](LifeLedger%20RFC%20Backlog.md). **Ergebnis: Noch keine
+Startfreigabe.** Die Slice-Richtung ist jetzt vorgegeben, aber mehrere
+Backlog-Aufträge sind nur teilweise konkretisiert. Die RFCs bleiben Entwürfe,
+keine angenommenen Entscheidungen oder ausführbaren Verträge. Diese Bewertung ersetzt nicht den
 [ursprünglichen Review](rfc-implementierungsreife-und-repository-review.md),
 sondern konkretisiert dessen verbleibende Punkte.
 
-Isolierte Machbarkeitsversuche mit synthetischen Daten waren im ursprünglichen
-Review separat denkbar. Sie erfüllen aber nicht das strengere V2-Start-Gate.
+Das frühere [V2-Gate](rfc-open-questions-resolution-V2.md) verlangt zusätzlich
+akzeptiertes RFC-0014 und vollständige RFCs 0015–0019; der Backlog nennt deren
+Existenz und P0/P1, hebt das V2-Gate aber nicht ausdrücklich auf. Welches Gate
+maßgeblich ist, muss entschieden werden. Isolierte Machbarkeitsversuche mit
+synthetischen Daten erfüllen das strengere V2-Gate nicht.
 Für echte Gesundheitsdaten, produktive Nutzung und externe Freigabe gelten
 zusätzliche unabhängige Sicherheits-, Datenschutz- und Rechtsprüfungen. Bis
 dahin ausschließlich synthetische Daten, auch für Logs, Dokumente, Backups und
@@ -23,13 +26,35 @@ Vorschläge sind keine Vorwegnahme einer Freigabe.
 
 | Nr. | Benötigte Information / Entscheidung | Warum vor Start |
 | --- | --- | --- |
-| 1 | Wer entscheidet über RFCs und ADRs, wer prüft Security und wer erteilt die dokumentierte Startfreigabe? Wie wird RFC-0014 akzeptiert und ADR-0002 entschieden? | V2 verlangt ausdrücklich akzeptiertes RFC-0014; alle RFCs sind Draft, ADR-0002 ist proposed. Keine Annahme durch Dokumentenänderung. |
-| 2 | Exakter Abnahmeumfang: Ist der erste Slice Windows-Desktop, ein synthetisches Dokument, eine Observation und ein Patient **einschließlich erfolgreichem Backup-Restore**? Gehören MedicationStatement und Timeline bereits dazu oder erst zur folgenden Nutzerreise? Welche Dokumenttypen und maximalen Größen? | V2 nennt die drei Ressourcen; die bisherige Nutzerreise nennt zusätzlich Medikation und Timeline. Ohne Abgrenzung sind Schnittstellen und Abschlusskriterien mehrdeutig. |
-| 3 | Muss die Health-Record-Anwendung bereits als isoliertes WASM-Plugin laufen? Falls ein integrierter Host-UI-Pfad für den Slice zulässig sein soll: welche Änderung/ADR erlaubt ihn, ohne RFC-0007/-0014 und die nicht umgehbaren Kontrollen zu verletzen? | Application als Plugin und Roadmap-Reihenfolge stehen derzeit in Spannung. V2 fordert außerdem ein vollständiges RFC-0019. |
+| 1 | Wer entscheidet über RFCs und ADRs, prüft Security und erteilt die dokumentierte Startfreigabe? Gilt weiterhin das strengere V2-Gate? | Der Backlog benennt Zuständigkeiten auf Teamebene, aber keine Personen oder Annahme von RFC-0014 und ADR-0002/-0003. |
+| 2 | Erfolgreichen Backup-Restore als Abnahmekriterium bestätigen; Dokumenttypen und maximale Größen festlegen. | Festgelegt sind Windows, Tauri/FastAPI/SQLite, Patient, DocumentReference, MedicationStatement und Timeline; Observation ist nicht Teil dieses Slice. Backup ist gefordert, Restore-Erfolg nicht ausdrücklich genannt. |
+| 3 | Architektur- und Sicherheitsreview sowie Annahme der integrierten Health-Record-Ausnahme in ADR-0003/RFC-0014 klären. Ist RFC-0019 trotz ausgeschlossener Plugins nach dem maßgeblichen Gate vollständig erforderlich? | Die integrierte Ausführung ist vorgegeben, die frühere Plugin-only-Grenze und das V2-Gate sind nicht automatisch angenommen oder aufgehoben. |
 | 4 | Was bedeutet verpflichtendes offline MFA für den ersten lokalen Owner: Faktoren, Setup-Zeitpunkt, Verlust und Recovery? Welche Bedienbarkeit und welches Verhalten bei verlorenen Faktoren sind gewünscht? | RFC-0003 fordert Erst-MFA, nennt aber keinen implementierbaren Faktor oder Recovery-Pfad. Keine implizite Abschwächung. |
 | 5 | Welche konkreten Windows-Versionen und Referenzgeräte sowie akzeptablen Grenzen für Startzeit, RAM, Importgröße, Validierungsdauer und Backup-/Restore-Zeit gelten? | Tauri, FastAPI, Validator, Verschlüsselung, Audit und gegebenenfalls Wasmtime verursachen messbare Last. Ohne Messziele keine reproduzierbare Abnahme. |
 | 6 | Welche Fristen und Verantwortlichen gelten für Audit, Events, Quarantäne und Backup, insbesondere Löschung und Wiederherstellung? | Datenschutz, Speicherbedarf und Löschgarantien hängen davon ab; Fristen dürfen nicht erfunden werden. |
-| 7 | Wer übernimmt die fachliche und rechtliche Prüfung von Familien-/Guardian-Regeln und die Freigabe von Terminologielizenzen? Falls diese Funktionen nicht zum ersten Slice gehören: wird deren Implementierung ausdrücklich gesperrt? | Rechtsordnungen und Lizenzrechte können nicht aus der technischen Architektur abgeleitet werden. V2 verlangt dennoch die zugehörigen RFC-Arbeiten. |
+| 7 | Wer übernimmt die fachliche und rechtliche Prüfung von Familien-/Guardian-Regeln und die Freigabe von Terminologielizenzen? | Rechtsordnungen und Lizenzrechte können nicht aus der technischen Architektur abgeleitet werden. Familienfunktionen gehören nicht zur festgelegten ersten Nutzerreise; sie dürfen ohne diese Prüfung nicht freigegeben werden. |
+
+## Abgleich mit dem Backlog
+
+„Teilweise“ bedeutet, dass der angeforderte Abschnitt existiert, aber die
+geforderte Entscheidung oder eine ausführbare Konkretisierung noch fehlt.
+Die Einträge sind keine Annahme der RFCs.
+
+| Auftrag | Stand und verbleibende Arbeit |
+| --- | --- |
+| RFC1-01/02 | Umfang und Teamrollen in RFC-0001 übernommen; konkrete Personen und Freigabeinstanzen fehlen. |
+| RFC2-01/02/03 | Topologie, Vertrauensgrenzen und korrekte Folgereferenzen in RFC-0002 dokumentiert; IPC, Authentisierung, Packaging und Schutz gegen Prozesse desselben Nutzers offen. |
+| RFC3-01/03 | Zustandsautomat und Consent-Felder in RFC-0003 dokumentiert; ausführbares Schema und Schnittstellen fehlen. |
+| RFC3-02/04 | Bootstrap-Reihenfolge und Widerrufsverhalten dokumentiert; Recovery-Key-Verfahren, MFA und Abbruchgrenzen fehlen. |
+| RFC4-01–03 | Prüfreihenfolge, Lifecycle und Owner-Regeln in RFC-0004 dokumentiert; vollständige Policy-/Capability-Matrix fehlt. |
+| RFC5-01/03 | At-least-once und sechs Slice-Events in RFC-0005 festgelegt; Schemas, Consumer und Betriebsparameter fehlen. |
+| RFC5-02 | Kategorien und Grundregeln dokumentiert; Aufbewahrungsfristen, Archivierung und Löschung sind nicht entschieden. |
+| RFC6-01–03 | WIT-Katalog, Budgetprinzipien und Host-Matrix in RFC-0006 dokumentiert; echte WIT-Definitionen, Zahlen und Plattformnachweise fehlen. Plugins sind nicht im Slice. |
+| RFC7-01–03 | Integrierter Health Record, Nutzerreise und Backup-Scope in RFC-0007 dokumentiert; ADR-0003 ist proposed, Restore- und Schlüsselvertrag offen. |
+| RFC8-01–03 | Guardian-Prüfung und Altersübergang in RFC-0008 skizziert, Notfallfelder mit RFC-0003 harmonisiert; Rechtsprüfung und konkrete Verfahren fehlen. |
+| RFC9-01–03 | Rotation und Offline-Verhalten in RFC-0009 skizziert; jede Paketänderung erfordert neuen Digest und neue Signatur. Trust-Bootstrap und Offline-Weiterbetrieb bleiben offen. |
+| RFC-0015–0019 | Alle existieren als Entwürfe; Existenz erfüllt das Backlog-Kriterium, nicht die Vollständigkeit des V2-Gates. |
+| P2: RFC-0010–0012 | Nicht Gegenstand der P0/P1-Startbedingung; Sync/AI bleiben außerhalb des Slice. Betriebsverantwortliche und Auditfristen bleiben auch für den lokalen Kern zu klären. |
 
 ## Vor Programmierung zu erstellende und zu prüfende Artefakte
 
@@ -55,14 +80,14 @@ Reviewenden und die Abnahmekriterien müssen aber benannt sein.
    Fehlerzuordnung und lauffähige positive/negative Fixtures.
 4. **API und Zugriff:** OpenAPI 3.1 mit Request-/Response-Schemas,
    Authentisierung, vollständiger Capability-/Consent-/Policy-Matrix für
-   Owner, Ressourcen, Import, Backup und Restore; Fehler, Idempotenz,
+   Owner, Ressourcen, Import, Backup und gegebenenfalls Restore; Fehler, Idempotenz,
    Concurrency und Audit. Die Skizzen in RFC-0016/-0018 sind noch keine
    ausführbaren Schemata.
 5. **Events und Audit:** tatsächliche Slice-Eventtypen, Registry und
    JSON-Schemas, Atomarität von Änderung/Audit/Outbox, Deduplizierung,
    Reihenfolge, Wiederanlauf, DLQ und sichere Retention samt Lösch-/
    Restore-Strategie. Widerruf darf nicht von einem Event abhängen.
-6. **Plugin-Vertrag gemäß V2:** maschinenlesbare Manifest-/Permission-Schemas,
+6. **Plugin-Vertrag gemäß V2, falls dieses Gate weiter gilt:** maschinenlesbare Manifest-/Permission-Schemas,
    eindeutiges Paket- und Signaturformat, vollständige versionierte WIT-
    Definitionen, Host-Fehler, Ressourcenlimits, SDK-Vertrag und unabhängig
    ausführbare Compliance-Fixtures. Vorliegende Tabellen sind keine WIT-
@@ -71,7 +96,7 @@ Reviewenden und die Abnahmekriterien müssen aber benannt sein.
 7. **Abnahme und Machbarkeit:** synthetische Ende-zu-Ende-Fälle für Setup,
    Import, ungültige Daten, Lesen, verweigerten und widerrufenen Zugriff,
    Audit-/Policy-Ausfall, parallelen Widerruf, falsches Credential, Neustart,
-   Offline-Betrieb und Backup-Restore. Messverfahren und Schwellen aus Nr. 5
+   Offline-Betrieb und, falls bestätigt, Backup-Restore. Messverfahren und Schwellen aus Nr. 5
    dokumentieren; technisch relevante Abhängigkeiten und deren Lizenzen
    inklusive Windows-Verfügbarkeit prüfen.
 
@@ -93,8 +118,8 @@ Reviewenden und die Abnahmekriterien müssen aber benannt sein.
 als Entwurf ab, die Planungstiefe reicht für den verlangten Start noch nicht.
 Insbesondere sind RFC-0014 nicht akzeptiert, RFC-0015–0019 nicht vollständig,
 Phase A nicht abgeschlossen und die Review-Blocker nicht geschlossen. Der
-konkrete synthetische Slice und Security-/Consent-Flows sind skizziert, aber
-nicht abschließend beschlossen und ausführbar spezifiziert. Diese Punkte
+synthetische Slice ist in seinem Produktumfang festgelegt; Security-/Consent-Flows
+sind aber nicht abschließend beschlossen und ausführbar spezifiziert. Diese Punkte
 dürfen nicht als erledigt markiert werden.
 
 Erneute Zugriffskontrolle, Offline-Validierung, Verschlüsselung, Audit und

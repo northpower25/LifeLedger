@@ -568,8 +568,11 @@ Sicherheitsgarantie
 
 ### Grundsatz
 
-Eine Application ist ein spezialisierter Plugin-Typ mit UI, Navigation,
-Workflows und Settings, der die gemeinsamen Plattformdienste nutzt.
+Für spätere Erweiterungen ist eine Application als spezialisierter Plugin-Typ
+vorgesehen. Der erste Health Record wird dagegen als integrierter Anwendungsteil
+ohne externes Plugin ausgeführt; die Änderung der bisherigen Grenze ist in
+[ADR-0003](../adr/0003-first-slice-application-boundary.md) vorgeschlagen.
+Auch er nutzt die gemeinsamen Plattformdienste.
 
 Anwendungen besitzen keine eigene Datenbank.
 
@@ -598,11 +601,11 @@ VitaFabric
 
 Geplant sind ein lokaler FastAPI-Dienst eingebettet in Tauri für den
 Desktop-Client und Flutter für Mobile. Desktop beginnt mit Windows; Linux
-und macOS folgen. Der erste vertikale Durchstich umfasst Desktop, lokale
-Datenhaltung, ein Dokument, einen Datentyp und ein Backup. Die erste
-Nutzerreise umfasst Arztbriefimport, Medikationserfassung, Timeline und
-Backup (RFC-0007). Vor der Freigabe für echte Gesundheitsdaten gelten die
-Sicherheits-Gates der Roadmap.
+und macOS folgen. Der erste Durchstich umfasst Patient, DocumentReference und
+MedicationStatement, Dokumentimport, Timeline und Backup (RFC-0007); nur
+synthetische Daten sind zugelassen. Observation gehört nicht zum Slice.
+Vor der Freigabe für echte Gesundheitsdaten gelten die Sicherheits-Gates der
+Roadmap.
 
 Die vorgeschlagene lokale Laufzeittopologie und ihre offenen Nachweise stehen
 in „Runtime Topology“ unten.
@@ -766,7 +769,20 @@ invalidieren und den eigenen Dienst beenden. Bei Absturz erfolgt beim
 Neustart Recovery vor neuer Datenfreigabe. Bereits exportierte Daten werden
 durch den Shutdown nicht zurückgerufen.
 
-### Failure Modes und Trust Boundaries
+### Process Trust Boundaries
+
+| Bereich | Vertrauensniveau und Authentisierung | Kommunikationsweg |
+| --- | --- | --- |
+| Tauri-UI/Host | Client-Eingaben nicht vertrauenswürdig; Owner-Sitzung und gegenseitige Prozessprüfung erforderlich. | Ausschließlich authentisiertes lokales IPC zum eigenen Backend. |
+| FastAPI/Core und VitaFabric | Vertrauenswürdige Durchsetzungsinstanzen, aber kein implizites Recht für Aufrufer; Identity, Consent, Capability und Policy am geschützten Zugriff prüfen. | Lokale interne Aufrufe; Gesundheitsdaten ausschließlich über VitaFabric. |
+| Plugin Runtime | Plugins nicht vertrauenswürdig; Host prüft Identität, Signatur und Berechtigungen. Im Slice nicht ausgeführt. | Nur isolierte, hostvermittelte Schnittstellen; kein direkter Storage. |
+| Storage Layer | Daten und Dateien gelten als manipulierbar; Integrität und Verschlüsselung prüfen, keine eigene Autorisierungsentscheidung. | Zugriff auf Gesundheitsdaten ausschließlich über VitaFabric und dessen Storage-Abstraktion. |
+
+Der konkrete Mechanismus für IPC, Prozessidentität und Schutz gegen Prozesse
+mit denselben Benutzerrechten ist offen; diese Tabelle behauptet keine bereits
+durchgesetzte Isolation.
+
+### Failure Modes
 
 UI, Host, Dienst, Dateisystem und externe Prozesse sind getrennte
 Vertrauensbereiche; ein anderer Prozess desselben Nutzers ist nicht

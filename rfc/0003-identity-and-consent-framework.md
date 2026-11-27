@@ -259,7 +259,12 @@ Jede Freigabe wird als Consent gespeichert.
     "Medication",
     "Allergies"
   ],
-  "expires": null
+  "expires": null,
+  "purpose": "example-purpose",
+  "operation": "read",
+  "resource": "MedicationStatement",
+  "version": "1",
+  "status": "DRAFT"
 }
 ```
 
@@ -300,10 +305,13 @@ allein genügt nicht. Bei unklarer Befugnis gilt Default Deny. Jede Entscheidung
 und Version wird datensparsam auditiert; Familienrecht ist vor dieser Funktion
 separat zu prüfen (RFC-0008).
 
-## System Bootstrap
+## Bootstrap Ownership
 
 Der erste lokale Owner wird bei einer neuen Installation ausdrücklich angelegt;
-das erste Gerät wird diesem Profil zugeordnet. Vor dem Anlegen dürfen keine
+anschließend folgen Recovery-Key-Einrichtung, Zuordnung des ersten Geräts und
+der initiale Consent-Kontext. Der Schlüssel darf erst als verwendbare Recovery
+gelten, wenn Erstellung, sichere Übergabe und Wiederherstellung spezifiziert
+und geprüft sind. Vor dem Anlegen dürfen keine
 Gesundheitsdaten übernommen werden. Der Owner wählt ein Credential, das
 Schlüsselmaterial wird lokal erzeugt und geschützt; weder Credential noch
 Klartextschlüssel gelangen in Logs oder Prozessargumente. Eine erste Sitzung
@@ -371,6 +379,7 @@ Enthält:
 
 ```text
 Name
+Geburtsdatum
 Allergien
 Medikationen
 Blutgruppe
@@ -402,6 +411,17 @@ Audit Event
 ## 11. Widerrufsmodell
 
 Widerruf muss sofort wirken.
+
+### Session Revocation Behaviour
+
+Nach bestätigtem Widerruf darf die betroffene Session keinen Zugriff aus dem
+widerrufenen Scope mehr ausführen; andere Berechtigungen werden nicht
+automatisch widerrufen. Neue Zugriffe werden synchron verweigert, nicht
+festgeschriebene Schreibvorgänge abgebrochen. Laufende Exporte und AI-Anfragen
+müssen vor weiterer Herausgabe erneut geprüft und bei Widerruf abgebrochen
+werden; bereits ausgelieferte Daten lassen sich nicht zurückholen. Die
+technische Abbruchgrenze für Streams und externe Provider ist noch zu
+spezifizieren. Export und AI sind nicht Teil des ersten Slice.
 
 ---
 

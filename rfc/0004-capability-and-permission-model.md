@@ -180,7 +180,7 @@ Zugriff verweigert
 
 ---
 
-## Capability Evaluation Flow
+## Capability Evaluation Algorithm
 
 Für jeden geschützten Zugriff: authentisierte Identity und aktive Sitzung →
 gültiger Consent für Profil, Zweck, Ressource und Operation → aktive,
@@ -198,6 +198,13 @@ FHIR-Typen und Dokumentoriginale sowie Backup/Restore separat zuzuordnen.
 Ein vollständiger maschinenlesbarer Katalog samt Policy-Matrix ist noch nicht
 vorhanden. Widerruf wirkt synchron am Zugriffspunkt, nicht erst nach
 Event-Zustellung; bereits übermittelte Kopien bleiben außerhalb der Kontrolle.
+
+## Owner Access Rules
+
+Auch der Owner benötigt eine authentisierte Sitzung, eine aktive passende
+Capability und gültigen Consent für Zweck, Ressource und Operation sowie eine
+positive Policy-Entscheidung. Ownership allein umgeht keine dieser Prüfungen;
+die konkreten Owner-Grants und die Matrix für Backup und Restore bleiben offen.
 
 ## Capability Lifecycle
 
