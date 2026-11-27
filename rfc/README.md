@@ -32,4 +32,5 @@ The RFCs remain drafts, not accepted architecture or evidence of implemented
 capabilities. The decisions in the [consistency review](../docs/review/rfc-consistency-review.md)
 and [open-question resolution](../docs/review/rfc-open-questions-resolution-V1.md)
 are reflected in the affected RFC drafts; remaining implementation details
-stay open.
+stay open. The [implementation readiness and repository review](../docs/review/rfc-implementierungsreife-und-repository-review.md)
+records the remaining questions by RFC and compares the repository with the drafts.
