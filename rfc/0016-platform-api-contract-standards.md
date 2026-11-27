@@ -1,6 +1,7 @@
-# RFC-0016: Platform API Contract Standards
+# RFC 0016: Platform API Contract Standards
 
-Status: Draft
+- Status: Draft
+- Depends On: [RFC-0002 Platform Core Architecture](0002-platform-core-architecture.md), [RFC-0007 Application Framework](0007-application-framework.md)
 
 ## Ziel
 

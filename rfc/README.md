@@ -22,6 +22,11 @@ Current platform proposals include:
 - [RFC-0012: Sustainability, Governance & Operations](0012-sustainability-governance-and-operations.md)
 - [RFC-0013: VitaFabric Data Contracts & FHIR Governance](0013-vitafabric-data-contracts-and-fhir-governance.md)
 - [RFC-0014: Core Runtime & Platform Boundaries](0014-core-runtime-platform-boundaries.md)
+- [RFC-0015: FHIR Profiles & Terminology Governance](0015-fhir-profiles-and-terminology-governance.md)
+- [RFC-0016: Platform API Contract Standards](0016-platform-api-contract-standards.md)
+- [RFC-0017: Event Schemas & Messaging Contracts](0017-event-schemas-and-messaging-contracts.md)
+- [RFC-0018: Identity & Consent APIs](0018-identity-and-consent-apis.md)
+- [RFC-0019: Plugin APIs & SDK Contracts](0019-plugin-apis-and-sdk-contracts.md)
 
 The RFCs remain drafts, not accepted architecture or evidence of implemented
 capabilities. The decisions in the [consistency review](../docs/review/rfc-consistency-review.md)
