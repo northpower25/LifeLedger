@@ -9,6 +9,12 @@ Abhängigkeiten, nicht notwendig aufeinanderfolgende Kalenderphasen. Arbeit
 ohne Abhängigkeit kann parallel stattfinden; jede Stufe benötigt ihre
 genannten Nachweise.
 
+Für den ersten Offline-Vertical-Slice gelten zusätzlich die strengeren
+Startbedingungen aus dem [V2-Arbeitsauftrag](../review/rfc-open-questions-resolution-V2.md).
+Der aktuelle [Startabgleich](../review/offene-informationen-erste-testversion.md)
+führt noch offene Entscheidungen und fehlende Verträge auf; die
+Roadmap-Stufen allein erteilen keine Programmierfreigabe.
+
 ## Verbindliche Leitplanken
 
 Gesundheitsdaten passieren VitaFabric; FHIR-Ressourcen verwenden FHIR R4,

@@ -758,6 +758,28 @@ Projektgovernance bestätigt werden.
 
 ---
 
+## Maintainer Succession Policy
+
+Der Prozess in §33 ist der geltende Entwurf für Übergabe, Ausfallvertretung,
+Quorum und Schlüsselrotation. Vor Betriebsaufnahme müssen konkrete
+Rolleninhaber und unabhängige Vertretungen benannt und ein getesteter
+Zugangs- und Incident-Übergabeplan hinterlegt werden. Fehlt das vorgeschlagene
+Quorum, werden privilegierte Freigaben ausgesetzt statt ein Vier-Augen-Prinzip
+zu fingieren. Die Fristen und Quoren bedürfen der Governance-Annahme.
+
+## Security Escalation Matrix
+
+| Ereignis | Erstzuständigkeit | Eskalation und Begrenzung |
+| --- | --- | --- |
+| Verdacht auf Schwachstelle | Security-Team über den privaten Meldekanal in `SECURITY.md` | vertrauliche Triage, keine öffentliche Offenlegung vor abgestimmter Koordination |
+| Schlüsselkompromittierung | Security und Signing-Verantwortliche | Signierung stoppen, Schlüssel widerrufen/rotieren, Maintainer informieren |
+| Aktive Ausnutzung oder Datenabfluss | Security und zuständige Betriebsverantwortliche | betroffene Funktion isolieren, Belege sichern, Incident und gegebenenfalls Meldepflichten prüfen |
+| Kein Security-Ansprechpartner erreichbar | benannte Security-Vertretung | privilegierte Releases pausieren; keine einseitige Freigabe |
+
+Konkrete Personen, gesicherte Kommunikationswege, Schweregrade,
+Reaktionsfristen und rechtliche Meldewege müssen vor Betrieb beschlossen und
+geübt werden. Keine Zusage einer bereits existierenden Bereitschaft.
+
 ## 34. Architekturentscheidung
 
 Dieses RFC legt fest:

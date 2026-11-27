@@ -149,7 +149,8 @@ Jedes Event besitzt einen Standardaufbau.
 Jedes Event MUSS eine Kategorie, einen Namen und eine eigene Schema-Version
 angeben. Das kanonische Routing-Schema ist
 `<category>.<name>.v<version>`; alle Segmente sind kleingeschriebene
-ASCII-Bezeichner mit Punkttrennung. Diese Felder entsprechen den logischen
+ASCII-Bezeichner mit Punkttrennung: Kategorie `[a-z][a-z0-9_]*`, Name
+`[a-z][a-z0-9_]*`, Version positive Ganzzahl. Diese Felder entsprechen den logischen
 Werten `EVENT_CATEGORY`, `EVENT_NAME` und `EVENT_VERSION`; im JSON-Envelope
 werden sie als `event_category`, `event_name` und `event_version` serialisiert.
 Eventnamen sind stabil und beschreiben vergangene Fakten, nicht Befehle.
@@ -434,6 +435,40 @@ Debugging
 ```
 
 ---
+
+## Delivery Guarantees
+
+Für registrierte dauerhafte Events wird mindestens einmalige Zustellung
+vorgeschlagen: Änderung und Outbox-Eintrag werden in derselben Transaktion
+persistiert; der Dispatcher bestätigt erst nach dauerhaft gespeichertem
+Consumer-Ergebnis. Ein Absturz kann Duplikate verursachen. Consumer müssen
+`event_id` dauerhaft und transaktional deduplizieren und Seiteneffekte
+idempotent ausführen. Externe Seiteneffekte erfordern eigene
+Idempotenzschlüssel; Exactly-once ist nicht garantiert.
+
+Reihenfolge gilt nur je explizit definiertem Stream und Sequenznummer, nicht
+global. Fehlgeschlagene Zustellung wird begrenzt wiederholt und danach sichtbar
+in eine geschützte DLQ verschoben; Kapazitätsgrenzen und Retry-Parameter sind
+vor Implementierung festzulegen. Volle Outbox oder fehlende Auditpersistenz
+führt bei Pflicht-Events zum Abbruch der auslösenden Transaktion. Widerruf
+wird synchron am Datenzugriff durchgesetzt, nicht durch Event-Auslieferung.
+
+## Event Retention
+
+Events sind kein Ersatz für das verpflichtende Audit. Audit, Replay, Debugging
+und Sync haben getrennte Zwecke, Zugriffsrechte und Fristen. Das vorgeschlagene
+Modell speichert nur datensparsame Envelope- und Statusdaten verschlüsselt;
+auch opake IDs können personenbezogen sein. Replay erfordert erneute
+Autorisierung und berücksichtigt Widerruf und Lösch-Tombstones. Debugdaten
+werden nicht für unbegrenzte Diagnose gesammelt. Archivierung darf Schutz,
+Löschfristen und Zugriffsprüfung nicht umgehen; Backup-Restore wendet
+Löschmarkierungen vor Freigabe an. Sind Retention oder Löschpflichten nicht
+geklärt, wird die jeweilige Funktion nicht freigegeben.
+
+Konkrete Fristen, rechtliche Grundlage, Archivformat, Speicherobergrenzen,
+Tombstone-Lebensdauer und Verhalten bei offline Replikaten sind noch offen;
+keine unbegrenzte Speicherung aus dieser Skizze ableiten. Ausgelagerte
+Kopien können nicht zuverlässig zurückgerufen werden.
 
 ## 18. Event Replay
 

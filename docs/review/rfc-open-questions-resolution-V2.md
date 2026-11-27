@@ -2,6 +2,11 @@
 # Arbeitsaufträge für GitHub Copilot
 # Ziel: Implementierungsreife für den ersten Offline Vertical Slice
 
+Bearbeitungsstand und weiterhin unerfüllte Startbedingungen:
+[Offene Informationen für die erste Testversion](offene-informationen-erste-testversion.md).
+Die folgenden Aufträge und die Definition of Done bleiben als ursprüngliche
+Vorgaben erhalten; die RFC-Ergänzungen sind weiterhin Entwürfe.
+
 Status: Architektur weitgehend geklärt
 Ziel: Nach Abschluss dieses Backlogs soll die Implementierung des ersten
 lauffähigen Prototyps beginnen können.

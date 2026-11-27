@@ -265,6 +265,60 @@ Jede Freigabe wird als Consent gespeichert.
 
 ---
 
+## Consent State Machine
+
+Ein Consent bindet eine eindeutige ID und Version an betroffene Profil-ID,
+Aussteller, Empfänger, Zweck, Ressourcen-/Operationsscope, Gültigkeitsbeginn,
+optionales Ende und Zustand. Jede Änderung erzeugt eine nachvollziehbare neue
+Version; eine Erweiterung erfordert eine neue explizite Zustimmung. Die
+bestehende JSON-Skizze in §7 ist nicht das vollständige Schema.
+
+| Zustand | Wirkung und erlaubte Übergänge |
+| --- | --- |
+| `DRAFT` | Kein Zugriff; nach ausdrücklicher Freigabe `ACTIVE`, sonst verwerfen. |
+| `ACTIVE` | Zugriff nur innerhalb aller Grenzen; → `SUSPENDED`, `REVOKED` oder bei Fristende `EXPIRED`. |
+| `SUSPENDED` | Kein Zugriff; berechtigter Aussteller → `ACTIVE` nach erneuter Prüfung oder → `REVOKED`; Fristende → `EXPIRED`. |
+| `REVOKED` | Endzustand, kein Zugriff; neue Zustimmung erzeugt neues Objekt. |
+| `EXPIRED` | Endzustand, kein Zugriff; Erneuerung erzeugt neues Objekt. |
+
+Zeit wird bei jedem Zugriff geprüft; ein verspätetes Ablauf-Event darf keinen
+Zugriff verlängern. Widerruf und geschützte Schreiboperationen werden am
+Zugriffspunkt serialisiert: Ein nach bestätigtem Widerruf begonnener Zugriff
+wird verweigert, noch nicht festgeschriebene Änderungen werden abgebrochen.
+Bereits ausgelieferte Daten und offline Kopien lassen sich nicht zurückholen.
+Wie lesende Streams beendet werden und welche messbare lokale Obergrenze
+gilt, bleibt vor Implementierung zu entscheiden.
+
+## Consent Ownership Rules
+
+Der authentisierte, handlungsberechtigte Profil-Owner erstellt, genehmigt,
+ändert, widerruft und erneuert eigene Freigaben. Ein Empfänger kann eine
+Freigabe ablehnen oder aufgeben, sie aber nicht selbst erweitern oder
+erneuern. Vertreter dürfen nur innerhalb nachgewiesener, gültiger
+Vertretungsbefugnisse und ihres engeren Scopes handeln; Haushaltszugehörigkeit
+allein genügt nicht. Bei unklarer Befugnis gilt Default Deny. Jede Entscheidung
+und Version wird datensparsam auditiert; Familienrecht ist vor dieser Funktion
+separat zu prüfen (RFC-0008).
+
+## System Bootstrap
+
+Der erste lokale Owner wird bei einer neuen Installation ausdrücklich angelegt;
+das erste Gerät wird diesem Profil zugeordnet. Vor dem Anlegen dürfen keine
+Gesundheitsdaten übernommen werden. Der Owner wählt ein Credential, das
+Schlüsselmaterial wird lokal erzeugt und geschützt; weder Credential noch
+Klartextschlüssel gelangen in Logs oder Prozessargumente. Eine erste Sitzung
+entsteht erst nach erfolgreicher Entsperrung. Auch der Zugriff auf eigene
+Daten benötigt einen ausdrücklich bestätigten, zweck- und operationsgebundenen
+Owner-Consent und eine Capability; ein UI-Häkchen allein ersetzt keine Prüfung.
+
+Das erste MFA-Setup muss offline durchführbar sein. Welche Faktoren,
+verpflichtende Aktivierung, Verlust- und Recovery-Verfahren gelten, ist noch
+nicht beschlossen; kein behaupteter MFA-Schutz ohne Umsetzung und Prüfung.
+Bootstrapping muss bei Unterbrechung atomar fortgesetzt oder zurückgerollt
+werden; ein zweiter gleichzeitiger Bootstrap wird verweigert. Ein kompromittiertes
+lokales Konto wird dadurch nicht ausgeschlossen. Konkrete KDF-Parameter,
+Schlüsselspeicher und Wiederherstellung sind Startfragen.
+
 ## 8. Scope-Modell
 
 Nicht:
