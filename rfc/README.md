@@ -10,3 +10,6 @@ Current platform proposals include [RFC-0001](0001-platform-direction.md) and
 [RFC-0002: Platform Core Architecture](RFC-0002%20Platform%20Core%20Architecture).
 Both are drafts, not accepted architecture or evidence of implemented
 capabilities.
+
+The [RFC-0003–RFC-0013 consistency review](RFC-0003-0013-consistency-review.md)
+records unresolved cross-RFC contracts and completeness gaps.

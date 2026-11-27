@@ -748,3 +748,9 @@ Dieses RFC legt fest:
 ✅ Sofortiger Widerruf
 
 ✅ VitaFabric Enforcement
+
+## Offene technische Fragen
+
+- **Befugnisse von Sorgeberechtigten (§6–8, §12):** Wie werden Befugnisse von Sorgeberechtigten bzw. Vertretungen begründet und nachgewiesen, und wie werden Umfang, Dauer und Rechtsstatus dargestellt und überprüft?
+- **Delegationsketten (§12–14, §24):** Darf ein Delegierter Befugnisse weiterdelegieren? Falls ja, wie werden Scopes, Ablauf und Widerruf innerhalb der Kette begrenzt und weitergegeben?
+- **Übergang zur Volljährigkeit (§17):** Welcher Zustandsübergang regelt die Übernahme der Profilkontrolle einschließlich bestehender Sorgeberechtigten-Delegationen, aktiver Sitzungen und Widerrufen?

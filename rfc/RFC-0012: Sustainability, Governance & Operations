@@ -747,3 +747,9 @@ Dieses RFC legt fest:
 ✅ Transparente Finanzen
 
 ✅ Nachhaltiger Projektbetrieb
+
+## Offene technische Fragen
+
+- **Governance-Verfahren (§8–11):** Wie werden Core Maintainer und Mitglieder des Steering Committee bestellt, und welche Amtszeiten, Quoren, Abstimmungs- und Interessenkonfliktregeln gelten für RFC- und Breaking-Change-Entscheidungen?
+- **Sicherheits- und Releasebetrieb (§12–16, §27):** Welche verbindlichen Fristen, Verantwortlichen und Eskalationswege gelten für Sicherheitsvorfälle und deren Offenlegung, Schlüsselrotation und Releases?
+- **Finanzaufsicht und Nachfolge (§24–26, §32–33):** Welche Kontrollen regeln Einnahmen, Ausgaben, Managed Services sowie Übergabe oder Nachfolge des Projektbetriebs in den zulässigen Betriebsmodellen?

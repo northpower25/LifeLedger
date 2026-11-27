@@ -778,3 +778,9 @@ Dieses RFC legt fest:
 ✅ Device Trust Modell
 
 ✅ Kein Betreiberzugriff auf Inhalte
+
+## Offene technische Fragen
+
+- **Schlüsselableitung und Wiederherstellung (§6–10, §18–20, §29):** Welches konkrete Protokoll leitet den Root Key aus Passwort und Recovery Secret ab und schützt ihn? Wie funktioniert die Wiederherstellung, insbesondere die Unterstützung durch einen Recovery Contact ohne dessen Zugriff auf Daten?
+- **Gerätelebenszyklus (§9–10, §28–29):** Wie werden Geräte authentisiert, Schlüssel rotiert und kompromittierte oder verlorene Geräte widerrufen, auch im Hinblick auf bereits verschlüsselte Daten?
+- **Konfliktauflösung (§12–13):** Welche Versions- und Konfliktregeln gelten bei gleichzeitigen FHIR-Änderungen sowie Konflikten zwischen Löschen und Aktualisieren, und wie bleibt dabei die Provenienz erhalten?

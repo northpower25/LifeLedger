@@ -704,3 +704,9 @@ Dieses RFC legt fest:
 ✅ Security Events
 
 ✅ Offline Funktionalität
+
+## Offene technische Fragen
+
+- **Event-Payloads und sensible Daten (§5, §17, §20):** Sind Events Benachrichtigungen, vollständige Zustandsänderungen oder beides? Welche Regeln für Payloads bzw. Referenzen, Verschlüsselung und Zugriffskontrolle gelten für persistierte Events und deren Replay?
+- **Autorisierung und Widerruf von Einwilligungen (§22–23, §25, §28):** Welche Capabilities regeln das Veröffentlichen, Abonnieren und Replay je Eventtyp, und prüft das Replay die aktuelle oder die historische Autorisierung?
+- **Reihenfolge und Idempotenz (§18, §25):** Welche Garantien für Reihenfolge, doppelte Zustellung und Idempotenz gelten bei Wiederholungen, Dead-Letter-Behandlung und Replay?

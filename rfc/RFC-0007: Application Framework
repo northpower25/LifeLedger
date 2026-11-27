@@ -668,3 +668,9 @@ Dieses RFC legt fest:
 ✅ Mehrbenutzerfähigkeit
 
 ✅ Lokalisierungspflicht
+
+## Offene technische Fragen
+
+- **Autorisierungsablauf (§6–7, §11–12):** Wie werden Manifest-Capabilities einer Anwendung gemeinsam mit der Einwilligung des Nutzers bzw. Profils geprüft, wenn Anwendungen die Einwilligung nicht selbst auswerten dürfen? Welche Plattform-API oder welcher Entscheidungsablauf ist maßgeblich?
+- **Updates und Migrationen (§18–20):** Welche Kompatibilitäts-, Fehler- und Rollback-Garantien gelten für Anwendungsupdates und Datenmigrationen?
+- **Kontext des Familienprofils (§21):** Wie werden das aktive Familienprofil und Profilwechsel in Navigation und Abläufen eindeutig kenntlich gemacht, damit Aktionen nicht versehentlich das falsche Profil betreffen?

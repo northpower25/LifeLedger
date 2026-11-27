@@ -772,3 +772,9 @@ Dieses RFC legt fest:
 ✅ Embedding Widerruf
 
 ✅ Kein AI-Zwang für Kernfunktionen
+
+## Offene technische Fragen
+
+- **Datenminimierung und Einwilligung (§9–12, §22–24):** Wie wird der konkrete, zweckgebundene Datensatz für einen externen Provider ausgewählt und vor der Übertragung autorisiert, und welcher Einwilligungs-Scope deckt diese Payload ab?
+- **Löschung abgeleiteter Daten (§14–16, §24–25):** Wie werden Embeddings, Prompts, Antworten und Caches ihren Quelldaten zugeordnet und nach Widerruf der Einwilligung oder Löschung entfernt bzw. ungültig gemacht?
+- **Freigabekriterien für den Health Twin (§20, §27–30):** Welche Genehmigungs- und Abnahmekriterien unterscheiden Health Twin und Predictive Twin und verhindern, dass Trends oder Risikowerte als medizinische Entscheidungen behandelt werden?

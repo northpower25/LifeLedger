@@ -802,3 +802,9 @@ Dieses RFC legt fest:
 ✅ Kein direkter Datenbankzugriff
 
 ✅ Kein implizites Vertrauen in Plugins
+
+## Offene technische Fragen
+
+- **Netzwerk- und Geheimnisgrenzen (§3, §9, §11, §15):** Wie wird der verbotene direkte Netzwerkzugriff gegenüber Zugriff über die Network API technisch durchgesetzt, und wie kann die Secret API Zugangsdaten bereitstellen, ohne Geheimniswerte an Plugins offenzulegen?
+- **Signaturprüfung und Widerruf (§6–8, §18):** Welche Artefakte werden genau signiert, wie werden Herausgeberidentität und Build-Hashes geprüft und wie werden widerrufene Schlüssel oder Pakete behandelt?
+- **Durchsetzung von Ressourcen- und Event-Limits (§10, §14):** Wie werden CPU-, Speicher- und Laufzeitlimits durchgesetzt, und welche Abo-Filter und Datenminimierungsregeln gelten für den Eventzugriff von Plugins?

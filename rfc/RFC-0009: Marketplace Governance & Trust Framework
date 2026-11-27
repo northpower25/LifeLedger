@@ -823,3 +823,9 @@ Dieses RFC legt fest:
 ✅ Marketplace bleibt optional
 
 ✅ Local-First Prinzip
+
+## Offene technische Fragen
+
+- **Vertrauensstufen (§8–9, §14–15):** Welche messbaren Kriterien unterscheiden „Verified“ von „Official“, und welche Rollen dürfen den jeweiligen Status vergeben, erneuern oder widerrufen?
+- **Delisting und Signaturwiderruf (§16–21):** Wie werden Delisting-Entscheidungen, widerrufene Signaturen und Sicherheitswarnungen an bereits installierte oder offline befindliche Pakete übermittelt, und welches Verhalten ist bei Installation und Laufzeit vorgeschrieben?
+- **Einsprüche und Interessenkonflikte (§19, §25):** Welche Fristen, Verfahren für unabhängige Prüfungen und Regeln für Interessenkonflikte gelten bei Einsprüchen gegen Marketplace-Entscheidungen?

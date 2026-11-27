@@ -439,3 +439,9 @@ Dieses RFC legt fest:
 ✅ Ressourcenbasierte Freigaben
 
 ✅ Plattformweites Modell
+
+## Offene technische Fragen
+
+- **Einwilligungssubjekt und Profilinhaberschaft (§4, §7, §14):** Bezeichnet `Consent.owner` einen Nutzer (`UserID`) oder ein Gesundheitsprofil (`ProfileID`)? Die Beispiele verwenden eine Nutzer-ID, während Gesundheitsdaten einem `HealthProfile` zugeordnet sind. Für die Autorisierung muss ein einheitliches Subjekt festgelegt werden.
+- **Zuordnung von Scopes zu Capabilities (§7–8, §14):** Wie werden Ressourcenscopes wie `Medication` und `Allergies` konkreten Ressourcen, Operationen und den `READ_*`-/`WRITE_*`-Capabilities aus RFC-0004 zugeordnet?
+- **Notfallzugriff und aktive Sitzungen (§10–11):** Welche Regeln für Identitätsprüfung, Autorisierung, Dauer und Widerruf gelten beim Notfallzugriff und für laufende Sitzungen, einschließlich eines Zugriffs, der vor dem Widerruf der Einwilligung bereits gewährt wurde?

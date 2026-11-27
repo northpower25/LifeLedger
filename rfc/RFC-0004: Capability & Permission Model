@@ -649,3 +649,9 @@ Dieses RFC legt fest:
 ✅ Bundle Unterstützung
 
 ✅ Plattformweite Durchsetzung
+
+## Offene technische Fragen
+
+- **Entscheidungseingaben und Delegation (§3–5, §14–16):** Welche kanonischen Eingaben und Richtlinienregeln führen Identität, Profil, Ressource, Aktion, Einwilligung und delegierte Befugnisse zu einer Autorisierungsentscheidung zusammen?
+- **Verbindlicher Capability-Katalog (§6, §8–10):** Welche Capability-IDs sind normativ, und wie werden Scopes aus RFC-0008 wie `MEDICATION_ACCESS` den `READ_*`- und `WRITE_*`-Capabilities zugeordnet? Wie werden weitere, in RFC-0005 verwendete Capabilities wie `CONSENT_MANAGEMENT` eingeordnet?
+- **Widerruf und Gültigkeit (§15, §19):** Wie schnell müssen bestehende Sitzungen, Tokens und zwischengespeicherte Entscheidungen nach einem Widerruf ungültig werden, und welche Gültigkeits- oder erneuten Prüfregeln gelten?
