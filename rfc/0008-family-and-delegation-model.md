@@ -1,8 +1,8 @@
-# RFC-0008: Family & Delegation Model
+# RFC 0008: Family & Delegation Model
 
-Status: Draft  
-Type: Architecture RFC  
-Owner: Identity & Consent Domain  
+- Status: Draft
+- Type: Architecture RFC
+- Owner: Identity & Consent Domain
 Depends On: RFC-0002 Platform Core Architecture  
 Depends On: RFC-0003 Identity & Consent Framework  
 Depends On: RFC-0004 Capability & Permission Model  
@@ -17,7 +17,7 @@ Blocks:
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 Dieses RFC definiert das Familien-, Vertretungs- und Delegationsmodell der LifeLedger Plattform.
 
@@ -43,9 +43,9 @@ Das Modell muss sowohl lokale Einzelnutzer-Szenarien als auch Haushalte mit mehr
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 ```text
 Familienunterstützung
@@ -65,7 +65,7 @@ Auditierbarkeit
 
 ---
 
-## Nichtziele
+### Nichtziele
 
 ```text
 Klinisches Rollenmodell
@@ -79,21 +79,21 @@ Organisationshierarchien
 
 ---
 
-# 3. Architekturprinzipien
+## 3. Architekturprinzipien
 
-## Ownership First
+### Ownership First
 
 Jedes Gesundheitsprofil besitzt genau einen Owner.
 
 ---
 
-## Delegation statt Besitzübertragung
+### Delegation statt Besitzübertragung
 
 Freigaben übertragen niemals Besitz.
 
 ---
 
-## Minimale Berechtigungen
+### Minimale Berechtigungen
 
 Jeder Zugriff erfolgt:
 
@@ -104,27 +104,27 @@ so viel wie nötig
 
 ---
 
-## Widerrufbarkeit
+### Widerrufbarkeit
 
 Jede Delegation muss widerrufbar sein.
 
 ---
 
-## Auditpflicht
+### Auditpflicht
 
 Jeder Zugriff wird protokolliert.
 
 ---
 
-# 4. Grundlegende Begriffe
+## 4. Grundlegende Begriffe
 
-## User
+### User
 
 Technische Identität.
 
 ---
 
-## Health Profile
+### Health Profile
 
 Gesundheitsprofil.
 
@@ -142,7 +142,7 @@ Freigaben
 
 ---
 
-## Household
+### Household
 
 Logische Gruppe.
 
@@ -158,40 +158,17 @@ Pflegebedürftige Angehörige
 
 ---
 
-# 5. Rollenmodell
+## 5. Rollen und Zuständigkeit
 
-RFC-0003 §6 ist die maßgebliche Quelle für Primary Owner, Guardian,
-Caregiver, Proxy und Emergency Contact. Dieses RFC definiert die Rollen
-nicht erneut, sondern beschreibt ihre Anwendung auf Haushalte und
-Delegationen.
-
----
-
-# 6. Guardian
-
-Definition und Rechte: RFC-0003 §6.
+RFC-0003 §6 ist die normative und alleinige Quelle für Definition, Rechte
+und Grenzen von Primary Owner, Guardian, Caregiver, Proxy und Emergency
+Contact. Dieses RFC wendet diese Rollen auf Haushalte und Delegationen an,
+ändert oder wiederholt ihre Rechte aber nicht. Ein Household oder eine
+Beziehung allein erteilt keine Capability und keine Einwilligung.
 
 ---
 
-# 7. Caregiver
-
-Definition und Rechte: RFC-0003 §6.
-
----
-
-# 8. Proxy
-
-Definition und Rechte: RFC-0003 §6.
-
----
-
-# 9. Emergency Contact
-
-Definition und Rechte: RFC-0003 §6.
-
----
-
-# 10. Dependent
+## 6. Dependent
 
 Abhängige Person.
 
@@ -213,7 +190,7 @@ Dependent beschreibt nur die Beziehung.
 
 ---
 
-# 11. Household Modell
+## 7. Household Modell
 
 ```text
 Household
@@ -228,9 +205,9 @@ Household
 
 ---
 
-# 12. Delegationsmodell
+## 8. Delegationsmodell
 
-## Direkte Delegation
+### Direkte Delegation
 
 ```text
 Owner
@@ -242,7 +219,7 @@ Caregiver
 
 ---
 
-## Guardian Delegation
+### Guardian Delegation
 
 ```text
 Guardian
@@ -254,7 +231,7 @@ Caregiver
 
 ---
 
-## Proxy Delegation
+### Proxy Delegation
 
 Standardmäßig verboten.
 
@@ -262,13 +239,13 @@ Kann optional erlaubt werden.
 
 ---
 
-# 13. Freigabebereiche
+## 9. Freigabebereiche
 
 Freigaben erfolgen nicht global.
 
 ---
 
-## Dokumente
+### Dokumente
 
 ```text
 DOCUMENT_ACCESS
@@ -276,7 +253,7 @@ DOCUMENT_ACCESS
 
 ---
 
-## Medikamente
+### Medikamente
 
 ```text
 MEDICATION_ACCESS
@@ -284,7 +261,7 @@ MEDICATION_ACCESS
 
 ---
 
-## Allergien
+### Allergien
 
 ```text
 ALLERGY_ACCESS
@@ -292,7 +269,7 @@ ALLERGY_ACCESS
 
 ---
 
-## Beobachtungen
+### Beobachtungen
 
 ```text
 OBSERVATION_ACCESS
@@ -300,7 +277,7 @@ OBSERVATION_ACCESS
 
 ---
 
-## Notfallprofil
+### Notfallprofil
 
 ```text
 EMERGENCY_ACCESS
@@ -308,7 +285,7 @@ EMERGENCY_ACCESS
 
 ---
 
-# 14. Zeitbasierte Freigaben
+## 10. Zeitbasierte Freigaben
 
 Unterstützt:
 
@@ -334,9 +311,9 @@ gültig für
 
 ---
 
-# 15. Notfallmodell
+## 11. Notfallmodell
 
-## Emergency Profile
+### Emergency Profile
 
 Separater minimaler Datensatz.
 
@@ -358,7 +335,7 @@ Notfallkontakte
 
 ---
 
-# 16. Emergency Access Workflow
+## 12. Emergency Access Workflow
 
 ```text
 Notfallanfrage
@@ -378,9 +355,9 @@ Audit Event
 
 ---
 
-# 17. Minderjährige
+## 13. Minderjährige
 
-## Standard
+### Standard
 
 ```text
 Owner = Kind
@@ -390,7 +367,7 @@ Guardian = Eltern
 
 ---
 
-## Zugriff
+### Zugriff
 
 Die Anwendung der Guardian-Rolle richtet sich nach RFC-0003 und den
 rechtlich zulässigen Vertretungsbefugnissen. Das Kind besitzt die
@@ -398,7 +375,7 @@ Profilidentität.
 
 ---
 
-## Volljährigkeit
+### Volljährigkeit
 
 System muss unterstützen:
 
@@ -410,7 +387,7 @@ Besitzübernahme
 
 ---
 
-# 18. Trennung von Daten
+## 14. Trennung von Daten
 
 Jeder Nutzer besitzt:
 
@@ -433,7 +410,7 @@ ohne Zuordnung
 
 ---
 
-# 19. User Interface Anforderungen
+## 15. User Interface Anforderungen
 
 Nutzer müssen erkennen:
 
@@ -449,7 +426,7 @@ Wann Zugriff endet
 
 ---
 
-# 20. Widerruf
+## 16. Widerruf
 
 Jeder Widerruf muss sofort wirken.
 
@@ -469,7 +446,7 @@ Plugins
 
 ---
 
-# 21. Audit Anforderungen
+## 17. Audit Anforderungen
 
 Jeder Zugriff speichert:
 
@@ -489,7 +466,7 @@ Ergebnis
 
 ---
 
-# 22. Event Bus Integration
+## 18. Event Bus Integration
 
 Events gemäß RFC-0005.
 
@@ -509,9 +486,9 @@ EMERGENCY_ACCESS_USED
 
 ---
 
-# 23. Application Integration
+## 19. Application Integration
 
-Alle Anwendungen müssen Family-Awareness unterstützen. 【1-e2c6d2】【2-4800f0】
+Alle Anwendungen müssen Family-Awareness unterstützen.
 
 Beispiele:
 
@@ -525,9 +502,9 @@ Medication Manager
 
 ---
 
-# 24. VitaFabric Integration
+## 20. VitaFabric Integration
 
-Familienrollen umgehen niemals VitaFabric. 【3-bf3243】
+Familienrollen umgehen niemals VitaFabric.
 
 Pflichtpfad:
 
@@ -553,7 +530,7 @@ FHIR Daten
 
 ---
 
-# 25. Sicherheitsanforderungen
+## 21. Sicherheitsanforderungen
 
 Pflicht:
 
@@ -583,7 +560,7 @@ Unsichtbare Freigaben
 
 ---
 
-# 26. Zukunftserweiterungen
+## 22. Zukunftserweiterungen
 
 Spätere Erweiterungen:
 
@@ -599,7 +576,7 @@ Juristische Vollmachten
 
 ---
 
-# 27. Architekturentscheidung
+## 23. Architekturentscheidung
 
 Dieses RFC legt fest:
 

@@ -1,5 +1,8 @@
 # RFC Konsistenzreview (RFC-0003 bis RFC-0013)
 
+Die folgenden Konsolidierungsentscheidungen wurden in den RFC-Drafts
+berücksichtigt. Sie nehmen die RFCs nicht an und belegen keine Implementierung.
+
 ## Priorität P1
 
 ### RFC-0003 ↔ RFC-0008

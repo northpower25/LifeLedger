@@ -8,7 +8,7 @@ VitaFabric ist das verbindliche Gesundheitsdaten-Gateway für Anwendungen,
 Integrationen, Plugins und LifeWeaver. Vorgeschlagene Connector- und
 Storage-Plugins sind kontrollierte interne Erweiterungspunkte, kein direkter
 Datenbankzugriff für Drittcode. Draft
-[RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture) schlägt
+[RFC-0002](../../rfc/0002-platform-core-architecture.md) schlägt
 VitaFabric als verpflichtenden Plattformbestandteil vor und legt nahe, dass
 Storage-Adapter nur verschlüsselte Daten und niemals Klartext oder Schlüssel
 erhalten; diese Anforderungen sind noch nicht implementiert.

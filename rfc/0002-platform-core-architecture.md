@@ -1,9 +1,9 @@
-# RFC-0002: Platform Core Architecture
+# RFC 0002: Platform Core Architecture
 
-**Status:** Draft  
-**Authors:** LifeLedger Architecture Group  
-**Type:** Architecture RFC  
-**Related Documents:**
+- Status: Draft
+- Type: Architecture RFC
+- Owner: Platform Core
+- Related Documents:
 
 - ADR-0002 Platform Direction
 - RFC-0001 Platform Direction
@@ -13,7 +13,7 @@
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 LifeLedger soll nicht ausschließlich eine persönliche Gesundheitsakte sein.
 
@@ -37,9 +37,9 @@ und legt fest, welche Komponenten zwingender Bestandteil der Plattform sind und 
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 - Local-First Betrieb
 - Erweiterbarkeit ähnlich Home Assistant
@@ -50,7 +50,7 @@ und legt fest, welche Komponenten zwingender Bestandteil der Plattform sind und 
 - Sichere Plugin-Architektur
 - Optionale Cloud-Komponenten
 
-## Nichtziele
+### Nichtziele
 
 - Medizinische Diagnosen
 - Therapieempfehlungen
@@ -60,9 +60,9 @@ und legt fest, welche Komponenten zwingender Bestandteil der Plattform sind und 
 
 ---
 
-# 3. Plattformarchitektur
+## 3. Plattformarchitektur
 
-## Zielstruktur
+### Zielstruktur
 
 ```text
 LifeLedger Platform
@@ -88,9 +88,9 @@ LifeLedger Platform
 
 ---
 
-# 4. Core Runtime
+## 4. Core Runtime
 
-## Zweck
+### Zweck
 
 Der Core Runtime stellt die minimal notwendige Plattform bereit.
 
@@ -100,9 +100,9 @@ Er enthält keine Gesundheitsmodelle.
 
 Er enthält keine KI.
 
-## Bestandteile
+### Bestandteile
 
-### Identity Service
+#### Identity Service
 
 Verantwortlich für:
 
@@ -115,7 +115,7 @@ Sessions
 
 ---
 
-### Consent Service
+#### Consent Service
 
 Verantwortlich für:
 
@@ -129,7 +129,7 @@ Familienbeziehungen
 
 ---
 
-### Plugin Host
+#### Plugin Host
 
 Verantwortlich für:
 
@@ -143,7 +143,7 @@ Plugin-Update
 
 ---
 
-### Event Bus
+#### Event Bus
 
 Verantwortlich für:
 
@@ -155,7 +155,7 @@ Subscriptions
 
 ---
 
-### Secret Store
+#### Secret Store
 
 Verantwortlich für:
 
@@ -167,7 +167,7 @@ Provider Credentials
 
 ---
 
-### Audit Service
+#### Audit Service
 
 Verantwortlich für:
 
@@ -180,9 +180,14 @@ Einwilligungen
 
 ---
 
-# 5. Plattformgrenzen
+## 5. Plattformgrenzen
 
-## Gehört immer zur Plattform
+RFC-0014 ist die maßgebliche Quelle der Komponentenverantwortung und
+Abgrenzung zwischen Plattform, VitaFabric, LifeWeaver und Erweiterungen. Die
+folgenden Listen fassen den Vertrag zusammen; sie legen keine monolithische
+Implementierung fest.
+
+### Zwingende Plattformverträge
 
 ```text
 Core Runtime
@@ -194,9 +199,13 @@ Plugin Host
 VitaFabric
 ```
 
+LifeWeaver ist eine optionale Plattformfunktion und für den lokalen Kernbetrieb
+nicht erforderlich. VitaFabric bleibt der einzige autorisierte
+Gesundheitsdatenzugriff und kann nicht durch ein Plugin ersetzt werden.
+
 ---
 
-## Darf Plugin sein
+### Darf Plugin sein
 
 ```text
 Connectoren
@@ -209,23 +218,25 @@ Anwendungen
 
 ---
 
-## Darf niemals Plugin sein
+### Darf niemals Plugin sein
 
 ```text
-Consent Enforcement
-Audit Service
-Authentifizierung
-FHIR Kernmodell
-Capability Enforcement
+Identity und Authentifizierung
+Consent Entscheidung und Enforcement
+Audit Integrität
+Capability Policy und Enforcement
+Plugin Host und Isolation
+Secret-/Schlüsselgrenzen
+VitaFabric Verträge, FHIR Validierung und Zugriffskontrolle
 ```
 
 ---
 
-# 6. Identity & Consent Modell
+## 6. Identity & Consent Modell
 
-## Benutzerrollen
+### Benutzerrollen
 
-### Primary Owner
+#### Primary Owner
 
 Besitzer eines Gesundheitsprofils.
 
@@ -240,7 +251,7 @@ widerrufen
 
 ---
 
-### Guardian
+#### Guardian
 
 Gesetzlicher Vertreter.
 
@@ -255,7 +266,7 @@ widerrufen
 
 ---
 
-### Caregiver
+#### Caregiver
 
 Pflegeperson.
 
@@ -269,7 +280,7 @@ keine Besitzrechte
 
 ---
 
-### Proxy
+#### Proxy
 
 Bevollmächtigter Vertreter.
 
@@ -281,7 +292,7 @@ Vorsorgevollmacht
 
 ---
 
-### Emergency Contact
+#### Emergency Contact
 
 Darf ausschließlich:
 
@@ -291,9 +302,9 @@ vordefinierte Notfalldaten lesen
 
 ---
 
-# 7. Capability Modell
+## 7. Capability Modell
 
-## Grundprinzip
+### Grundprinzip
 
 Kein Plugin erhält implizite Rechte.
 
@@ -301,7 +312,7 @@ Alle Fähigkeiten müssen explizit angefordert werden.
 
 ---
 
-## Gesundheitsdaten
+### Gesundheitsdaten
 
 ```text
 READ_PATIENT
@@ -313,7 +324,7 @@ READ_MEDICATION
 
 ---
 
-## Schreibrechte
+### Schreibrechte
 
 ```text
 WRITE_OBSERVATION
@@ -323,7 +334,7 @@ WRITE_MEDICATION
 
 ---
 
-## Systemrechte
+### Systemrechte
 
 ```text
 NETWORK_ACCESS
@@ -334,7 +345,7 @@ CAMERA_ACCESS
 
 ---
 
-## KI Rechte
+### KI Rechte
 
 ```text
 AI_LOCAL_MODEL
@@ -346,7 +357,7 @@ AI_AGENT
 
 ---
 
-## Administrative Rechte
+### Administrative Rechte
 
 ```text
 USER_MANAGEMENT
@@ -357,15 +368,15 @@ PLUGIN_SIGN
 
 ---
 
-# 8. Event Bus
+## 8. Event Bus
 
-## Ziel
+### Ziel
 
 Lose Kopplung aller Komponenten.
 
 ---
 
-## Standard Events
+### Standard Events
 
 ```text
 FHIR_CREATED
@@ -384,7 +395,7 @@ USER_REMOVED
 
 ---
 
-## Beispiel
+### Beispiel
 
 ```text
 Observation gespeichert
@@ -404,9 +415,9 @@ Abonnierte Plugins
 
 ---
 
-# 9. VitaFabric Regeln
+## 9. VitaFabric Regeln
 
-## Verbindliche Regel
+### Verbindliche Regel
 
 Alle Gesundheitsdaten passieren VitaFabric.
 
@@ -422,7 +433,7 @@ Storage
 
 ---
 
-## Verboten
+### Verboten
 
 ```text
 Plugin
@@ -432,7 +443,7 @@ Datenbank
 
 ---
 
-## Storage Plugins
+### Storage Plugins
 
 Storage Adapter erhalten:
 
@@ -450,9 +461,9 @@ FHIR Ownership Kontrolle
 
 ---
 
-# 10. Plugin Runtime
+## 10. Plugin Runtime
 
-## Entscheidung
+### Entscheidung
 
 WASM First
 
@@ -472,7 +483,7 @@ Gründe:
 
 ---
 
-## Spätere Erweiterungen
+### Spätere Erweiterungen
 
 Optional:
 
@@ -487,9 +498,9 @@ nicht ausgeführt; ein unisolierter Fallback ist ausgeschlossen (RFC-0006).
 
 ---
 
-# 11. Plugin-Signierung
+## 11. Plugin-Signierung
 
-## Community
+### Community
 
 ```text
 Self Signed
@@ -497,7 +508,7 @@ Self Signed
 
 ---
 
-## Verified
+### Verified
 
 ```text
 Maintainer Sign-Off
@@ -507,7 +518,7 @@ Das konkrete Signatur- und Prüfverfahren bleibt zu spezifizieren.
 
 ---
 
-## Official
+### Official
 
 ```text
 LifeLedger Signing Key
@@ -515,29 +526,29 @@ LifeLedger Signing Key
 
 ---
 
-# 12. Marketplace
+## 12. Marketplace
 
-## Kategorien
+### Kategorien
 
-### Community
+#### Community
 
 Keine Prüfung.
 
 ---
 
-### Verified
+#### Verified
 
 Review durchgeführt.
 
 ---
 
-### Official
+#### Official
 
 Projektverantwortung übernommen.
 
 ---
 
-## Wichtige Regel
+### Wichtige Regel
 
 Marketplace ist:
 
@@ -553,9 +564,9 @@ Sicherheitsgarantie
 
 ---
 
-# 13. Application Model
+## 13. Application Model
 
-## Grundsatz
+### Grundsatz
 
 Eine Application ist ein spezialisierter Plugin-Typ mit UI, Navigation,
 Workflows und Settings, der die gemeinsamen Plattformdienste nutzt.
@@ -583,7 +594,7 @@ VitaFabric
 
 ---
 
-## Erster Client und Durchstich
+### Erster Client und Durchstich
 
 Geplant sind ein lokaler FastAPI-Dienst eingebettet in Tauri für den
 Desktop-Client und Flutter für Mobile. Desktop beginnt mit Windows; Linux
@@ -603,13 +614,13 @@ Vertrauensgrenzen bleiben integrationsspezifisch zu klären.
 
 ---
 
-# 14. Deployment Modelle
+## 14. Deployment Modelle
 
 Die geplante Reihenfolge ist Mode 1 → Mode 2 → Mode 3 → Mode 4.
 Optionale Modi benötigen jeweils ein eigenes Review und machen den lokalen
 Kern nicht von einem Cloud-Dienst abhängig.
 
-## Mode 1
+### Mode 1
 
 Local Only
 
@@ -619,7 +630,7 @@ Standard
 
 ---
 
-## Mode 2
+### Mode 2
 
 Local + Relay
 
@@ -633,7 +644,7 @@ Discovery
 
 ---
 
-## Mode 3
+### Mode 3
 
 Local + Zero Knowledge Sync
 
@@ -653,7 +664,7 @@ Klartext
 
 ---
 
-## Mode 4
+### Mode 4
 
 Managed Cloud
 
@@ -663,39 +674,39 @@ Separates Datenschutz- und Sicherheitsreview erforderlich.
 
 ---
 
-# 15. Sicherheitsprinzipien
+## 15. Sicherheitsprinzipien
 
-## Zero Trust
+### Zero Trust
 
 Plugins sind niemals automatisch vertrauenswürdig.
 
 ---
 
-## Least Privilege
+### Least Privilege
 
 Plugins erhalten nur notwendige Rechte.
 
 ---
 
-## Auditability
+### Auditability
 
 Jede Freigabe muss nachvollziehbar sein.
 
 ---
 
-## Local First
+### Local First
 
 Jede Kernfunktion muss lokal lauffähig sein.
 
 ---
 
-## Consent First
+### Consent First
 
 Kein Zugriff auf Gesundheitsdaten ohne Freigabe.
 
 ---
 
-# 16. Offene Nachfolge-RFCs
+## 16. Offene Nachfolge-RFCs
 
 Dieses RFC erzeugt folgende Folgedokumente:
 
@@ -715,7 +726,7 @@ RFC-0008 Family Model
 
 ---
 
-# 17. Architekturentscheidung
+## 17. Architekturentscheidung
 
 Dieses RFC legt folgende vorläufige Entscheidungen fest:
 

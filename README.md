@@ -22,7 +22,7 @@ The platform's component responsibilities remain distinct:
   storage abstraction. Health data must pass through VitaFabric.
 - **LifeWeaver** owns optional AI providers, MCP and agents.
 
-The [draft RFC-0002](rfc/RFC-0002%20Platform%20Core%20Architecture) proposes a
+The [draft RFC-0002](rfc/0002-platform-core-architecture.md) proposes a
 Core Runtime for shared identity and consent, security services, an event bus,
 and plugin hosting, with capability-based access and a WASM-first plugin
 runtime. The Core Runtime is not intended to contain business logic, health

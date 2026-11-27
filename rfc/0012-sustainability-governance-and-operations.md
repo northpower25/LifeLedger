@@ -1,8 +1,8 @@
-# RFC-0012: Sustainability, Governance & Operations
+# RFC 0012: Sustainability, Governance & Operations
 
-Status: Draft  
-Type: Governance RFC  
-Owner: Project Governance  
+- Status: Draft
+- Type: Governance RFC
+- Owner: Project Governance
 Depends On: RFC-0002 Platform Core Architecture  
 Depends On: RFC-0009 Marketplace Governance  
 Depends On: RFC-0010 Zero Knowledge Sync
@@ -16,7 +16,7 @@ Blocks:
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 Dieses RFC definiert die langfristige Betriebs-, Governance- und Nachhaltigkeitsstrategie der LifeLedger Plattform.
 
@@ -52,13 +52,13 @@ Unabhängigkeit
 Community-Beteiligung
 ```
 
-ohne die Plattform von einem einzelnen Unternehmen oder Sponsor abhängig zu machen. Die Notwendigkeit dieser Regelungen wird in den Roadmaps und der Bestandsaufnahme ausdrücklich hervorgehoben. 【1-58d9d2】【2-699430】
+ohne die Plattform von einem einzelnen Unternehmen oder Sponsor abhängig zu machen. Die Notwendigkeit dieser Regelungen wird in den Roadmaps und der Bestandsaufnahme ausdrücklich hervorgehoben.
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 ```text
 Projektkontinuität
@@ -76,7 +76,7 @@ Community-Beteiligung
 
 ---
 
-## Nichtziele
+### Nichtziele
 
 ```text
 Kommerzielle Exklusivität
@@ -90,35 +90,35 @@ Provider Lock-In
 
 ---
 
-# 3. Grundprinzipien
+## 3. Grundprinzipien
 
-## Local First
+### Local First
 
 Lokale Nutzung bleibt dauerhaft möglich.
 
 ---
 
-## Open Source First
+### Open Source First
 
 Der Kern bleibt offen.
 
 ---
 
-## Community Before Monetization
+### Community Before Monetization
 
 Geschäftsmodelle dürfen Kernprinzipien nicht gefährden.
 
 ---
 
-## Security Before Growth
+### Security Before Growth
 
 Sicherheit hat Vorrang vor Funktionserweiterungen.
 
 ---
 
-# 4. Governance Modell
+## 4. Governance Modell
 
-## Governance Ebenen
+### Governance Ebenen
 
 GitHub, RFC-Prozess und Maintainer-Modell bilden die vorgesehene
 Arbeitsgrundlage. OpenCollective ist für die Finanzierungsphase gemäß §24
@@ -139,7 +139,7 @@ Steering Committee
 
 ---
 
-# 5. Community
+## 5. Community
 
 Kann:
 
@@ -157,7 +157,7 @@ beitragen.
 
 ---
 
-# 6. Contributors
+## 6. Contributors
 
 Personen mit regelmäßigen Beiträgen.
 
@@ -177,7 +177,7 @@ leisten.
 
 ---
 
-# 7. Maintainers
+## 7. Maintainers
 
 Verantwortlich für Komponenten.
 
@@ -197,7 +197,7 @@ Marketplace
 
 ---
 
-# 8. Core Maintainers
+## 8. Core Maintainers
 
 Verantwortlich für:
 
@@ -211,7 +211,7 @@ Breaking Changes
 
 ---
 
-# 9. Steering Committee
+## 9. Steering Committee
 
 Langfristige Projektführung.
 
@@ -231,9 +231,9 @@ Finanzierung
 
 ---
 
-# 10. Entscheidungssystem
+## 10. Entscheidungssystem
 
-## Technische Entscheidungen
+### Technische Entscheidungen
 
 ```text
 RFC Prozess
@@ -241,7 +241,7 @@ RFC Prozess
 
 ---
 
-## Dauerhafte Entscheidungen
+### Dauerhafte Entscheidungen
 
 ```text
 ADR Prozess
@@ -249,7 +249,7 @@ ADR Prozess
 
 ---
 
-## Konflikte
+### Konflikte
 
 ```text
 Maintainer Vote
@@ -257,7 +257,7 @@ Maintainer Vote
 
 ---
 
-# 11. RFC Prozess
+## 11. RFC Prozess
 
 Vorschlag:
 
@@ -283,9 +283,9 @@ Implemented
 
 ---
 
-# 12. Sicherheitsgovernance
+## 12. Sicherheitsgovernance
 
-## Security Team
+### Security Team
 
 Eigenständige Rolle.
 
@@ -305,7 +305,7 @@ Security Reviews
 
 ---
 
-# 13. Security Meldungen
+## 13. Security Meldungen
 
 Unterstützte Kanäle:
 
@@ -319,7 +319,7 @@ Responsible Disclosure
 
 ---
 
-# 14. Incident Response
+## 14. Incident Response
 
 Ablauf:
 
@@ -345,9 +345,9 @@ Veröffentlichung
 
 ---
 
-# 15. Marketplace Betrieb
+## 15. Marketplace Betrieb
 
-Der Marketplace benötigt Betreiber. 【3-1b7564】【2-699430】
+Der Marketplace benötigt Betreiber.
 
 ---
 
@@ -365,9 +365,9 @@ Review Prozesse
 
 ---
 
-# 16. Signing Infrastructure
+## 16. Signing Infrastructure
 
-Official Plugins benötigen Projekt-Signaturen. 【3-1b7564】
+Official Plugins benötigen Projekt-Signaturen.
 
 ---
 
@@ -381,7 +381,7 @@ Security Team
 
 ---
 
-# 17. Relay Infrastruktur
+## 17. Relay Infrastruktur
 
 Optionales Deployment.
 
@@ -401,11 +401,11 @@ möglich.
 
 ---
 
-Kein Relay wird vorausgesetzt. 【2-699430】【4-514ceb】
+Kein Relay wird vorausgesetzt.
 
 ---
 
-# 18. Zero Knowledge Sync Betrieb
+## 18. Zero Knowledge Sync Betrieb
 
 Optional.
 
@@ -427,7 +427,7 @@ RFC-0010 bleibt verbindlich.
 
 ---
 
-# 19. Dokumentation
+## 19. Dokumentation
 
 Jede Plattformkomponente benötigt:
 
@@ -443,7 +443,7 @@ Beispiele
 
 ---
 
-# 20. Übersetzungen
+## 20. Übersetzungen
 
 Geplante Hauptsprachen:
 
@@ -467,7 +467,7 @@ Weitere Community Beiträge
 
 ---
 
-# 21. Übersetzungsprozess
+## 21. Übersetzungsprozess
 
 Empfohlen:
 
@@ -483,7 +483,7 @@ Crowdin
 
 ---
 
-# 22. Accessibility
+## 22. Accessibility
 
 Projektziel:
 
@@ -503,7 +503,7 @@ Application Maintainer
 
 ---
 
-# 23. Lizenzmodell
+## 23. Lizenzmodell
 
 Projektkern:
 
@@ -511,7 +511,7 @@ Projektkern:
 AGPL-3.0
 ```
 
-gemäß aktuellem Repository-Stand. 【1-58d9d2】
+gemäß aktuellem Repository-Stand.
 
 ---
 
@@ -529,13 +529,13 @@ verwenden.
 
 ---
 
-# 24. Finanzierung
+## 24. Finanzierung
 
 Finanzierung erfolgt stufenweise.
 
 ---
 
-# Phase 1
+### Phase 1
 
 ```text
 Privates Projekt
@@ -545,7 +545,7 @@ Community Beiträge
 
 ---
 
-# Phase 2
+### Phase 2
 
 ```text
 GitHub Sponsors
@@ -555,7 +555,7 @@ OpenCollective
 
 ---
 
-# Phase 3
+### Phase 3
 
 ```text
 Managed Services
@@ -567,7 +567,7 @@ Support
 
 ---
 
-# 25. Ausgaben
+## 25. Ausgaben
 
 Mögliche Kosten:
 
@@ -587,7 +587,7 @@ Dokumentation
 
 ---
 
-# 26. Transparenz
+## 26. Transparenz
 
 Pflicht:
 
@@ -601,7 +601,7 @@ Governance Dokumentation
 
 ---
 
-# 27. Release Management
+## 27. Release Management
 
 Jedes Release benötigt:
 
@@ -617,9 +617,9 @@ Versionsinformationen
 
 ---
 
-# 28. Support Modell
+## 28. Support Modell
 
-## Community Support
+### Community Support
 
 ```text
 GitHub Discussions
@@ -629,19 +629,19 @@ Issues
 
 ---
 
-## Maintainer Support
+### Maintainer Support
 
 Best Effort.
 
 ---
 
-## Kommerzieller Support
+### Kommerzieller Support
 
 Später optional.
 
 ---
 
-# 29. Nachhaltigkeitsrisiken
+## 29. Nachhaltigkeitsrisiken
 
 Risiken:
 
@@ -657,7 +657,7 @@ Dokumentationsschulden
 
 ---
 
-# 30. Gegenmaßnahmen
+## 30. Gegenmaßnahmen
 
 ```text
 Transparente Prozesse
@@ -673,7 +673,7 @@ Dokumentation
 
 ---
 
-# 31. Erfolgskennzahlen
+## 31. Erfolgskennzahlen
 
 Beispiele:
 
@@ -691,7 +691,7 @@ Release Stabilität
 
 ---
 
-# 32. Betriebsmodelle
+## 32. Betriebsmodelle
 
 Unterstützte Modelle:
 
@@ -711,33 +711,54 @@ Keine Bindung an ein einzelnes Modell.
 
 ---
 
-# 33. Nachfolgeplanung
+## 33. Maintainer Succession Process
 
-## Maintainer Succession Process
+Der Nachfolgeprozess gilt für Core Maintainer, Marketplace-Verantwortliche
+und Security-Team-Mitglieder. Für jede kritische Rolle gibt es mindestens
+eine benannte Vertretung, dokumentierte Aufgaben, offene Vorgänge,
+Abhängigkeiten und eine Liste der benötigten Zugänge. Öffentliche
+Übergabedokumentation enthält niemals Geheimnisse oder private Schlüssel.
 
-Für den geplanten Rückzug oder Ausfall eines Maintainers sind Zuständigkeiten,
-offene Arbeiten, Dokumentation und benötigte Zugänge für die Nachfolge zu
-erfassen. Die zuständigen Maintainer bestimmen im Governance-Verfahren eine
-Vertretung oder Nachfolge und dokumentieren Entscheidung und Übergabe. Zugänge
-und Signaturschlüssel sind kontrolliert zu übertragen bzw. zu widerrufen oder
-zu rotieren; Geheimnisse gehören nicht in die öffentliche Dokumentation.
+### Geplanter Rückzug
 
-Verfahren für unbesetzte Entscheidungsgremien, Fristen, Quoren und konkrete
-Schlüsselübergabe bleiben vor einem produktiven Betrieb zu spezifizieren.
+Die ausscheidende Person kündigt den Rückzug an, übergibt offene Arbeiten und
+Zuständigkeiten an die benannte Vertretung und lässt nicht mehr benötigte
+Zugänge widerrufen. Neue Rechte werden nur nach dokumentierter Zustimmung der
+für die Komponente zuständigen Maintainer erteilt.
 
-Jede kritische Rolle benötigt:
+### Ausfall oder Nichterreichbarkeit
 
-```text
-Dokumentation
+Bei längerem Ausfall übernehmen die benannten Vertretungen die Tagesarbeit,
+aber keine dauerhafte Governance- oder Schlüsselinhaberschaft. Nach 14
+Kalendertagen ohne bestätigte Erreichbarkeit können mindestens zwei
+unabhängige Core Maintainer gemeinsam eine befristete Vertretung für höchstens
+90 Tage einsetzen. Eine Verlängerung oder dauerhafte Nachfolge erfordert
+öffentliche Begründung und dokumentierte Zustimmung der verbleibenden
+Core-Maintainer-Mehrheit; bei fehlendem Quorum bleibt die Änderung blockiert
+und wird nicht durch Einzelentscheidung freigegeben.
 
-Vertretung
+Marketplace- und Security-Team-Vertretungen müssen jeweils aus dem
+entsprechenden Bereich kommen. Die Marketplace-Vertretung darf keine
+Sicherheitsmeldung eigenständig schließen; die Security-Vertretung darf
+keine Paketfreigabe allein signieren.
 
-Übergabeprozess
-```
+### Zugänge und Schlüssel
+
+Konten, Tokens und Rollen werden personenbezogen vergeben, inventarisiert und
+bei Ausscheiden oder Kompromittierung unverzüglich widerrufen. Signing Keys
+werden nicht übertragen: Bei notwendigem Wechsel wird ein neuer Schlüssel
+unter Vier-Augen-Kontrolle erzeugt, veröffentlicht und der alte widerrufen.
+Recovery, Rotation, Widerruf und neue Vertrauensanker werden nachvollziehbar
+protokolliert. Keine Person darf allein gleichzeitig den Build, die
+Marketplace-Freigabe und die finale Projektsignatur kontrollieren.
+
+Fristen und Quoren dieses Prozesses sind Governance-Vorschläge und müssen vor
+einem produktiven Marketplace- oder Release-Betrieb durch die zuständige
+Projektgovernance bestätigt werden.
 
 ---
 
-# 34. Architekturentscheidung
+## 34. Architekturentscheidung
 
 Dieses RFC legt fest:
 

@@ -1,7 +1,7 @@
 # Security
 
 Detailed security architecture and operational guidance are not yet
-specified. Draft [RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture)
+specified. Draft [RFC-0002](../../rfc/0002-platform-core-architecture.md)
 proposes Core Runtime security services, identity and consent, audit, a
 capability model, and a plugin host; these are not implemented or accepted
 controls. Threat models must cover sensitive local health data, family/delegate

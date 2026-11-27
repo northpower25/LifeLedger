@@ -1,8 +1,8 @@
-# RFC-0010: Zero-Knowledge Sync & Recovery Framework
+# RFC 0010: Zero-Knowledge Sync & Recovery Framework
 
-Status: Draft  
-Type: Security RFC  
-Owner: Platform Security  
+- Status: Draft
+- Type: Security RFC
+- Owner: Platform Security
 Depends On: RFC-0002 Platform Core Architecture  
 Depends On: RFC-0003 Identity & Consent Framework  
 Depends On: RFC-0005 Event Bus Architecture  
@@ -17,7 +17,7 @@ Blocks:
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 Dieses RFC definiert die optionale Zero-Knowledge-Synchronisierung der LifeLedger Plattform.
 
@@ -43,13 +43,13 @@ können.
 
 Zero-Knowledge-Sync ist eine optionale Erweiterung.
 
-Der lokale Betrieb bleibt vollständig funktionsfähig und benötigt keinen Cloud-Dienst. Dies folgt den Plattformprinzipien der Roadmaps und Deployment-Szenarien. 【1-69db50】【2-47d84b】【3-83e818】【4-98fb3b】
+Der lokale Betrieb bleibt vollständig funktionsfähig und benötigt keinen Cloud-Dienst. Dies folgt den Plattformprinzipien der Roadmaps und Deployment-Szenarien.
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 ```text
 Ende-zu-Ende Verschlüsselung
@@ -67,7 +67,7 @@ Cloud Optional
 
 ---
 
-## Nichtziele
+### Nichtziele
 
 ```text
 Cloud Pflicht
@@ -81,33 +81,33 @@ Zentraler Schlüsseldienst
 
 ---
 
-# 3. Grundprinzipien
+## 3. Grundprinzipien
 
-## Local First
+### Local First
 
 Alle Kernfunktionen funktionieren lokal.
 
 ---
 
-## User Owns The Keys
+### User Owns The Keys
 
 Schlüssel gehören ausschließlich dem Nutzer.
 
 ---
 
-## Zero Knowledge
+### Zero Knowledge
 
 Server besitzen keine Lesemöglichkeit.
 
 ---
 
-## Verifizierbare Kryptographie
+### Verifizierbare Kryptographie
 
 Keine proprietären Verfahren.
 
 ---
 
-# 4. Architektur
+## 4. Architektur
 
 ```text
 Device
@@ -139,9 +139,9 @@ Decrypt
 
 ---
 
-# 5. Datenklassen
+## 5. Datenklassen
 
-## Synchronisierbar
+### Synchronisierbar
 
 ```text
 FHIR Daten
@@ -157,7 +157,7 @@ Application Daten
 
 ---
 
-## Nicht synchronisierbar
+### Nicht synchronisierbar
 
 ```text
 Lokale Secrets
@@ -169,9 +169,9 @@ Betriebssystemschlüssel
 
 ---
 
-# 6. Schlüsselhierarchie
+## 6. Schlüsselhierarchie
 
-## Root Key
+### Root Key
 
 Höchste Vertrauensebene.
 
@@ -189,7 +189,7 @@ Recovery Secret
 
 ---
 
-## Data Encryption Key
+### Data Encryption Key
 
 ```text
 DEK
@@ -199,7 +199,7 @@ verschlüsselt Daten.
 
 ---
 
-## Device Key
+### Device Key
 
 ```text
 DK
@@ -209,7 +209,7 @@ identifiziert Geräte.
 
 ---
 
-# 7. Kryptographische Anforderungen
+## 7. Kryptographische Anforderungen
 
 Passwortableitung:
 
@@ -241,7 +241,7 @@ SHA-256
 
 ---
 
-# 8. Benutzerkonto Modell
+## 8. Benutzerkonto Modell
 
 Ein Benutzer kann besitzen:
 
@@ -265,13 +265,13 @@ Tablet
 
 ---
 
-# 9. Device Enrollment
+## 9. Device Enrollment
 
 Neue Geräte werden aktiv freigegeben.
 
 ---
 
-## Standardverfahren
+### Standardverfahren
 
 ```text
 QR Code Pairing
@@ -303,7 +303,7 @@ Vertrauen hergestellt
 
 ---
 
-# 10. Trusted Device Modell
+## 10. Trusted Device Modell
 
 Nur autorisierte Geräte dürfen:
 
@@ -317,7 +317,7 @@ Recovery durchführen
 
 ---
 
-# 11. Synchronisationsobjekte
+## 11. Synchronisationsobjekte
 
 Jedes Objekt besitzt:
 
@@ -335,13 +335,13 @@ Hash
 
 ---
 
-# 12. Konfliktbehandlung
+## 12. Konfliktbehandlung
 
 Konflikte sind erwartbar.
 
 ---
 
-## Beispiele
+### Beispiele
 
 ```text
 Zwei Geräte
@@ -351,9 +351,9 @@ Zwei Geräte
 
 ---
 
-# 13. Konfliktstrategie
+## 13. Konfliktstrategie
 
-Last Writer Wins ist ausschließlich zulässig für:
+Last Writer Wins (LWW) ist ausschließlich zulässig für:
 
 ```text
 Settings
@@ -367,24 +367,54 @@ Für andere Datenklassen ist Last Writer Wins damit nicht freigegeben.
 
 ---
 
-FHIR Ressourcen:
+### FHIR Conflict Resolution Workflow
 
-```text
-Conflict Resolution Workflow
-```
+Jede Änderung trägt eine Objekt-ID, Elternversion bzw. kausale
+Versionsreferenz, Geräte-ID, monotone lokale Sequenz und Provenienz.
+Zeitstempel dienen der Anzeige, niemals als alleinige Konfliktpriorität.
+Wiederholte Übertragung derselben Operation ist idempotent.
+
+1. **Kein Konflikt:** Eine Änderung, die auf der aktuellen Version basiert,
+   wird übernommen.
+2. **Unabhängige Änderungen:** Nur Felder/Elemente, die durch ein
+   versioniertes Ressourcenschema als unabhängig und mergebar definiert sind,
+   dürfen automatisch zusammengeführt werden. Provenienz beider Änderungen
+   bleibt erhalten. FHIR-Arrays, klinische Werte und unbekannte Extensions
+   werden nicht pauschal feldweise gemergt.
+3. **Nicht mergebare Änderungen:** Beide Versionen bleiben als verschlüsselte
+   Konfliktvarianten erhalten; keine Seite überschreibt die andere.
+4. **Löschung gegen Änderung:** Ein bestätigter Lösch-Tombstone gewinnt
+   standardmäßig gegen eine nebenläufige Änderung. Die Ressource wird auf
+   allen Geräten verborgen und nicht weiter verarbeitet. Eine Wiederherstellung
+   ist nur als explizite, auditierte Nutzeraktion mit neuer Ressourcenversion
+   möglich; Synchronisation allein darf keine gelöschten Daten wiederbeleben.
+   Der Tombstone wird bis zur Bestätigung aller autorisierten Geräte und danach
+   entsprechend der festgelegten Tombstone-Retention weitergeführt.
+5. **Konkurrierende Löschungen:** Werden idempotent zu einem Tombstone
+   zusammengefasst. Ein späterer Restore ist eine neue, separat autorisierte
+   Operation.
+
+**Konfliktpriorität:** Consent- oder Gerätewiderruf sperrt Verarbeitung zuerst;
+danach gilt Lösch-Tombstone vor Update; danach kausale Nachfolge; danach
+deterministischer Merge nur für ausdrücklich freigegebene Felder. Es gibt
+keinen Zeitstempel- oder Geräteprioritäts-Sieg für konkurrierende klinische
+Änderungen.
+
+**Manueller Review und UI:** Der Nutzer sieht Ressourcentyp, betroffene
+Felder, Quelle/Gerät, Zeit und beide Werte sowie die Optionen „Version A
+behalten“, „Version B behalten“ oder „sicher zusammenführen“, sofern ein
+validierter Merge verfügbar ist. Bei Löschung gegen Änderung ist standardmäßig
+„gelöscht lassen“ ausgewählt. Bis zur Entscheidung bleiben konkurrierende
+Versionen lokal verschlüsselt, als Konflikt markiert und für Export, RAG,
+Embedding-Erzeugung und nachgelagerte Workflows gesperrt. Eine Auflösung
+erzeugt eine neue Version mit Provenienz und Audit-Eintrag; ohne verfügbaren
+Owner wird der Konflikt nicht automatisch aufgelöst.
 
 ---
 
-Manuelle Entscheidung möglich.
+## 14. Synchronisationsmodell
 
-Der Workflow muss vor seiner Implementierung insbesondere Versionierung,
-Provenienz sowie Konflikte zwischen Löschung und Änderung festlegen.
-
----
-
-# 14. Synchronisationsmodell
-
-## Push
+### Push
 
 ```text
 Client → Sync Service
@@ -392,7 +422,7 @@ Client → Sync Service
 
 ---
 
-## Pull
+### Pull
 
 ```text
 Client ← Sync Service
@@ -400,7 +430,7 @@ Client ← Sync Service
 
 ---
 
-## Hybrid
+### Hybrid
 
 Festgelegt als Sync-Architektur.
 
@@ -410,7 +440,7 @@ Push + Pull
 
 ---
 
-# 15. Offline Support
+## 15. Offline Support
 
 Pflicht:
 
@@ -424,15 +454,15 @@ Synchronisation erfolgt später.
 
 ---
 
-# 16. Backup Modell
+## 16. Backup Modell
 
-## Lokales Backup
+### Lokales Backup
 
 Pflicht.
 
 ---
 
-## Verschlüsseltes Backup
+### Verschlüsseltes Backup
 
 Optional.
 
@@ -450,13 +480,13 @@ Versionen
 
 ---
 
-# 17. Recovery Modell
+## 17. Recovery Modell
 
 Kritischer Bestandteil.
 
 ---
 
-# 18. Recovery Key
+## 18. Recovery Key
 
 Bei Einrichtung erzeugt:
 
@@ -484,7 +514,7 @@ Bitwarden
 
 ---
 
-# 19. Trusted Recovery Contact
+## 19. Trusted Recovery Contact
 
 Optional.
 
@@ -510,13 +540,13 @@ Hat keinen Zugriff auf Daten.
 
 ---
 
-# 20. Schlüsselverlust
+## 20. Schlüsselverlust
 
-## Ohne Recovery Key
+### Ohne Recovery Key
 
 und
 
-## Ohne autorisiertes Gerät
+### Ohne autorisiertes Gerät
 
 ---
 
@@ -532,7 +562,7 @@ Dies ist bewusstes Zero-Knowledge Verhalten.
 
 ---
 
-# 21. Metadatenmodell
+## 21. Metadatenmodell
 
 Zero Knowledge bedeutet nicht:
 
@@ -556,7 +586,7 @@ Geräte-ID
 
 ---
 
-# 22. Metadatenminimierung
+## 22. Metadatenminimierung
 
 Pflicht:
 
@@ -570,7 +600,7 @@ Keine Medikationsnamen
 
 ---
 
-# 23. Consent Integration
+## 23. Consent Integration
 
 Synchronisation erzeugt keine Sonderrechte.
 
@@ -596,9 +626,9 @@ Data Access
 
 ---
 
-# 24. Family Modell Integration
+## 24. Family Modell Integration
 
-Gemäß RFC-0008. 【3-83e818】【1-69db50】
+Gemäß RFC-0008.
 
 ---
 
@@ -610,7 +640,7 @@ Besitzrechte werden nicht verändert.
 
 ---
 
-# 25. Event Bus Integration
+## 25. Event Bus Integration
 
 Gemäß RFC-0005.
 
@@ -632,7 +662,7 @@ DEVICE_REMOVED
 
 ---
 
-# 26. Relay Service
+## 26. Relay Service
 
 Optional.
 
@@ -662,17 +692,17 @@ Passwords
 
 ---
 
-# 27. Managed Cloud
+## 27. Managed Cloud
 
 Separates Deployment-Modell.
 
 Nicht Bestandteil dieses RFC.
 
-Für Managed Cloud ist ein zusätzliches Review erforderlich. 【1-69db50】
+Für Managed Cloud ist ein zusätzliches Review erforderlich.
 
 ---
 
-# 28. Audit Anforderungen
+## 28. Audit Anforderungen
 
 Protokollieren:
 
@@ -690,7 +720,7 @@ Conflict Resolution
 
 ---
 
-# 29. Sicherheitsanforderungen
+## 29. Sicherheitsanforderungen
 
 Pflicht:
 
@@ -710,7 +740,7 @@ Key Rotation
 
 ---
 
-# 30. Nicht zulässig
+## 30. Nicht zulässig
 
 ```text
 Master Keys beim Betreiber
@@ -724,9 +754,9 @@ Cloud Pflicht
 
 ---
 
-# 31. Zukünftige Erweiterungen
+## 31. Zukünftige Erweiterungen
 
-## Phase 1
+### Phase 1
 
 ```text
 Single User Sync
@@ -734,7 +764,7 @@ Single User Sync
 
 ---
 
-## Phase 2
+### Phase 2
 
 ```text
 Family Sync
@@ -742,7 +772,7 @@ Family Sync
 
 ---
 
-## Phase 3
+### Phase 3
 
 ```text
 Cross Household Sharing
@@ -750,7 +780,7 @@ Cross Household Sharing
 
 ---
 
-## Phase 4
+### Phase 4
 
 ```text
 Federated Sync Nodes
@@ -758,7 +788,7 @@ Federated Sync Nodes
 
 ---
 
-# 32. Architekturentscheidung
+## 32. Architekturentscheidung
 
 Dieses RFC legt fest:
 

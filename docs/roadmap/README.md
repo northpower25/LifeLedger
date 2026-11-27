@@ -22,6 +22,6 @@ commitment.
 The proposed platform framing, Identity & Consent layer, six plugin types,
 Marketplace and deployment scenarios are described in the
 [architecture overview](../architecture/README.md), [draft RFC-0001](../../rfc/0001-platform-direction.md),
-[draft RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture) and
+[draft RFC-0002](../../rfc/0002-platform-core-architecture.md) and
 [proposed ADR](../../adr/0002-platform-direction.md). They are not yet
 accepted decisions or implemented capabilities.

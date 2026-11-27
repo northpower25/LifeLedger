@@ -1,6 +1,12 @@
 # RFC Konsolidierungs- und Änderungsplan
 
-Status: Nach Architekturreview RFC-0003 bis RFC-0013
+Status: Review-Aufträge in den RFC-Drafts konsolidiert (2026-11-27)
+
+Die folgenden Punkte dienten als Arbeitsaufträge für die Überarbeitung. Die
+Entscheidungen sind in den genannten RFCs als Vorschläge konkretisiert; die
+RFCs bleiben Drafts und sind weder angenommene Architektur noch Nachweis einer
+Implementierung. Insbesondere Quoren, Fristen und Retentionswerte bedürfen
+vor produktivem Betrieb der Governance-, Sicherheits- und Datenschutzprüfung.
 
 ---
 
@@ -12,7 +18,7 @@ Diese Punkte sollten vor Beginn einer eigentlichen Implementierung erledigt werd
 
 ## RFC-0014 Core Runtime & Platform Boundaries
 
-Neu erstellen.
+Grenzen in RFC-0014 konkretisiert.
 
 Ziel:
 
@@ -32,6 +38,11 @@ Was DARF Plugin sein?
 
 Was DARF NIEMALS Plugin sein?
 
+Ergebnis: verpflichtende, intern austauschbare Core-Verträge; VitaFabric als
+einziger Health-Data-Gateway-Owner; LifeWeaver optional; Applications als
+spezialisierte Plugins; nicht umgehbare Identity-, Consent-, Capability-,
+Audit-, Schlüssel- und Datenvertragskontrollen.
+
 ---
 
 ## RFC-0009 Marketplace Governance
@@ -50,6 +61,10 @@ Ergänzen:
 - Ablehnungsprozess
 - Rezertifizierung
 - Signaturworkflow
+
+Ergebnis: zwei unabhängige Reviewer, dokumentierte Ablehnung und Einspruch,
+Rezertifizierung spätestens nach zwölf Monaten bzw. bei sicherheits- oder
+vertrauensrelevanten Änderungen und Signatur des freigegebenen Paket-Digests.
 
 ---
 
@@ -71,6 +86,10 @@ Fehlend:
 - Manueller Review
 - UI-Verhalten
 
+Ergebnis: kausale Versionierung ohne Zeitstempelpriorität, begrenzter Merge
+nur für explizit unabhängige Felder, Tombstone vor nebenläufigem Update,
+manuelle Auflösung samt gesperrtem Konfliktzustand und Audit.
+
 ---
 
 ## RFC-0011 AI Provider Framework
@@ -89,6 +108,11 @@ Fehlend:
 - Hard Delete
 - Embedding Reindex
 - Retention
+
+Ergebnis: sofortige Zugriffssperre beim Soft Delete, Online-Purge innerhalb
+24 Stunden, Backup-Retention höchstens 30 Tage, expliziter Reindex aus
+autoritativen VitaFabric-Quellen und Statusereignis erst nach bestätigtem
+Purge der registrierten Online-Stores.
 
 ---
 
@@ -109,6 +133,10 @@ Festlegen:
 - Component Model
 - Sandboxing Grenzen
 
+Ergebnis: Wasmtime, WebAssembly Component Model und WASI 0.2 (Preview 2);
+versionierte WIT-Schnittstellen, gepinnte Runtime-Abhängigkeiten und
+fail-closed Ausführung ohne Umgehungs-Fallback.
+
 ---
 
 ## RFC-0007 Application Framework
@@ -124,6 +152,10 @@ Fehlend:
 - Upgrade Strategy
 - Compatibility Matrix
 
+Ergebnis: deklarative Abhängigkeiten und Digest-Lockfile, offlinefähige
+Staging-Migrationen, atomare Upgrades mit Rollback und Kompatibilitätsprüfung
+für Manifest, Platform API, ABI und App-Datenschema.
+
 ---
 
 ## RFC-0012 Governance
@@ -138,6 +170,11 @@ Fehlend:
 - Schlüsselübergabe
 - Marketplace Vertretung
 - Security Team Vertretung
+
+Ergebnis: benannte Stellvertretungen für Core-, Marketplace- und
+Security-Rollen, befristete Ausfallvertretung mit Mehrpersonenquorum und
+kontrollierter Schlüsselrotation. Fristen und Quoren bleiben vor Betrieb
+governancepflichtig.
 
 ---
 
@@ -166,6 +203,10 @@ Fehlend:
 - Reviewprozess
 - Auditpflicht je Stufe
 
+Ergebnis: Mindestfreigabe, Review und Audit für jede Risikostufe; Default
+Deny, Höherstufung nach größtem Schadenspotenzial und unabhängige Reviews bei
+hohen bzw. kritischen Capabilities.
+
 ---
 
 ## RFC-0005 Event Bus
@@ -183,6 +224,9 @@ EVENT_NAME
 
 EVENT_VERSION
 ```
+
+Ergebnis: versioniertes `<category>.<name>.v<version>`-Routing, registrierte
+Kategorien/Owner, inkompatible Schemaänderung nur mit neuer Event-Version.
 
 ---
 
@@ -205,3 +249,7 @@ LiteLLM
 ```
 
 Klassifikation definieren.
+
+Ergebnis: Trennung zwischen Inference Server, Router/Gateway und Cloud
+Provider; API-Kompatibilität wird pro Modell und Endpoint deklariert und
+begründet keine Vertrauens- oder Sicherheitsstufe.

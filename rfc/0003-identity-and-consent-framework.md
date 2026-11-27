@@ -1,14 +1,14 @@
-# RFC-0003: Identity & Consent Framework
+# RFC 0003: Identity & Consent Framework
 
-Status: Draft  
-Type: Architecture RFC  
-Owner: Platform Core  
+- Status: Draft
+- Type: Architecture RFC
+- Owner: Platform Core
 Depends On: RFC-0002 Platform Core Architecture  
 Blocks: RFC-0004, RFC-0006, RFC-0008, RFC-0010
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 Dieses RFC definiert das zentrale Identity- und Consent-Modell der LifeLedger-Plattform.
 
@@ -23,13 +23,13 @@ Es legt fest:
 - Notfallzugriffe
 - Auditierbarkeit
 
-Alle Datenzugriffe innerhalb von LifeLedger, VitaFabric, LifeWeaver und Plugins müssen dieses Modell verwenden. Gesundheitsdaten dürfen niemals außerhalb dieses Modells freigegeben werden. Die Notwendigkeit eines gemeinsamen Identity-&-Consent-Layers ergibt sich direkt aus der Plattformvision, den Roadmaps und den gemeinsamen Plattformfähigkeiten. 【1-adf3f8】【2-e0e861】【3-140342】【4-b5f51c】【5-7d0cf5】【6-1815ff】
+Alle Datenzugriffe innerhalb von LifeLedger, VitaFabric, LifeWeaver und Plugins müssen dieses Modell verwenden. Gesundheitsdaten dürfen niemals außerhalb dieses Modells freigegeben werden. Die Notwendigkeit eines gemeinsamen Identity-&-Consent-Layers ergibt sich direkt aus der Plattformvision, den Roadmaps und den gemeinsamen Plattformfähigkeiten.
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 ```text
 Nachvollziehbare Datenfreigaben
@@ -47,7 +47,7 @@ Auditierbarkeit
 Plugin-Integrierbarkeit
 ```
 
-## Nichtziele
+### Nichtziele
 
 ```text
 Externe Identitätsprovider im MVP
@@ -61,41 +61,41 @@ Krankenhaus-Berechtigungssysteme
 
 ---
 
-# 3. Grundprinzipien
+## 3. Grundprinzipien
 
-## Ownership First
+### Ownership First
 
 Jeder Gesundheitsdatensatz besitzt genau einen Owner.
 
 ---
 
-## Consent First
+### Consent First
 
 Kein Zugriff ohne gültige Einwilligung.
 
 ---
 
-## Least Privilege
+### Least Privilege
 
 Freigaben müssen minimal sein.
 
 ---
 
-## Revocable Access
+### Revocable Access
 
 Jede Freigabe muss widerrufbar sein.
 
 ---
 
-## Audit Required
+### Audit Required
 
 Jede Freigabe wird protokolliert.
 
 ---
 
-# 4. Identitätsmodell
+## 4. Identitätsmodell
 
-## User
+### User
 
 Basisobjekt.
 
@@ -110,7 +110,7 @@ User
 
 ---
 
-## Health Profile
+### Health Profile
 
 Gesundheitsdaten gehören einem Profil.
 
@@ -124,9 +124,9 @@ HealthProfile
 
 ---
 
-# 5. Household Modell
+## 5. Household Modell
 
-## Household
+### Household
 
 Verwaltet Familienbeziehungen.
 
@@ -141,13 +141,13 @@ Household
 
 ---
 
-# 6. Rollenmodell
+## 6. Rollenmodell
 
 Dieses RFC ist die maßgebliche Quelle für die Definitionen der folgenden
 Rollen. RFC-0008 beschreibt deren Anwendung im Familien- und
 Delegationsmodell und definiert die Rollen nicht erneut.
 
-## Primary Owner
+### Primary Owner
 
 Besitzer eines Gesundheitsprofils.
 
@@ -165,7 +165,7 @@ exportieren
 
 ---
 
-## Guardian
+### Guardian
 
 Gesetzlicher Vertreter.
 
@@ -190,7 +190,7 @@ soweit rechtlich zulässig.
 
 ---
 
-## Caregiver
+### Caregiver
 
 Pflegeperson.
 
@@ -219,7 +219,7 @@ Notfalldefinition ändern
 
 ---
 
-## Proxy
+### Proxy
 
 Bevollmächtigter Vertreter.
 
@@ -235,7 +235,7 @@ Owner umfassen.
 
 ---
 
-## Emergency Contact
+### Emergency Contact
 
 Darf ausschließlich Notfallinformationen im Emergency Profile einsehen.
 
@@ -244,9 +244,9 @@ Historie.
 
 ---
 
-# 7. Consent Modell
+## 7. Consent Modell
 
-## Consent Object
+### Consent Object
 
 Jede Freigabe wird als Consent gespeichert.
 
@@ -265,7 +265,7 @@ Jede Freigabe wird als Consent gespeichert.
 
 ---
 
-# 8. Scope-Modell
+## 8. Scope-Modell
 
 Nicht:
 
@@ -288,7 +288,7 @@ einzeln.
 
 ---
 
-# 9. Delegation
+## 9. Delegation
 
 Delegationsfähig:
 
@@ -307,9 +307,9 @@ Emergency Contact
 
 ---
 
-# 10. Notfallzugriff
+## 10. Notfallzugriff
 
-## Emergency Bundle
+### Emergency Bundle
 
 Separater Datensatz.
 
@@ -325,7 +325,7 @@ Notfallkontakte
 
 ---
 
-## Emergency Access Workflow
+### Emergency Access Workflow
 
 ```text
 Anfrage
@@ -345,13 +345,13 @@ Audit Event
 
 ---
 
-# 11. Widerrufsmodell
+## 11. Widerrufsmodell
 
 Widerruf muss sofort wirken.
 
 ---
 
-## Widerruf betrifft
+### Widerruf betrifft
 
 ```text
 aktive Sessions
@@ -365,7 +365,7 @@ Provider Freigaben
 
 ---
 
-# 12. Audit Anforderungen
+## 12. Audit Anforderungen
 
 Jeder Zugriff erzeugt:
 
@@ -379,7 +379,7 @@ Ergebnis
 
 ---
 
-# 13. Plugin Integration
+## 13. Plugin Integration
 
 Plugins sehen niemals Rollen.
 
@@ -392,7 +392,7 @@ Consent Result
 
 ---
 
-# 14. API Anforderungen
+## 14. API Anforderungen
 
 Identity API
 
@@ -418,7 +418,7 @@ requestEmergencyAccess
 
 ---
 
-# 15. Sicherheitsanforderungen
+## 15. Sicherheitsanforderungen
 
 Pflicht:
 
@@ -434,7 +434,7 @@ Recovery Verfahren
 
 ---
 
-# 16. Architekturentscheidung
+## 16. Architekturentscheidung
 
 Dieses RFC legt fest:
 

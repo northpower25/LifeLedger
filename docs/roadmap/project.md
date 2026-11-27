@@ -26,7 +26,7 @@ und ungelöste Zielkonflikte werden nicht durch diese Roadmap entschieden.
 ## Plattformperspektive und Deployment
 
 Die Gesundheitsakte ist als erste Referenzanwendung einer erweiterbaren
-Plattform vorgeschlagen. Draft [RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture)
+Plattform vorgeschlagen. Draft [RFC-0002](../../rfc/0002-platform-core-architecture.md)
 beschreibt einen Core Runtime mit Identity & Consent, Security Services,
 Event Bus, Plugin Host, Secret Store und Audit Service. Er schlägt explizite,
 technisch durchzusetzende Capabilities und WASM First als Plugin-Runtime vor;

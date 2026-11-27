@@ -11,7 +11,7 @@ of the platform. Applications, integrations and AI capabilities should be
 delivered through secure, reviewed plugin contracts. The vision is inspired by
 Home Assistant's integration platform, with VitaFabric as the trusted health
 data bus and LifeWeaver providing optional AI capabilities. The [platform-direction RFC](../../rfc/0001-platform-direction.md) and
-[draft RFC-0002](../../rfc/RFC-0002%20Platform%20Core%20Architecture) propose
+[draft RFC-0002](../../rfc/0002-platform-core-architecture.md) propose
 shared runtime and extension boundaries; these remain under review and none of
 the capabilities is implied to exist.
 

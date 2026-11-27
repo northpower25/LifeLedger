@@ -1,15 +1,15 @@
-# RFC-0004: Capability & Permission Model
+# RFC 0004: Capability & Permission Model
 
-Status: Draft  
-Type: Architecture RFC  
-Owner: Platform Core  
+- Status: Draft
+- Type: Architecture RFC
+- Owner: Platform Core
 Depends On: RFC-0002 Platform Core Architecture  
 Depends On: RFC-0003 Identity & Consent Framework  
 Blocks: RFC-0006, RFC-0007, RFC-0009, RFC-0011
 
 ---
 
-# 1. Zusammenfassung
+## 1. Zusammenfassung
 
 Dieses RFC definiert das Capability- und Berechtigungsmodell der LifeLedger Plattform.
 
@@ -42,9 +42,9 @@ Sie sind keine freiwilligen Deklarationen.
 
 ---
 
-# 2. Ziele
+## 2. Ziele
 
-## Ziele
+### Ziele
 
 ```text
 Least Privilege
@@ -62,7 +62,7 @@ Plugin-Sicherheit
 
 ---
 
-## Nichtziele
+### Nichtziele
 
 ```text
 Business Rollen
@@ -78,9 +78,9 @@ Diese Bereiche werden durch RFC-0003 geregelt.
 
 ---
 
-# 3. Architekturprinzipien
+## 3. Architekturprinzipien
 
-## Default Deny
+### Default Deny
 
 Jede Capability ist verboten.
 
@@ -92,7 +92,7 @@ Default = Deny
 
 ---
 
-## Capability Based Security
+### Capability Based Security
 
 Plugins erhalten niemals:
 
@@ -106,7 +106,7 @@ sondern konkrete Fähigkeiten.
 
 ---
 
-## Consent + Capability
+### Consent + Capability
 
 Zugriff benötigt beide Bedingungen.
 
@@ -120,9 +120,9 @@ Consent vorhanden
 
 ---
 
-# 4. Sicherheitsmodell
+## 4. Sicherheitsmodell
 
-## Zugriffspfad
+### Zugriffspfad
 
 ```text
 Request
@@ -148,7 +148,7 @@ Alle Prüfungen sind verpflichtend.
 
 ---
 
-## Beispiel
+### Beispiel
 
 ```text
 Plugin
@@ -180,15 +180,15 @@ Zugriff verweigert
 
 ---
 
-# 5. Capability Ebenen
+## 5. Capability Ebenen
 
 Die Plattform verwendet vier Capability-Ebenen.
 
 ---
 
-# 6. FHIR Capabilities
+## 6. FHIR Capabilities
 
-## Read
+### Read
 
 ```text
 READ_PATIENT
@@ -210,7 +210,7 @@ READ_PROVENANCE
 
 ---
 
-## Write
+### Write
 
 ```text
 WRITE_OBSERVATION
@@ -224,7 +224,7 @@ WRITE_CONDITION
 
 ---
 
-## Administrative Datenoperationen
+### Administrative Datenoperationen
 
 ```text
 MERGE_RECORDS
@@ -236,9 +236,9 @@ EXPORT_DATA
 
 ---
 
-# 7. Plattform Capabilities
+## 7. Plattform Capabilities
 
-## Netzwerk
+### Netzwerk
 
 ```text
 NETWORK_ACCESS
@@ -254,7 +254,7 @@ Websocket
 
 ---
 
-## Datei Zugriff
+### Datei Zugriff
 
 ```text
 LOCAL_STORAGE_READ
@@ -264,7 +264,7 @@ LOCAL_STORAGE_WRITE
 
 ---
 
-## Kamera
+### Kamera
 
 ```text
 CAMERA_ACCESS
@@ -272,7 +272,7 @@ CAMERA_ACCESS
 
 ---
 
-## Benachrichtigungen
+### Benachrichtigungen
 
 ```text
 NOTIFICATION_ACCESS
@@ -280,7 +280,7 @@ NOTIFICATION_ACCESS
 
 ---
 
-## Hintergrundprozesse
+### Hintergrundprozesse
 
 ```text
 BACKGROUND_TASKS
@@ -288,9 +288,9 @@ BACKGROUND_TASKS
 
 ---
 
-# 8. KI Capabilities
+## 8. KI Capabilities
 
-## Lokale KI
+### Lokale KI
 
 ```text
 AI_LOCAL_MODEL
@@ -298,7 +298,7 @@ AI_LOCAL_MODEL
 
 ---
 
-## Remote KI
+### Remote KI
 
 ```text
 AI_REMOTE_PROVIDER
@@ -306,7 +306,7 @@ AI_REMOTE_PROVIDER
 
 ---
 
-## Embeddings
+### Embeddings
 
 ```text
 AI_EMBEDDING
@@ -320,7 +320,7 @@ und die VitaFabric-Datenverträge für Derived Data gemäß RFC-0013.
 
 ---
 
-## RAG
+### RAG
 
 ```text
 AI_RAG
@@ -328,7 +328,7 @@ AI_RAG
 
 ---
 
-## Agenten
+### Agenten
 
 ```text
 AI_AGENT
@@ -336,9 +336,9 @@ AI_AGENT
 
 ---
 
-# 9. Administrative Capabilities
+## 9. Administrative Capabilities
 
-## Consent und Household
+### Consent und Household
 
 ```text
 MANAGE_CONSENT
@@ -351,7 +351,7 @@ Prüfung der jeweiligen Identität und Vertretungsbefugnis.
 
 ---
 
-## Benutzerverwaltung
+### Benutzerverwaltung
 
 ```text
 USER_MANAGEMENT
@@ -359,7 +359,7 @@ USER_MANAGEMENT
 
 ---
 
-## Plugin Installation
+### Plugin Installation
 
 ```text
 PLUGIN_INSTALL
@@ -367,7 +367,7 @@ PLUGIN_INSTALL
 
 ---
 
-## Plugin Signierung
+### Plugin Signierung
 
 ```text
 PLUGIN_SIGN
@@ -375,7 +375,7 @@ PLUGIN_SIGN
 
 ---
 
-## Audit Zugriff
+### Audit Zugriff
 
 ```text
 AUDIT_VIEW
@@ -383,7 +383,7 @@ AUDIT_VIEW
 
 ---
 
-## Notfallzugriff
+### Notfallzugriff
 
 ```text
 EMERGENCY_ACCESS
@@ -391,13 +391,13 @@ EMERGENCY_ACCESS
 
 ---
 
-# 10. Capability Bundles
+## 10. Capability Bundles
 
 Zur Vereinfachung dürfen Bundles definiert werden.
 
 ---
 
-## Health Viewer
+### Health Viewer
 
 ```text
 READ_PATIENT
@@ -407,7 +407,7 @@ READ_DOCUMENT
 
 ---
 
-## Import Connector
+### Import Connector
 
 ```text
 WRITE_OBSERVATION
@@ -417,7 +417,7 @@ NETWORK_ACCESS
 
 ---
 
-## AI Assistant
+### AI Assistant
 
 ```text
 READ_DOCUMENT
@@ -433,7 +433,7 @@ Sie aggregieren Fähigkeiten.
 
 ---
 
-# 11. Plugin Manifest
+## 11. Plugin Manifest
 
 Jedes Plugin muss Capabilities deklarieren.
 
@@ -452,9 +452,9 @@ Beispiel:
 
 ---
 
-# 12. Capability Review
+## 12. Capability Review
 
-## Community
+### Community
 
 Selbstdeklaration.
 
@@ -462,21 +462,28 @@ Keine Prüfung.
 
 ---
 
-## Verified
+### Verified
 
 Review durch Maintainer.
 
 ---
 
-## Official
+### Official
 
 Pflichtprüfung.
 
+Die Prüfungstiefe folgt der höchsten Capability-Risikostufe aus §17.
+Capabilities der Stufen Hoch und Kritisch benötigen dokumentierte
+Sicherheitsprüfung; Kritisch erfordert zusätzlich zwei unabhängige Reviewer.
+Eine Community-Selbstauskunft oder Marketplace-Einstufung vergibt niemals
+selbst einen Grant und ersetzt nicht die explizite Nutzerfreigabe oder das
+Host Enforcement.
+
 ---
 
-# 13. Durchsetzung
+## 13. Durchsetzung
 
-## Host Enforcement
+### Host Enforcement
 
 Capabilities werden nicht durch Plugins geprüft.
 
@@ -484,7 +491,7 @@ Sie werden durch den Plattformhost geprüft.
 
 ---
 
-## Beispiel
+### Beispiel
 
 Nicht erlaubt:
 
@@ -518,7 +525,7 @@ Zugriff
 
 ---
 
-# 14. Capability APIs
+## 14. Capability APIs
 
 Jede Plattform-API muss definieren:
 
@@ -544,13 +551,13 @@ storeMedication()
 
 ---
 
-# 15. Revocation
+## 15. Revocation
 
 Capabilities können widerrufen werden.
 
 ---
 
-## Folgen
+### Folgen
 
 ```text
 Plugin Neustart
@@ -562,7 +569,7 @@ Token Invalidierung
 
 ---
 
-# 16. Audit Anforderungen
+## 16. Audit Anforderungen
 
 Jede Nutzung protokolliert:
 
@@ -577,21 +584,55 @@ Ergebnis
 
 ---
 
-# 17. Capability Matrix
+## 17. Capability Risk Levels
 
-| Kategorie | Capability | Risiko |
-|------------|------------|---------|
-| FHIR Read | READ_PATIENT | Niedrig |
-| FHIR Read | READ_DOCUMENT | Mittel |
-| FHIR Write | WRITE_OBSERVATION | Mittel |
-| Export | EXPORT_DATA | Hoch |
-| AI | AI_REMOTE_PROVIDER | Hoch |
-| Admin | USER_MANAGEMENT | Hoch |
-| Admin | EMERGENCY_ACCESS | Kritisch |
+Das Risiko wird für jede Capability anhand der Sensitivität der erreichbaren
+Daten, des möglichen Schadens, der Reichweite und der Umkehrbarkeit einer
+Aktion bewertet. Die höchste zutreffende Stufe gilt. Bundles erben die höchste
+Stufe ihrer enthaltenen Capabilities; sie dürfen eine Einstufung nicht
+absenken.
+
+| Stufe | Mindestfreigabe | Review vor Freigabe | Audit |
+|---|---|---|---|
+| Niedrig | Nutzerfreigabe pro Plugin oder App | Automatisierte Manifest- und Kompatibilitätsprüfung | Installation, Freigabe und Nutzung |
+| Mittel | Explizite Nutzerfreigabe mit Zweck und Datenumfang | Maintainer-Review bei Marketplace-Listing; erneute Prüfung bei Scope-Änderung | Jede Ressourcennutzung mit Ergebnis |
+| Hoch | Explizite, widerrufbare Nutzerfreigabe je Datenkategorie und Empfänger | Sicherheitsreview und Review durch zwei voneinander unabhängige Reviewer für Verified/Official Listings | Jede Nutzung, jeder Export und jede Änderung mit Akteur, Scope, Zeit und Ergebnis |
+| Kritisch | Schrittweise Nutzerbestätigung je Vorgang; keine unbeaufsichtigte oder gebündelte Freigabe | Sicherheits- und Governance-Freigabe durch zwei unabhängige Reviewer; kritische Fähigkeit standardmäßig nicht an Drittanbieter-Erweiterungen vergeben | Unveränderlicher Audit-Eintrag, einschließlich Ablehnung und Widerruf |
+
+| Capability-Beispiel | Mindeststufe |
+|---|---|
+| `NOTIFICATION_ACCESS` | Niedrig |
+| `READ_DOCUMENT`, `READ_OBSERVATION`, `READ_EMBEDDINGS` | Hoch |
+| `WRITE_OBSERVATION`, `EXPORT_DATA` | Hoch |
+| `READ_PATIENT`, `AI_REMOTE_PROVIDER`, `MANAGE_HOUSEHOLD` | Hoch |
+| `DELETE_RECORDS`, `MANAGE_CONSENT`, `EMERGENCY_ACCESS`, `USER_MANAGEMENT`, `PLUGIN_SIGN` | Kritisch |
+
+Die Beispiele sind Mindeststufen. Ein konkreter Anwendungsfall darf höher,
+aber nicht niedriger eingestuft werden. Unbekannte oder nicht bewertete
+Capabilities bleiben gesperrt. Eine Nutzerfreigabe ersetzt weder Consent
+gemäß RFC-0003 noch Host Enforcement oder die unabhängige Sicherheitsprüfung.
+
+### Genehmigungs- und Reviewprozess
+
+1. Der Capability-Eigentümer dokumentiert Datenklasse, Zweck, Empfänger,
+   Reichweite, Widerruf und Schadensauswirkung.
+2. Der Host prüft die Einstufung und verweigert nicht katalogisierte
+   Capabilities (Default Deny).
+3. Die Freigabe erfordert mindestens die oben angegebene Nutzerbestätigung.
+   Für Marketplace-Einstufungen gelten zusätzlich die unabhängigen Reviews
+   aus RFC-0009.
+4. Scope- oder Verhaltensänderungen lösen eine Neubewertung aus. Beim
+   Entfernen einer Capability werden aktive Grants und Tokens widerrufen.
+
+Der Audit-Eintrag enthält mindestens Capability-ID, Erweiterungs- und
+Nutzer-ID, Ressourcenkategorie, Entscheidung, Reviewer/Freigebenden und
+Zeitpunkt. Audit-Datensätze dürfen keine Gesundheitsinhalte oder Geheimnisse
+enthalten. Aufbewahrung und Zugriff auf Auditdaten folgen RFC-0012 und den
+geltenden Datenschutzanforderungen.
 
 ---
 
-# 18. Sicherheitsanforderungen
+## 18. Sicherheitsanforderungen
 
 Pflicht:
 
@@ -621,7 +662,7 @@ Capability deklarieren aber nicht erzwingen
 
 ---
 
-# 19. Migrationsstrategie
+## 19. Migrationsstrategie
 
 V1:
 
@@ -647,7 +688,7 @@ Kontextabhängige Capabilities
 
 ---
 
-# 20. Architekturentscheidung
+## 20. Architekturentscheidung
 
 Dieses RFC legt fest:
 

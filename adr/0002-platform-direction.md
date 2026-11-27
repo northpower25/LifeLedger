@@ -4,7 +4,7 @@
 - Date: 2026-11-26
 - Decision makers: pending architecture and community review
 - Related issues or RFCs: [RFC 0001](../rfc/0001-platform-direction.md),
-  [RFC-0002](../rfc/RFC-0002%20Platform%20Core%20Architecture)
+  [RFC-0002](../rfc/0002-platform-core-architecture.md)
 
 ## Context
 
