@@ -1,0 +1,1397 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "LifeLedger Offline Slice API",
+    "description": "Local-only API for synthetic Patient, DocumentReference and MedicationStatement data.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health",
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer"
+                      }
+                    ]
+                  },
+                  "type": "object",
+                  "title": "Response Health Api V1 Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/owner/status": {
+      "get": {
+        "tags": [
+          "Owner"
+        ],
+        "summary": "Owner Status",
+        "operationId": "owner_status_api_v1_owner_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnerStatusResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/owner/setup": {
+      "post": {
+        "tags": [
+          "Owner"
+        ],
+        "summary": "Setup Owner",
+        "operationId": "setup_owner_api_v1_owner_setup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OwnerSetup"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnerSetupResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/owner/setup/resume": {
+      "post": {
+        "tags": [
+          "Owner"
+        ],
+        "summary": "Resume Owner Setup",
+        "operationId": "resume_owner_setup_api_v1_owner_setup_resume_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupResume"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Resume Owner Setup Api V1 Owner Setup Resume Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/owner/setup/confirm": {
+      "post": {
+        "tags": [
+          "Owner"
+        ],
+        "summary": "Confirm Owner",
+        "operationId": "confirm_owner_api_v1_owner_setup_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TotpConfirmation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/owner/unlock": {
+      "post": {
+        "tags": [
+          "Owner"
+        ],
+        "summary": "Unlock Owner",
+        "operationId": "unlock_owner_api_v1_owner_unlock_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UnlockRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/owner/lock": {
+      "post": {
+        "tags": [
+          "Owner"
+        ],
+        "summary": "Lock Owner",
+        "operationId": "lock_owner_api_v1_owner_lock_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/patients": {
+      "get": {
+        "tags": [
+          "Patient"
+        ],
+        "summary": "List Patients",
+        "operationId": "list_patients_api_v1_patients_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PatientResource"
+                  },
+                  "type": "array",
+                  "title": "Response List Patients Api V1 Patients Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Patient"
+        ],
+        "summary": "Create Patient",
+        "operationId": "create_patient_api_v1_patients_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientResource"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/patients/{patient_id}/documents": {
+      "post": {
+        "tags": [
+          "DocumentReference"
+        ],
+        "summary": "Import Document",
+        "operationId": "import_document_api_v1_patients__patient_id__documents_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "patient_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Patient Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentReferenceResource"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "DocumentReference"
+        ],
+        "summary": "List Documents",
+        "operationId": "list_documents_api_v1_patients__patient_id__documents_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "patient_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Patient Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DocumentReferenceResource"
+                  },
+                  "title": "Response List Documents Api V1 Patients  Patient Id  Documents Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/patients/{patient_id}/medication-statements": {
+      "post": {
+        "tags": [
+          "MedicationStatement"
+        ],
+        "summary": "Create Medication",
+        "operationId": "create_medication_api_v1_patients__patient_id__medication_statements_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "patient_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Patient Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MedicationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MedicationStatementResource"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "MedicationStatement"
+        ],
+        "summary": "List Medications",
+        "operationId": "list_medications_api_v1_patients__patient_id__medication_statements_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "patient_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Patient Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MedicationStatementResource"
+                  },
+                  "title": "Response List Medications Api V1 Patients  Patient Id  Medication Statements Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/patients/{patient_id}/timeline": {
+      "get": {
+        "tags": [
+          "Timeline"
+        ],
+        "summary": "Timeline",
+        "operationId": "timeline_api_v1_patients__patient_id__timeline_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "patient_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Patient Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimelineEntry"
+                  },
+                  "title": "Response Timeline Api V1 Patients  Patient Id  Timeline Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/consent/revoke": {
+      "post": {
+        "tags": [
+          "Consent"
+        ],
+        "summary": "Revoke Consent",
+        "operationId": "revoke_consent_api_v1_consent_revoke_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/backup": {
+      "post": {
+        "tags": [
+          "Backup"
+        ],
+        "summary": "Create Backup",
+        "operationId": "create_backup_api_v1_backup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/backup/restore": {
+      "post": {
+        "tags": [
+          "Backup"
+        ],
+        "summary": "Restore Backup",
+        "operationId": "restore_backup_api_v1_backup_restore_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupRestore"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BackupCreate": {
+        "properties": {
+          "passphrase": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 12,
+            "title": "Passphrase"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "passphrase"
+        ],
+        "title": "BackupCreate"
+      },
+      "BackupResponse": {
+        "properties": {
+          "backup_base64": {
+            "type": "string",
+            "title": "Backup Base64"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          }
+        },
+        "type": "object",
+        "required": [
+          "backup_base64",
+          "sha256"
+        ],
+        "title": "BackupResponse"
+      },
+      "BackupRestore": {
+        "properties": {
+          "passphrase": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 12,
+            "title": "Passphrase"
+          },
+          "backup_base64": {
+            "type": "string",
+            "maxLength": 100000000,
+            "minLength": 64,
+            "title": "Backup Base64"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "passphrase",
+          "backup_base64"
+        ],
+        "title": "BackupRestore"
+      },
+      "DocumentAttachment": {
+        "properties": {
+          "contentType": {
+            "type": "string",
+            "enum": [
+              "application/pdf",
+              "text/plain",
+              "image/png"
+            ],
+            "title": "Contenttype"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "size": {
+            "type": "integer",
+            "title": "Size"
+          },
+          "hash": {
+            "type": "string",
+            "title": "Hash"
+          },
+          "data": {
+            "type": "string",
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contentType",
+          "title",
+          "size",
+          "hash",
+          "data"
+        ],
+        "title": "DocumentAttachment"
+      },
+      "DocumentContent": {
+        "properties": {
+          "attachment": {
+            "$ref": "#/components/schemas/DocumentAttachment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "attachment"
+        ],
+        "title": "DocumentContent"
+      },
+      "DocumentCreate": {
+        "properties": {
+          "patient_id": {
+            "type": "string",
+            "title": "Patient Id"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "content_type": {
+            "type": "string",
+            "enum": [
+              "application/pdf",
+              "text/plain",
+              "image/png"
+            ],
+            "title": "Content Type"
+          },
+          "content_base64": {
+            "type": "string",
+            "maxLength": 14000000,
+            "minLength": 4,
+            "title": "Content Base64"
+          },
+          "synthetic": {
+            "type": "boolean",
+            "const": true,
+            "title": "Synthetic"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "patient_id",
+          "title",
+          "content_type",
+          "content_base64",
+          "synthetic"
+        ],
+        "title": "DocumentCreate"
+      },
+      "DocumentReferenceResource": {
+        "properties": {
+          "resourceType": {
+            "type": "string",
+            "const": "DocumentReference",
+            "title": "Resourcetype"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "const": "current",
+            "title": "Status"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/FhirReference"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Date"
+          },
+          "content": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentContent"
+            },
+            "type": "array",
+            "title": "Content"
+          },
+          "extension": {
+            "items": {
+              "$ref": "#/components/schemas/FhirExtension"
+            },
+            "type": "array",
+            "title": "Extension"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resourceType",
+          "id",
+          "status",
+          "subject",
+          "date",
+          "content",
+          "extension"
+        ],
+        "title": "DocumentReferenceResource"
+      },
+      "FhirExtension": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "valueBoolean": {
+            "type": "boolean",
+            "title": "Valueboolean"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "valueBoolean"
+        ],
+        "title": "FhirExtension"
+      },
+      "FhirHumanName": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "FhirHumanName"
+      },
+      "FhirNarrative": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "generated",
+            "title": "Status"
+          },
+          "div": {
+            "type": "string",
+            "title": "Div"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "div"
+        ],
+        "title": "FhirNarrative"
+      },
+      "FhirReference": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference"
+        ],
+        "title": "FhirReference"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MedicationConcept": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "MedicationConcept"
+      },
+      "MedicationCreate": {
+        "properties": {
+          "patient_id": {
+            "type": "string",
+            "title": "Patient Id"
+          },
+          "medication_text": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Medication Text"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed",
+              "not-taken",
+              "on-hold",
+              "stopped",
+              "unknown"
+            ],
+            "title": "Status",
+            "default": "active"
+          },
+          "effective_datetime": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Effective Datetime"
+          },
+          "synthetic": {
+            "type": "boolean",
+            "const": true,
+            "title": "Synthetic"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "patient_id",
+          "medication_text",
+          "effective_datetime",
+          "synthetic"
+        ],
+        "title": "MedicationCreate"
+      },
+      "MedicationStatementResource": {
+        "properties": {
+          "resourceType": {
+            "type": "string",
+            "const": "MedicationStatement",
+            "title": "Resourcetype"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "completed",
+              "not-taken",
+              "on-hold",
+              "stopped",
+              "unknown"
+            ],
+            "title": "Status"
+          },
+          "medicationCodeableConcept": {
+            "$ref": "#/components/schemas/MedicationConcept"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/FhirReference"
+          },
+          "effectiveDateTime": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Effectivedatetime"
+          },
+          "dateAsserted": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Dateasserted"
+          },
+          "extension": {
+            "items": {
+              "$ref": "#/components/schemas/FhirExtension"
+            },
+            "type": "array",
+            "title": "Extension"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resourceType",
+          "id",
+          "status",
+          "medicationCodeableConcept",
+          "subject",
+          "effectiveDateTime",
+          "dateAsserted",
+          "extension"
+        ],
+        "title": "MedicationStatementResource"
+      },
+      "OwnerSetup": {
+        "properties": {
+          "display_name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Display Name"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 12,
+            "title": "Password"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "display_name",
+          "password"
+        ],
+        "title": "OwnerSetup"
+      },
+      "OwnerSetupResponse": {
+        "properties": {
+          "owner_id": {
+            "type": "string",
+            "title": "Owner Id"
+          },
+          "totp_secret": {
+            "type": "string",
+            "title": "Totp Secret"
+          },
+          "totp_uri": {
+            "type": "string",
+            "title": "Totp Uri"
+          },
+          "status": {
+            "type": "string",
+            "const": "pending_mfa_confirmation",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "owner_id",
+          "totp_secret",
+          "totp_uri",
+          "status"
+        ],
+        "title": "OwnerSetupResponse"
+      },
+      "OwnerStatusResponse": {
+        "properties": {
+          "owner_exists": {
+            "type": "boolean",
+            "title": "Owner Exists"
+          },
+          "owner_confirmed": {
+            "type": "boolean",
+            "title": "Owner Confirmed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "owner_exists",
+          "owner_confirmed"
+        ],
+        "title": "OwnerStatusResponse"
+      },
+      "PatientCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "synthetic": {
+            "type": "boolean",
+            "const": true,
+            "title": "Synthetic"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "synthetic"
+        ],
+        "title": "PatientCreate"
+      },
+      "PatientResource": {
+        "properties": {
+          "resourceType": {
+            "type": "string",
+            "const": "Patient",
+            "title": "Resourcetype"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "name": {
+            "items": {
+              "$ref": "#/components/schemas/FhirHumanName"
+            },
+            "type": "array",
+            "title": "Name"
+          },
+          "extension": {
+            "items": {
+              "$ref": "#/components/schemas/FhirExtension"
+            },
+            "type": "array",
+            "title": "Extension"
+          },
+          "text": {
+            "$ref": "#/components/schemas/FhirNarrative"
+          }
+        },
+        "type": "object",
+        "required": [
+          "resourceType",
+          "id",
+          "active",
+          "name",
+          "extension",
+          "text"
+        ],
+        "title": "PatientResource"
+      },
+      "SessionResponse": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "const": "bearer",
+            "title": "Token Type"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "token_type",
+          "expires_in"
+        ],
+        "title": "SessionResponse"
+      },
+      "SetupResume": {
+        "properties": {
+          "password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 12,
+            "title": "Password"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "password"
+        ],
+        "title": "SetupResume"
+      },
+      "TimelineEntry": {
+        "properties": {
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "Patient",
+              "DocumentReference",
+              "MedicationStatement"
+            ],
+            "title": "Resource Type"
+          },
+          "resource": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PatientResource"
+              },
+              {
+                "$ref": "#/components/schemas/DocumentReferenceResource"
+              },
+              {
+                "$ref": "#/components/schemas/MedicationStatementResource"
+              }
+            ],
+            "title": "Resource"
+          }
+        },
+        "type": "object",
+        "required": [
+          "occurred_at",
+          "resource_type",
+          "resource"
+        ],
+        "title": "TimelineEntry"
+      },
+      "TotpConfirmation": {
+        "properties": {
+          "password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 12,
+            "title": "Password"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "title": "Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "password",
+          "code"
+        ],
+        "title": "TotpConfirmation"
+      },
+      "UnlockRequest": {
+        "properties": {
+          "password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 12,
+            "title": "Password"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "title": "Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "password",
+          "code"
+        ],
+        "title": "UnlockRequest"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

@@ -1,0 +1,126 @@
+# Windows-Testprotokoll: erster Offline-Slice
+
+**Status: Vorlage, nicht durchgeführt.** Nur für eine isolierte Testumgebung
+und ausschließlich synthetische Daten. Der Build ist ein unsignierter
+Entwicklungsstand, keine Freigabe für echte Gesundheitsdaten. Den folgenden
+Test mit dem exakt im Formular notierten Commit durchführen. Ein erfolgreicher
+Funktionstest beweist keine Same-User-Isolation oder Produktionssicherheit.
+
+## Vorbereitung und Build
+
+1. Windows 10/11 x64 (möglichst saubere VM), WebView2 Runtime, Python 3.12,
+   Node.js 22, Rust mit `x86_64-pc-windows-msvc` sowie Visual Studio C++ Build
+   Tools installieren. Für Setup, Paketdownloads und Installer-Build ist
+   Internetzugang erforderlich. Der eigentliche Offline-Test erfolgt erst
+   nach Installation und Deaktivierung aller Netzwerkadapter.
+2. Repository einschließlich des PR-Branches auschecken. In PowerShell im
+   Repositoryverzeichnis ausführen:
+
+   ```powershell
+   git rev-parse HEAD
+   py -3.12 -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   python -m pip install -e "./backend[test]"
+   python -m pytest backend/tests -q
+   .\backend\scripts\build_windows_sidecar.ps1
+   Push-Location frontend-desktop
+   npm ci
+   npm run tauri build
+   Pop-Location
+   ```
+
+   Jeder Schritt muss erfolgreich enden; bei einem Fehler abbrechen und die
+   Fehlermeldung im Formular notieren. Der Sidecar liegt unter
+   `frontend-desktop/src-tauri/binaries/lifeledger-api-x86_64-pc-windows-msvc.exe`,
+   die Installer unter `frontend-desktop/src-tauri/target/release/bundle/`.
+   Alternativ kann ein erfolgreiches Windows-Actions-Artefakt desselben
+   Commits verwendet werden. Ein erfolgreicher Build ersetzt die folgenden
+   interaktiven Tests nicht.
+3. Einen erzeugten Installer installieren. Für einen isolierten Erststart eine
+   neue Windows-Testbenutzerumgebung verwenden. Standard-Datenbank:
+   `%LOCALAPPDATA%\LifeLedger\lifeledger.sqlite3`. Keine bestehende Datenbank
+   löschen oder überschreiben. Das Restore ersetzt den aktuellen Datenbestand.
+4. Lokal eine UTF-8-Textdatei `synthetisch.txt` mit dem Inhalt
+   `SYNTHETISCHES TESTDOKUMENT 123` anlegen. Einen offlinefähigen
+   TOTP-Authenticator bereithalten und die Windows-Uhr überprüfen. Passwörter
+   und TOTP-Schlüssel niemals im Protokoll oder in Screenshots festhalten.
+5. Netzwerkkonnektivität vorübergehend deaktivieren (alle Adapter, auch VPN).
+   Sicherstellen, dass auch WLAN und Mobilfunk aus sind. Erst danach die
+   installierte Anwendung starten. Die Tests W01–W10 offline durchführen.
+
+## Tests
+
+Ergebnis jeweils **bestanden**, **fehlgeschlagen** oder **nicht durchgeführt**
+eintragen. Bei Abweichungen Schritte, Zeitpunkt und bereinigte Fehlermeldung
+festhalten; keine Geheimnisse, Tokens oder personenbezogenen Daten teilen.
+
+| ID | Durchführung | Erwartetes Ergebnis |
+| --- | --- | --- |
+| W01 Start | App starten; im Task-Manager den Prozess `lifeledger-api.exe` suchen. | UI mit Hinweis auf synthetische Daten erscheint; ein API-Prozess läuft. |
+| W02 Owner | Owner mit Testnamen und Passwort (mindestens 12 Zeichen) anlegen; angezeigten TOTP-Schlüssel im Authenticator erfassen und aktuellen Code bestätigen. | Einrichtung erfolgreich, Patient-Bereich erscheint. |
+| W03 Daten | Patient `Testperson Alpha` anlegen, auswählen, `synthetisch.txt` unter Titel `Testdokument 123` importieren, Medikation `Testmedikation 123` anlegen. | Timeline zeigt Patient, DocumentReference und MedicationStatement mit den Testbezeichnungen. |
+| W04 Backup | Separate Test-Passphrase mit mindestens 12 Zeichen eingeben und verschlüsseltes Backup erstellen. Downloadverzeichnis und Dateigröße prüfen. | Datei `LifeLedger-synthetic-backup.llbackup` vorhanden und nicht leer. |
+| W05 Veränderung | Nach dem Backup `Testperson Beta` anlegen. | Beide Testpersonen sind auswählbar. |
+| W06 Negativ-Restore | Backup mit falscher Passphrase wiederherstellen. | Fehlermeldung; beide Testpersonen bleiben erhalten. |
+| W07 Restore | Korrekte Passphrase eingeben und Backup wiederherstellen; falls nötig auf einen neuen TOTP-Zeitschritt warten, dann erneut entsperren. | Erneute Anmeldung erforderlich; Alpha und dessen drei Timeline-Einträge vorhanden, Beta fehlt. |
+| W08 Sperren | `Sperren` wählen und mit Passwort und frischem TOTP-Code wieder entsperren. | Geschützte Daten verschwinden und erscheinen erst nach erfolgreicher Anmeldung. |
+| W09 Negativ-Anmeldung | Nach Sperren falsches Passwort bzw. falschen TOTP-Code verwenden; anschließend mit gültigen Daten anmelden. | Falsche Daten werden abgelehnt; gültige Anmeldung funktioniert mit einem noch nicht verwendeten TOTP-Code. |
+| W10 Beenden/Neustart | App schließen; Prozessliste prüfen; neu starten und anmelden. | Sidecar endet ebenfalls; erneuter Start und persistierte Daten funktionieren offline. |
+| W11 Mehrfachstart | Bei laufender App ein zweites Exemplar starten; Prozesse, Meldungen und Datenbestand beobachten. | Keine konkurrierenden Instanzen/Seiteneffekte; ansonsten als Fehler bzw. offene Sicherheitsgrenze dokumentieren. |
+| W12 IPC-Basistest | Bei laufender App deren Sidecar-PID und zugehörigen lokalen TCP-Listen-Port ermitteln; `GET http://127.0.0.1:<Port>/api/v1/health` ohne IPC-Header senden. | Bindung nur an Loopback; direkte Anfrage ohne Geheimnis wird mit HTTP 403 abgewiesen. Kein Testbeweis für Same-User-Isolation. |
+| W13 Dokumentgrenze | Unterstützte synthetische Textdatei über 10 MiB bzw. ungültige PDF-Datei importieren. | Import wird abgewiesen und kein neuer Timeline-Eintrag erzeugt. |
+
+Für W12 im separaten PowerShell-Fenster (nicht im Entwicklungsmodus starten;
+`LIFELEDGER_DEV_MODE` darf nicht gesetzt sein):
+
+```powershell
+Get-Process lifeledger-api
+Get-NetTCPConnection -State Listen -OwningProcess <PID>
+try {
+  Invoke-WebRequest "http://127.0.0.1:<Port>/api/v1/health" -UseBasicParsing
+} catch {
+  if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode }
+  else { throw }
+}
+```
+
+PID und Port durch tatsächlich ermittelte Werte ersetzen. Andere lokale
+Prozesse, Port-Races, Prozess-Impersonation und Zugriff durch denselben
+Windows-Benutzer sind durch W12 nicht ausreichend geprüft. Scheitert W11 oder
+ist die gegenseitige Authentisierung nicht belegt, bleibt das IPC-Gate offen.
+Erst nach allen Tests Netzwerkadapter wieder aktivieren.
+
+## Auszufüllendes Formular
+
+```text
+Tester/in (optional):                 Datum:
+Commit-SHA / PR:
+Windows-Version / Architektur:
+VM oder Gerät / frisches Benutzerprofil:
+Buildquelle (lokal / Actions) / Installer-Typ:
+Python / Node / Rust:
+Build Sidecar:      bestanden / fehlgeschlagen / nicht durchgeführt
+Build Installer:    bestanden / fehlgeschlagen / nicht durchgeführt
+Backend-Tests:      bestanden / fehlgeschlagen / nicht durchgeführt
+Netzwerk für W01–W10 deaktiviert und geprüft: ja / nein
+
+W01:                W02:                W03:
+W04:                W05:                W06:
+W07:                W08:                W09:
+W10:                W11:                W12:
+W13:
+
+Abweichungen / bereinigte Fehlermeldungen:
+Nicht durchgeführte Schritte und Grund:
+Gesamtergebnis: bestanden / fehlgeschlagen / nicht vollständig
+Bestätigung: Nur synthetische Daten verwendet: ja / nein
+```
+
+**Gesamtergebnis bestanden** nur, wenn Build und alle Tests bestanden und
+W01–W10 tatsächlich offline durchgeführt wurden. Auch dann bleibt die
+Windows-IPC-Sicherheitsprüfung separat offen, bis Same-User-Grenze,
+gegenseitige Authentisierung und Startup-Race fachlich verifiziert sind.
+Eine Quellcode-Prüfung hat bereits ein Port-Race mit möglicher Offenlegung
+des IPC-Geheimnisses und von Anmeldedaten aufgezeigt. Es wurde unter Windows
+nicht reproduziert und wird durch W12 nicht ausgeschlossen; Details stehen im
+[Implementierungsstatus](../review/offene-informationen-erste-testversion.md).

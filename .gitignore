@@ -7,6 +7,9 @@ build/
 target/
 __pycache__/
 .venv/
+*.egg-info/
+*.tsbuildinfo
+frontend-desktop/src-tauri/binaries/
 
 # Local configuration and secrets
 .env
