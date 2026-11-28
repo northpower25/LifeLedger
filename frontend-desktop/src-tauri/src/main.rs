@@ -86,14 +86,15 @@ fn start_api(app: &tauri::App) -> Result<ApiState, Box<dyn std::error::Error>> {
         })?;
 
     let mut random = [0u8; 32];
-    getrandom::getrandom(&mut random)?;
+    getrandom::getrandom(&mut random)
+        .map_err(|error| Error::new(ErrorKind::Other, error.to_string()))?;
     let ipc_secret = random
         .iter()
         .map(|byte| format!("{byte:02x}"))
         .collect::<String>();
     let tls = generate_simple_self_signed(vec!["127.0.0.1".to_string()])?;
     let certificate_pem = tls.cert.pem();
-    let private_key_pem = tls.signing_key.serialize_pem();
+    let private_key_pem = tls.key_pair.serialize_pem();
     let bootstrap = serde_json::to_vec(&SidecarBootstrap {
         ipc_secret: ipc_secret.clone(),
         certificate_pem: certificate_pem.clone(),
