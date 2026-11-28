@@ -18,7 +18,9 @@ The Tauri host starts the packaged API child and sends a per-run IPC secret
 and ephemeral TLS keypair through stdin. It pins the generated certificate and
 uses HTTPS for readiness and every proxied API call, so a loopback listener
 without that key cannot receive credentials or API requests. Windows CI builds
-the sidecar, desktop executable, MSI, and NSIS installer; install, service
+the sidecar as a directory containing its runtime dependencies, and bundles
+it with the desktop application in the MSI and NSIS installers. The desktop
+executable alone is not a standalone distribution. Install, service
 lifecycle, offline behavior, and runtime TLS still require manual Windows
 testing. Isolation from another process running as the same user is not
 claimed. Do not use real health data.

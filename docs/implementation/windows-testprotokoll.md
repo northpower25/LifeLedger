@@ -36,7 +36,8 @@ Produktionssicherheit.
 
    Jeder Schritt muss erfolgreich enden; bei einem Fehler abbrechen und die
    Fehlermeldung im Formular notieren. Der Sidecar liegt unter
-   `frontend-desktop/src-tauri/binaries/lifeledger-api-x86_64-pc-windows-msvc.exe`,
+   `frontend-desktop/src-tauri/binaries/lifeledger-api/lifeledger-api.exe`
+   mit den zugehörigen Laufzeitdateien im selben Verzeichnis,
    die Installer unter `frontend-desktop/src-tauri/target/release/bundle/`.
    Alternativ kann ein erfolgreiches Windows-Actions-Artefakt desselben
    Commits verwendet werden. Ein erfolgreicher Build ersetzt die folgenden

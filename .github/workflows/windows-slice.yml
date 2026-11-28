@@ -28,18 +28,23 @@ jobs:
         run: python -m pytest backend/tests -q
       - name: Build Windows API sidecar
         run: ./backend/scripts/build_windows_sidecar.ps1
+      - name: Test packaged sidecar TLS and process identity
+        run: |
+          $env:LIFELEDGER_TEST_SIDECAR = "$PWD/frontend-desktop/src-tauri/binaries/lifeledger-api/lifeledger-api.exe"
+          python -m pytest backend/tests/test_api.py -q -k test_sidecar_uses_pinned_tls_before_accepting_http
       - name: Install frontend dependencies
         working-directory: frontend-desktop
         run: npm ci
       - name: Build Windows desktop and installers
         working-directory: frontend-desktop
         run: npm run tauri build
+      - name: Smoke test installed MSI startup and shutdown
+        run: ./backend/scripts/test_windows_installer.ps1
       - name: Upload unsigned internal test builds
         uses: actions/upload-artifact@v4
         with:
           name: LifeLedger-windows-internal-test
           if-no-files-found: error
           path: |
-            frontend-desktop/src-tauri/target/release/lifeledger-desktop.exe
             frontend-desktop/src-tauri/target/release/bundle/**/*.msi
             frontend-desktop/src-tauri/target/release/bundle/**/*.exe

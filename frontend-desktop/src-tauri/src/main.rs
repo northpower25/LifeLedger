@@ -17,7 +17,27 @@ struct ApiState {
     base_url: String,
     ipc_secret: String,
     client: Client,
-    child: Mutex<Child>,
+    child: Mutex<Sidecar>,
+}
+
+struct Sidecar(Child);
+
+impl Sidecar {
+    fn stop(&mut self) -> std::io::Result<()> {
+        if self.0.try_wait()?.is_none() {
+            self.0.kill()?;
+            self.0.wait()?;
+        }
+        Ok(())
+    }
+}
+
+impl Drop for Sidecar {
+    fn drop(&mut self) {
+        if let Err(error) = self.stop() {
+            eprintln!("Failed to stop local API: {error}");
+        }
+    }
 }
 
 #[derive(Serialize)]
@@ -41,38 +61,20 @@ struct ApiReply {
     body: String,
 }
 
-fn target_sidecar_name() -> Result<String, String> {
-    let target = match (std::env::consts::OS, std::env::consts::ARCH) {
-        ("windows", "x86_64") => "x86_64-pc-windows-msvc",
-        ("windows", "aarch64") => "aarch64-pc-windows-msvc",
-        ("linux", "x86_64") => "x86_64-unknown-linux-gnu",
-        ("macos", "aarch64") => "aarch64-apple-darwin",
-        ("macos", "x86_64") => "x86_64-apple-darwin",
-        _ => return Err("unsupported_sidecar_platform".into()),
-    };
-    let suffix = if std::env::consts::OS == "windows" {
-        ".exe"
-    } else {
-        ""
-    };
-    Ok(format!("lifeledger-api-{target}{suffix}"))
-}
-
 fn start_api(app: &tauri::App) -> Result<ApiState, Box<dyn std::error::Error>> {
     let port_listener = TcpListener::bind(("127.0.0.1", 0))?;
     let port = port_listener.local_addr()?.port();
     drop(port_listener);
 
     let resource_dir = app.path().resource_dir()?;
-    let sidecar_name =
-        target_sidecar_name().map_err(|message| Error::new(ErrorKind::Unsupported, message))?;
+    let sidecar_name = if cfg!(windows) {
+        "lifeledger-api.exe"
+    } else {
+        "lifeledger-api"
+    };
     let candidates = [
         std::env::var_os("LIFELEDGER_API_BIN").map(PathBuf::from),
-        Some(resource_dir.join(&sidecar_name)),
-        Some(resource_dir.join("binaries").join(&sidecar_name)),
-        std::env::current_exe()
-            .ok()
-            .and_then(|path| path.parent().map(|directory| directory.join(&sidecar_name))),
+        Some(resource_dir.join("lifeledger-api").join(sidecar_name)),
     ];
     let sidecar = candidates
         .into_iter()
@@ -100,13 +102,20 @@ fn start_api(app: &tauri::App) -> Result<ApiState, Box<dyn std::error::Error>> {
         certificate_pem: certificate_pem.clone(),
         private_key_pem,
     })?;
-    let mut child = Command::new(sidecar)
+    let mut command = Command::new(sidecar);
+    command
         .args(["--port", &port.to_string(), "--ipc-stdin"])
         .stdin(Stdio::piped())
         .stdout(Stdio::null())
-        .stderr(Stdio::inherit())
-        .spawn()?;
+        .stderr(Stdio::inherit());
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        command.creation_flags(0x08000000); // CREATE_NO_WINDOW
+    }
+    let mut child = Sidecar(command.spawn()?);
     let mut child_stdin = child
+        .0
         .stdin
         .take()
         .ok_or_else(|| Error::new(ErrorKind::BrokenPipe, "local_api_stdin_unavailable"))?;
@@ -129,16 +138,15 @@ fn start_api(app: &tauri::App) -> Result<ApiState, Box<dyn std::error::Error>> {
             .send()
             .and_then(|response| response.json::<serde_json::Value>())
             .is_ok_and(|body| {
-                body["status"] == "ok" && body["pid"].as_u64() == Some(u64::from(child.id()))
+                body["status"] == "ok" && body["pid"].as_u64() == Some(u64::from(child.0.id()))
             });
-        if ready && child.try_wait()?.is_none() {
+        if ready && child.0.try_wait()?.is_none() {
             break;
         }
         if Instant::now() >= deadline {
-            let _ = child.kill();
             return Err("local_api_start_timeout".into());
         }
-        if child.try_wait()?.is_some() {
+        if child.0.try_wait()?.is_some() {
             return Err("local_api_process_exited".into());
         }
         thread::sleep(Duration::from_millis(100));
@@ -200,7 +208,11 @@ fn main() {
         if matches!(event, RunEvent::Exit) {
             if let Some(state) = handle.try_state::<ApiState>() {
                 if let Ok(mut child) = state.child.lock() {
-                    let _ = child.kill();
+                    if let Err(error) = child.stop() {
+                        eprintln!("Failed to stop local API: {error}");
+                    }
+                } else {
+                    eprintln!("Failed to lock local API process state");
                 }
             }
         }

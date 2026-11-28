@@ -220,7 +220,11 @@ def test_packaged_api_requires_the_private_host_channel(tmp_path):
     assert locked_down.get("/api/v1/health").status_code == 503
 
 
-def test_packaged_sidecar_uses_pinned_tls_before_accepting_http(tmp_path):
+@pytest.mark.parametrize("packaged", [False, True], ids=["python", "packaged"])
+def test_sidecar_uses_pinned_tls_before_accepting_http(tmp_path, packaged):
+    executable = os.environ.get("LIFELEDGER_TEST_SIDECAR")
+    if packaged and not executable:
+        pytest.skip("Set LIFELEDGER_TEST_SIDECAR to test the packaged sidecar")
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     subject = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "127.0.0.1")])
     now = datetime.now(timezone.utc)
@@ -261,15 +265,9 @@ def test_packaged_sidecar_uses_pinned_tls_before_accepting_http(tmp_path):
     environment = os.environ.copy()
     environment["PYTHONPATH"] = str(repository / "backend")
     environment["LIFELEDGER_DATABASE"] = str(tmp_path / "sidecar.sqlite3")
+    command = [executable] if packaged else [sys.executable, "-m", "lifeledger.app"]
     process = subprocess.Popen(
-        [
-            sys.executable,
-            "-m",
-            "lifeledger.app",
-            "--port",
-            str(port),
-            "--ipc-stdin",
-        ],
+        [*command, "--port", str(port), "--ipc-stdin"],
         cwd=repository,
         env=environment,
         stdin=subprocess.PIPE,
@@ -283,7 +281,7 @@ def test_packaged_sidecar_uses_pinned_tls_before_accepting_http(tmp_path):
     trusted_context = ssl.create_default_context(cadata=certificate_pem)
     untrusted_context = ssl.create_default_context()
     try:
-        for _ in range(50):
+        for _ in range(300 if packaged else 50):
             if process.poll() is not None:
                 pytest.fail(f"Sidecar exited early with code {process.returncode}")
             try:

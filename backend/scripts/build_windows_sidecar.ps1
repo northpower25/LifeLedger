@@ -13,21 +13,15 @@ try {
     python -m PyInstaller `
         --clean `
         --noconfirm `
-        --onefile `
+        --onedir `
         --name lifeledger-api `
         --paths $backend `
         --add-data "$schema;lifeledger" `
-        --distpath (Join-Path $work "dist") `
+        --distpath $binaries `
         --workpath (Join-Path $work "work") `
         --specpath $work `
         lifeledger/launcher.py
     if ($LASTEXITCODE -ne 0) { throw "Building the sidecar failed ($LASTEXITCODE)." }
-
-    New-Item -ItemType Directory -Force -Path $binaries | Out-Null
-    Copy-Item `
-        (Join-Path $work "dist/lifeledger-api.exe") `
-        (Join-Path $binaries "lifeledger-api-x86_64-pc-windows-msvc.exe") `
-        -Force
 }
 finally {
     Pop-Location
