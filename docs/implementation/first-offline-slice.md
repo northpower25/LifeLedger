@@ -132,6 +132,7 @@ specified in OpenAPI. Authorization is `Authorization: Bearer <session>`.
 | Timeline | `GET /patients/{patient_id}/timeline` | Return Patient, documents and medications, newest first. |
 | Consent | `POST /consent/revoke` | Revoke the local Owner's active health-record consent synchronously. |
 | Backup | `POST /backup` | Create a passphrase-protected encrypted backup envelope. |
+| Backup history | `POST /backup/saved`, `GET /backup/history` | Record a client-confirmed desktop save and list up to 100 most recent entries; paths are encrypted in audit payloads. Both require backup-create consent and capability. |
 | Restore | `POST /backup/restore` | Validate and restore the encrypted backup; expires all sessions. |
 | Recovery | `POST /backup/recover` | Recover into an empty local database using the backup passphrase; unlock afterwards with the restored Owner credentials. Protected by the local IPC channel, not an Owner session. |
 | Validate | `POST /backup/validate` | Validate the backup and its schema before the replacement confirmation, with an authorized Owner session. |
@@ -151,6 +152,18 @@ made afterward are not included. Close other application instances before
 replacement; cross-process session invalidation and same-user isolation are
 not guaranteed. The desktop requires a new destination filename for every
 backup and never overwrites an existing file.
+
+The suggested backup filename uses the local client clock (`YYYYMMDD_HHmm`);
+backups in the same minute require distinct filenames. Only after a successful
+desktop file write is a `BACKUP_SAVED` audit entry recorded, with the path
+encrypted under the Owner data key and the timestamp in database metadata.
+The app warns when no save is recorded or more than 14 days have elapsed,
+and flags future or invalid timestamps. The clock must be correct. History
+does not prove a file is still present or restorable, and browser downloads
+are not recorded. The save entry is created after the snapshot, so restoring
+that file restores only earlier history. A failure to record after writing is
+reported separately and does not mean the file was lost. This is a client
+assertion, not a tamper-proof proof of a save against a malicious local user.
 
 ## Deliverable 4: SQLite schema
 

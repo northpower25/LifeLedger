@@ -55,6 +55,47 @@ def create_client(tmp_path):
     return client, database, secret, confirmation_code
 
 
+def test_backup_history_is_authorized_encrypted_and_part_of_the_snapshot(tmp_path):
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    client, database, secret, _ = create_client(source_dir)
+    assert client.get("/api/v1/backup/history").json() == []
+    assert client.post("/api/v1/backup", json={"passphrase": BACKUP_PASSWORD}).status_code == 200
+    assert client.get("/api/v1/backup/history").json() == []
+    path = r"C:\SyntheticPrivatePath\first.llbackup"
+    saved = client.post("/api/v1/backup/saved", json={"path": path})
+    assert saved.status_code == 200
+    assert saved.json()["path"] == path
+    assert client.get("/api/v1/backup/history").json() == [saved.json()]
+    with sqlite3.connect(database) as db:
+        payload = db.execute("SELECT payload FROM audit WHERE event_type = 'BACKUP_SAVED'").fetchone()[0]
+        assert path.encode() not in payload
+    assert path.encode() not in database.read_bytes()
+    assert client.post("/api/v1/backup/saved", json={"path": ""}).status_code == 422
+
+    second = client.post("/api/v1/backup/saved", json={"path": "second.llbackup"}).json()
+    assert client.get("/api/v1/backup/history").json() == [second, saved.json()]
+    backup = client.post("/api/v1/backup", json={"passphrase": BACKUP_PASSWORD}).json()["backup_base64"]
+    client.post("/api/v1/backup/saved", json={"path": "third.llbackup"})
+
+    recovered = TestClient(create_app(tmp_path / "recovered.sqlite3", dev_api=True))
+    assert recovered.get("/api/v1/backup/history").status_code == 401
+    assert recovered.post("/api/v1/backup/saved", json={"path": path}).status_code == 401
+    assert recovered.post("/api/v1/backup/recover", json={
+        "passphrase": BACKUP_PASSWORD, "backup_base64": backup,
+    }).status_code == 204
+    unlocked = recovered.post("/api/v1/owner/unlock", json={
+        "password": PASSWORD,
+        "code": pyotp.TOTP(secret).at((int(time.time() // 30) + 1) * 30),
+    })
+    assert unlocked.status_code == 200
+    recovered.headers["Authorization"] = f"Bearer {unlocked.json()['access_token']}"
+    assert recovered.get("/api/v1/backup/history").json() == [second, saved.json()]
+    assert recovered.post("/api/v1/consent/revoke").status_code == 204
+    assert recovered.get("/api/v1/backup/history").status_code == 403
+    assert recovered.post("/api/v1/backup/saved", json={"path": path}).status_code == 403
+
+
 def test_offline_health_record_journey_and_encrypted_backup_restore(tmp_path):
     client, database, totp_secret, _ = create_client(tmp_path)
 

@@ -28,6 +28,15 @@ claimed. Do not use real health data.
 In the desktop app, creating a backup opens a native save dialog. Select a
 destination and keep the separate backup passphrase safe; the app confirms
 the saved path. Cancelling saves nothing; an existing file is never overwritten.
+The suggested name uses the client machine's local time to the minute. Two
+backups in the same minute need different names. After a successful desktop
+write, its time and encrypted path are recorded locally; if recording fails,
+the file remains saved but the reminder can be outdated. The app displays up
+to 100 entries and warns after more than 14 days or when none are recorded.
+Check the system clock. This is a save record, not proof that the file remains
+available or can be restored. Browser downloads cannot be confirmed and are
+not recorded. A restored snapshot contains only history recorded before that
+snapshot, so its own save and any later saves are absent.
 Restore validates the selected backup and warns that it replaces the current
 data. Optionally save the current Owner's backup to a new file first, then
 confirm using the current Owner password and a fresh TOTP code. Close other

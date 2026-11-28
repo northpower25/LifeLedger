@@ -1,10 +1,10 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { isTauri } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
 import { writeTextFile } from "@tauri-apps/plugin-fs";
 import { QRCodeSVG } from "qrcode.react";
 import { api, FhirResource } from "./api";
-import { saveBackup, writeNewBackup } from "./backup";
+import { backupAge, backupFilename, backupOverdue, BackupEntry, saveBackup, writeNewBackup } from "./backup";
 import { Locale, message } from "./i18n";
 
 type OwnerStatus = { owner_exists: boolean; owner_confirmed: boolean };
@@ -42,6 +42,10 @@ export default function App() {
   const [backupStatus, setBackupStatus] = useState("");
   const [backupError, setBackupError] = useState("");
   const [savingBackup, setSavingBackup] = useState(false);
+  const [backupHistory, setBackupHistory] = useState<BackupEntry[] | null>(null);
+  const [historyError, setHistoryError] = useState(false);
+  const [now, setNow] = useState(Date.now());
+  const historyVersion = useRef(0);
   const [recovering, setRecovering] = useState(false);
   const [recoveryStatus, setRecoveryStatus] = useState("");
   const [replacementBackup, setReplacementBackup] = useState("");
@@ -56,6 +60,26 @@ export default function App() {
       .then(setOwnerStatus)
       .catch(() => setError(text("error")));
   }, [text]);
+
+  useEffect(() => {
+    let active = true;
+    const version = ++historyVersion.current;
+    setBackupHistory(null);
+    setHistoryError(false);
+    if (token) {
+      api<BackupEntry[]>("/backup/history", {}, token)
+        .then((entries) => { if (active && historyVersion.current === version) setBackupHistory(entries); })
+        .catch(() => { if (active && historyVersion.current === version) setHistoryError(true); });
+    }
+    return () => { active = false; };
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    setNow(Date.now());
+    const timer = window.setInterval(() => setNow(Date.now()), 60_000);
+    return () => window.clearInterval(timer);
+  }, [token]);
 
   async function submit(event: FormEvent, operation: () => Promise<void>) {
     event.preventDefault();
@@ -207,18 +231,39 @@ export default function App() {
       if (isTauri()) {
         const path = await saveBackup(
           () => save({
-            defaultPath: "LifeLedger-synthetic-backup.llbackup",
+            defaultPath: backupFilename(new Date()),
             filters: [{ name: "LifeLedger Backup", extensions: ["llbackup"] }],
           }),
           create,
           (path, content) => writeNewBackup(path, content, writeTextFile),
         );
         setBackupStatus(path === null ? text("backupCancelled") : `${text("backupSaved")} ${path}`);
+        if (path !== null) {
+          ++historyVersion.current;
+          try {
+            await api<BackupEntry>("/backup/saved", {
+              method: "POST",
+              body: JSON.stringify({ path }),
+            }, token);
+          } catch {
+            setHistoryError(true);
+            setBackupError(text("backupRecordFailed"));
+            return;
+          }
+          try {
+            const entries = await api<BackupEntry[]>("/backup/history", {}, token);
+            setBackupHistory(entries);
+            setHistoryError(false);
+            setNow(Date.now());
+          } catch {
+            setHistoryError(true);
+          }
+        }
       } else {
         const content = await create();
         const link = document.createElement("a");
         link.href = URL.createObjectURL(new Blob([content], { type: "text/plain" }));
-        link.download = "LifeLedger-synthetic-backup.llbackup";
+        link.download = backupFilename(new Date());
         link.click();
         window.setTimeout(() => URL.revokeObjectURL(link.href), 60_000);
         setBackupStatus(text("backupDownloadStarted"));
@@ -346,6 +391,9 @@ export default function App() {
     }
   }, [token, selectedPatient]);
 
+  const latestBackup = backupHistory?.[0];
+  const age = latestBackup ? backupAge(latestBackup.saved_at, now) : null;
+
   return (
     <main>
       <header className="topbar">
@@ -359,13 +407,19 @@ export default function App() {
             <option value="de">Deutsch</option>
             <option value="en">English</option>
           </select>
-          {token && <button className="secondary" onClick={lock}>{text("lock")}</button>}
+          {token && <button className="secondary" disabled={savingBackup || replacementBusy} onClick={lock}>{text("lock")}</button>}
         </div>
       </header>
 
       <p className="warning" role="note">{text("syntheticWarning")}</p>
       {error && <p className="error" role="alert">{error}</p>}
       {recoveryStatus && <p role="status">{recoveryStatus}</p>}
+      {token && historyError && <p className="error" role="alert">{text("backupHistoryFailed")}</p>}
+      {token && backupHistory && !historyError && (
+        !latestBackup ? <p className="warning" role="note">{text("backupNever")}</p>
+          : age === "future" || age === "invalid" ? <p className="warning" role="note">{text("backupClockWarning")}</p>
+            : backupOverdue(latestBackup.saved_at, now) && <p className="warning" role="note">{text("backupReminder").replace("{days}", String(age))}</p>
+      )}
 
       {!token && !totpSecret && ownerStatus?.owner_exists === false && (
         <>
@@ -475,6 +529,19 @@ export default function App() {
 
           <section className="card">
             <h2>Backup</h2>
+            {backupHistory && backupHistory.length > 0 && !historyError && (
+              <>
+                <h3>{text("backupHistory")}</h3>
+                <p>{text("backupHistoryHint")}</p>
+                <ol>
+                  {backupHistory.map((entry, index) => (
+                    <li key={`${entry.saved_at}-${index}`}>
+                      <time>{new Date(entry.saved_at).toLocaleString(locale)}</time>{" — "}{entry.path}
+                    </li>
+                  ))}
+                </ol>
+              </>
+            )}
             <div className="actions">
               <form onSubmit={createBackup}>
                 <label>{text("backupPassword")}<input required minLength={12} type="password" value={backupPassword} onChange={(event) => setBackupPassword(event.target.value)} /></label>

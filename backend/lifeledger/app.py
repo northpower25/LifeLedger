@@ -184,6 +184,11 @@ class BackupCreate(BaseModel):
     passphrase: PASSWORD
 
 
+class BackupSaved(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    path: Annotated[str, StringConstraints(min_length=1, max_length=4096)]
+
+
 class BackupRestore(BaseModel):
     model_config = ConfigDict(extra="forbid")
     passphrase: PASSWORD
@@ -266,7 +271,8 @@ def check_backup_schema(source: sqlite3.Connection, target: sqlite3.Connection) 
 
 def copy_backup_tables(source: sqlite3.Connection, target: sqlite3.Connection) -> None:
     for table in BACKUP_TABLES:
-        cursor = source.execute(f'SELECT * FROM "{table}"')
+        order = " ORDER BY rowid" if table == "audit" else ""
+        cursor = source.execute(f'SELECT * FROM "{table}"{order}')
         placeholders = ", ".join("?" for _ in cursor.description)
         while rows := cursor.fetchmany(128):
             target.executemany(f'INSERT INTO "{table}" VALUES ({placeholders})', rows)
@@ -363,6 +369,11 @@ class TimelineEntry(BaseModel):
 class BackupResponse(BaseModel):
     backup_base64: str
     sha256: str
+
+
+class BackupHistoryEntry(BaseModel):
+    saved_at: datetime
+    path: str
 
 
 class Session:
@@ -1133,6 +1144,32 @@ def create_app(
         }
         packed = json.dumps(envelope, separators=(",", ":"), sort_keys=True).encode()
         return {"backup_base64": b64encode(packed), "sha256": hashlib.sha256(packed).hexdigest()}
+
+    @app.post("/api/v1/backup/saved", response_model=BackupHistoryEntry, tags=["Backup"])
+    def record_saved_backup(request: BackupSaved, session: SessionDependency) -> dict[str, str]:
+        with transaction(db_path) as db:
+            _authorize(db, session, "Backup", "create")
+            _audit(db, session.owner_id, session.key, "BACKUP_SAVED", {"path": request.path})
+            saved_at = db.execute(
+                "SELECT occurred_at FROM audit WHERE rowid = last_insert_rowid()"
+            ).fetchone()["occurred_at"]
+        return {"saved_at": saved_at, "path": request.path}
+
+    @app.get("/api/v1/backup/history", response_model=list[BackupHistoryEntry], tags=["Backup"])
+    def backup_history(session: SessionDependency) -> list[dict[str, str]]:
+        with transaction(db_path) as db:
+            _authorize(db, session, "Backup", "create")
+            rows = db.execute(
+                "SELECT event_id, occurred_at, payload FROM audit "
+                "WHERE owner_id = ? AND event_type = 'BACKUP_SAVED' ORDER BY rowid DESC LIMIT 100",
+                (session.owner_id,),
+            ).fetchall()
+            return [
+                {"saved_at": row["occurred_at"], "path": _open(
+                    session.key, "audit", row["event_id"], row["payload"]
+                )["path"]}
+                for row in rows
+            ]
 
     @app.post("/api/v1/backup/restore", status_code=status.HTTP_204_NO_CONTENT, tags=["Backup"])
     def restore_backup(request: BackupRestore, session: SessionDependency) -> Response:
