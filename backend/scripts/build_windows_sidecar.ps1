@@ -4,6 +4,7 @@ $backend = Split-Path -Parent $PSScriptRoot
 $repository = Split-Path -Parent $backend
 $binaries = Join-Path $repository "frontend-desktop/src-tauri/binaries"
 $work = Join-Path $env:TEMP "lifeledger-pyinstaller"
+$schema = Join-Path $backend "lifeledger/schema.sql"
 
 Push-Location $backend
 try {
@@ -15,7 +16,7 @@ try {
         --onefile `
         --name lifeledger-api `
         --paths $backend `
-        --add-data "lifeledger/schema.sql;lifeledger" `
+        --add-data "$schema;lifeledger" `
         --distpath (Join-Path $work "dist") `
         --workpath (Join-Path $work "work") `
         --specpath $work `
