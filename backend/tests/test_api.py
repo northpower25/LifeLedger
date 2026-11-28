@@ -22,9 +22,12 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.x509.oid import NameOID
 from fastapi.testclient import TestClient
+from fastapi import HTTPException
 
 from lifeledger.app import BACKUP_AAD, BackupRestore, create_app, decrypt_backup, parse_ipc_bootstrap
 from lifeledger.crypto import b64decode, b64encode, derive_key
+from lifeledger.database import transaction
+import lifeledger.app as app_module
 
 
 PASSWORD = "synthetic-owner-password-1"
@@ -201,6 +204,117 @@ def test_recovery_refuses_existing_owner_without_changing_data(tmp_path):
     assert response.json()["detail"] == "recovery_database_not_empty"
     assert current.get("/api/v1/patients").json()[0]["id"] == patient["id"]
 
+
+def test_replace_other_owner_requires_fresh_factors_and_invalidates_session(tmp_path):
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    source, _, source_secret, _ = create_client(source_dir)
+    original_patient = source.post(
+        "/api/v1/patients", json={"name": "Original owner patient", "synthetic": True}
+    ).json()
+    backup = source.post("/api/v1/backup", json={"passphrase": BACKUP_PASSWORD}).json()["backup_base64"]
+    current, _, current_secret, used_code = create_client(tmp_path)
+    current_patient = current.post(
+        "/api/v1/patients", json={"name": "Temporary patient", "synthetic": True}
+    ).json()
+    payload = {"passphrase": BACKUP_PASSWORD, "backup_base64": backup}
+    assert current.post("/api/v1/backup/validate", json=payload).status_code == 204
+    assert current.post("/api/v1/backup/validate", json={**payload, "passphrase": "wrong-backup-passphrase"}).status_code == 422
+    code = pyotp.TOTP(current_secret).at((int(time.time() // 30) + 1) * 30)
+    assert current.post("/api/v1/backup/replace", json={
+        **payload, "password": "wrong-owner-password", "code": code,
+    }).status_code == 401
+    assert current.post("/api/v1/backup/replace", json={
+        **payload, "password": PASSWORD, "code": used_code,
+    }).status_code == 401
+    assert current.get("/api/v1/patients").json()[0]["id"] == current_patient["id"]
+    result = current.post("/api/v1/backup/replace", json={
+        **payload, "password": PASSWORD, "code": code,
+    })
+    assert result.status_code == 204, result.text
+    assert current.get("/api/v1/patients").status_code == 401
+    unlocked = current.post("/api/v1/owner/unlock", json={
+        "password": PASSWORD,
+        "code": pyotp.TOTP(source_secret).at((int(time.time() // 30) + 1) * 30),
+    })
+    assert unlocked.status_code == 200
+    current.headers["Authorization"] = f"Bearer {unlocked.json()['access_token']}"
+    assert current.get("/api/v1/patients").json()[0]["id"] == original_patient["id"]
+
+
+def test_failed_replacement_rolls_back_current_database(tmp_path, monkeypatch):
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    source, _, _, _ = create_client(source_dir)
+    backup = source.post("/api/v1/backup", json={"passphrase": BACKUP_PASSWORD}).json()["backup_base64"]
+    current, _, secret, _ = create_client(tmp_path)
+    patient = current.post(
+        "/api/v1/patients", json={"name": "Existing patient", "synthetic": True}
+    ).json()
+
+    def fail_copy(source_db, target_db):
+        raise sqlite3.OperationalError("synthetic write failure")
+
+    monkeypatch.setattr(app_module, "copy_backup_tables", fail_copy)
+    response = current.post("/api/v1/backup/replace", json={
+        "passphrase": BACKUP_PASSWORD,
+        "backup_base64": backup,
+        "password": PASSWORD,
+        "code": pyotp.TOTP(secret).at((int(time.time() // 30) + 1) * 30),
+    })
+    assert response.status_code == 422
+    assert current.get("/api/v1/patients").json()[0]["id"] == patient["id"]
+
+
+def test_same_owner_replacement_rejects_reuse_of_confirmation_totp(tmp_path):
+    client, _, secret, _ = create_client(tmp_path)
+    old_token = client.headers["Authorization"].split()[1]
+    already_resolved = client.app.state.sessions.resolve(old_token)
+    backup = client.post("/api/v1/backup", json={"passphrase": BACKUP_PASSWORD}).json()["backup_base64"]
+    step = (int(time.time() // 30) + 1) * 30
+    code = pyotp.TOTP(secret).at(step)
+    assert client.post("/api/v1/backup/replace", json={
+        "passphrase": BACKUP_PASSWORD, "backup_base64": backup,
+        "password": PASSWORD, "code": code,
+    }).status_code == 204
+    assert client.post("/api/v1/owner/unlock", json={"password": PASSWORD, "code": code}).status_code == 401
+    with transaction(tmp_path / "lifeledger.sqlite3") as db:
+        with pytest.raises(HTTPException) as error:
+            app_module._authorize(db, already_resolved, "Patient", "read")
+        assert error.value.status_code == 401
+
+
+def test_replacement_refuses_revoked_consent(tmp_path):
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    source, _, _, _ = create_client(source_dir)
+    backup = source.post("/api/v1/backup", json={"passphrase": BACKUP_PASSWORD}).json()["backup_base64"]
+    current, _, secret, _ = create_client(tmp_path)
+    assert current.post("/api/v1/consent/revoke").status_code == 204
+    response = current.post("/api/v1/backup/replace", json={
+        "passphrase": BACKUP_PASSWORD, "backup_base64": backup, "password": PASSWORD,
+        "code": pyotp.TOTP(secret).at((int(time.time() // 30) + 1) * 30),
+    })
+    assert response.status_code == 403
+    assert current.get("/api/v1/owner/status").json()["owner_exists"] is True
+
+
+def test_concurrent_replacements_cannot_both_use_the_same_session(tmp_path):
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    source, _, _, _ = create_client(source_dir)
+    backup = source.post("/api/v1/backup", json={"passphrase": BACKUP_PASSWORD}).json()["backup_base64"]
+    current, _, secret, _ = create_client(tmp_path)
+    payload = {
+        "passphrase": BACKUP_PASSWORD, "backup_base64": backup, "password": PASSWORD,
+        "code": pyotp.TOTP(secret).at((int(time.time() // 30) + 1) * 30),
+    }
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        responses = list(executor.map(
+            lambda _: current.post("/api/v1/backup/replace", json=payload).status_code,
+            range(2),
+        ))
+    assert sorted(responses) == [204, 401]
 
 def test_recovery_rejects_authenticated_invalid_schema_without_partial_data(tmp_path):
     source_dir = tmp_path / "source"

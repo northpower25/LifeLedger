@@ -42,7 +42,7 @@ architecture:
 | Documents | PDF, UTF-8 plain text, or PNG only; 10 MiB maximum. MIME signatures/encoding are checked. Document bytes are stored inside the encrypted DocumentReference payload. |
 | Synthetic data | Create/import requests require `synthetic: true`; this is an explicit caller assertion, not an automated detector. Never use real records or upload user documents during development/testing. |
 | Timeline | Descending local record-creation timestamp; timestamps are stored as UTC ISO-8601 metadata. Medication effective time remains inside its encrypted FHIR resource. |
-| Backup | User supplies a separate passphrase (minimum 12 characters). The SQLite online-backup API snapshots a consistent database image up to 64 MiB; the full image is wrapped in an Argon2id-derived AES-256-GCM envelope. In-session restore requires an unlocked Owner with matching Owner ID and replaces the local database. Start-screen recovery requires an empty database and does not create an authenticated session. Both require the backup passphrase and validate the schema and integrity. |
+| Backup | User supplies a separate passphrase (minimum 12 characters). The SQLite online-backup API snapshots a consistent database image up to 64 MiB; the full image is wrapped in an Argon2id-derived AES-256-GCM envelope. The desktop validates the backup, warns about data loss and requires the current Owner password and fresh TOTP before replacing the local database, including with another Owner's backup. A separate current-Owner backup can be saved first to a new file without overwriting existing files. Start-screen recovery requires an empty database and does not create an authenticated session. Restored Owner credentials are required to unlock. The legacy same-Owner restore endpoint remains supported. |
 | Retention | No automatic purge/retention job in the test slice. User can remove the local test database only after closing the application. Do not rely on this prototype for records requiring retention or deletion guarantees. |
 | Network | Packaged API binds to a random loopback port and uses per-launch TLS. The Tauri host generates an ephemeral self-signed certificate, pins it for every HTTPS request, and pipes the certificate, private key and IPC secret to the child over stdin. The API secret and request data are sent only inside the pinned TLS channel. Direct browser API access is allowed only with the explicit `LIFELEDGER_DEV_MODE=1` development flag. Windows lifecycle and same-user-process isolation remain unverified. |
 
@@ -134,13 +134,23 @@ specified in OpenAPI. Authorization is `Authorization: Bearer <session>`.
 | Backup | `POST /backup` | Create a passphrase-protected encrypted backup envelope. |
 | Restore | `POST /backup/restore` | Validate and restore the encrypted backup; expires all sessions. |
 | Recovery | `POST /backup/recover` | Recover into an empty local database using the backup passphrase; unlock afterwards with the restored Owner credentials. Protected by the local IPC channel, not an Owner session. |
+| Validate | `POST /backup/validate` | Validate the backup and its schema before the replacement confirmation, with an authorized Owner session. |
+| Replace | `POST /backup/replace` | Require an authorized session, backup passphrase, current Owner password and fresh TOTP; transactionally replace the local database and invalidate local sessions. |
 | Readiness | `GET /health` | Report local service readiness without exposing health data. |
 
-Start-screen recovery cannot write an encrypted `BACKUP_RESTORED` audit event:
+Start-screen recovery and cross-Owner replacement cannot write an encrypted `BACKUP_RESTORED` audit event:
 the Owner data key is unavailable until a subsequent unlock. The restored
 database retains the audit records included in the backup; the later unlock
 is audited normally. Recovery decrypts the database image in memory, so large
 backups increase peak memory usage.
+
+Replacement holds a SQLite write transaction; failed imports roll back. Backup
+validation and replacement each decrypt and check the backup, adding latency
+and memory usage. A backup saved before replacement is a snapshot: changes
+made afterward are not included. Close other application instances before
+replacement; cross-process session invalidation and same-user isolation are
+not guaranteed. The desktop requires a new destination filename for every
+backup and never overwrites an existing file.
 
 ## Deliverable 4: SQLite schema
 

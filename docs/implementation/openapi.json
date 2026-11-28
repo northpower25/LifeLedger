@@ -721,6 +721,84 @@
           }
         }
       }
+    },
+    "/api/v1/backup/validate": {
+      "post": {
+        "tags": [
+          "Backup"
+        ],
+        "summary": "Validate Backup",
+        "operationId": "validate_backup_api_v1_backup_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupRestore"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/backup/replace": {
+      "post": {
+        "tags": [
+          "Backup"
+        ],
+        "summary": "Replace Backup",
+        "operationId": "replace_backup_api_v1_backup_replace_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupReplace"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -740,6 +818,42 @@
           "passphrase"
         ],
         "title": "BackupCreate"
+      },
+      "BackupReplace": {
+        "properties": {
+          "passphrase": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 12,
+            "title": "Passphrase"
+          },
+          "backup_base64": {
+            "type": "string",
+            "maxLength": 100000000,
+            "minLength": 64,
+            "title": "Backup Base64"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 12,
+            "title": "Password"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "title": "Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "passphrase",
+          "backup_base64",
+          "password",
+          "code"
+        ],
+        "title": "BackupReplace"
       },
       "BackupResponse": {
         "properties": {

@@ -4,7 +4,7 @@ import { save } from "@tauri-apps/plugin-dialog";
 import { writeTextFile } from "@tauri-apps/plugin-fs";
 import { QRCodeSVG } from "qrcode.react";
 import { api, FhirResource } from "./api";
-import { saveBackup } from "./backup";
+import { saveBackup, writeNewBackup } from "./backup";
 import { Locale, message } from "./i18n";
 
 type OwnerStatus = { owner_exists: boolean; owner_confirmed: boolean };
@@ -44,6 +44,11 @@ export default function App() {
   const [savingBackup, setSavingBackup] = useState(false);
   const [recovering, setRecovering] = useState(false);
   const [recoveryStatus, setRecoveryStatus] = useState("");
+  const [replacementBackup, setReplacementBackup] = useState("");
+  const [replacementPassword, setReplacementPassword] = useState("");
+  const [replacementCode, setReplacementCode] = useState("");
+  const [replacementConfirmed, setReplacementConfirmed] = useState(false);
+  const [replacementBusy, setReplacementBusy] = useState(false);
   const text = useMemo(() => (key: Parameters<typeof message>[1]) => message(locale, key), [locale]);
 
   useEffect(() => {
@@ -186,6 +191,10 @@ export default function App() {
       setBackupError(text("backupPasswordInvalid"));
       return;
     }
+    if (replacementBackup && !isTauri()) {
+      setBackupError(text("replacementDesktopOnly"));
+      return;
+    }
     setSavingBackup(true);
     try {
       const create = async () => {
@@ -202,7 +211,7 @@ export default function App() {
             filters: [{ name: "LifeLedger Backup", extensions: ["llbackup"] }],
           }),
           create,
-          writeTextFile,
+          (path, content) => writeNewBackup(path, content, writeTextFile),
         );
         setBackupStatus(path === null ? text("backupCancelled") : `${text("backupSaved")} ${path}`);
       } else {
@@ -222,16 +231,41 @@ export default function App() {
   }
 
   async function restoreBackup(event: FormEvent, file?: File) {
-    await submit(event, async () => {
-      setBackupStatus("");
-      setBackupError("");
+    event.preventDefault();
+    setBackupStatus("");
+    setBackupError("");
+    setReplacementBusy(true);
+    try {
       if (!file || restorePassword.length < 12) throw new Error("invalid_backup_input");
       const backupBase64 = (await file.text()).trim();
-      await api("/backup/restore", {
+      await api("/backup/validate", {
         method: "POST",
         body: JSON.stringify({
           passphrase: restorePassword,
           backup_base64: backupBase64,
+        }),
+      }, token);
+      setReplacementBackup(backupBase64);
+      setReplacementConfirmed(false);
+    } catch {
+      setBackupError(text("recoveryFailed"));
+    } finally {
+      setReplacementBusy(false);
+    }
+  }
+
+  async function replaceBackup(event: FormEvent) {
+    event.preventDefault();
+    setBackupError("");
+    setReplacementBusy(true);
+    try {
+      await api("/backup/replace", {
+        method: "POST",
+        body: JSON.stringify({
+          passphrase: restorePassword,
+          backup_base64: replacementBackup,
+          password: replacementPassword,
+          code: replacementCode,
         }),
       }, token);
       setToken("");
@@ -240,7 +274,16 @@ export default function App() {
       setTimeline([]);
       setBackupPassword("");
       setRestorePassword("");
-    });
+      setReplacementBackup("");
+      setReplacementPassword("");
+      setReplacementCode("");
+      setOwnerStatus({ owner_exists: true, owner_confirmed: true });
+      setRecoveryStatus(text("recoverySucceeded"));
+    } catch {
+      setBackupError(text("replacementFailed"));
+    } finally {
+      setReplacementBusy(false);
+    }
   }
 
   async function recoverBackup(event: FormEvent<HTMLFormElement>) {
@@ -265,6 +308,9 @@ export default function App() {
       });
       setBackupPassword("");
       setRestorePassword("");
+      setReplacementBackup("");
+      setReplacementPassword("");
+      setReplacementCode("");
       form.reset();
       setOwnerStatus({ owner_exists: true, owner_confirmed: true });
       setRecoveryStatus(text("recoverySucceeded"));
@@ -288,6 +334,9 @@ export default function App() {
       setBackupError("");
       setBackupPassword("");
       setRestorePassword("");
+      setReplacementBackup("");
+      setReplacementPassword("");
+      setReplacementCode("");
     }
   }
 
@@ -429,16 +478,27 @@ export default function App() {
             <div className="actions">
               <form onSubmit={createBackup}>
                 <label>{text("backupPassword")}<input required minLength={12} type="password" value={backupPassword} onChange={(event) => setBackupPassword(event.target.value)} /></label>
-                <button disabled={savingBackup}>{text("backup")}</button>
+                <button disabled={savingBackup || replacementBusy}>{text("backup")}</button>
               </form>
-              <form onSubmit={(event) => restoreBackup(event, (event.currentTarget.elements.namedItem("backup") as HTMLInputElement).files?.[0])}>
+              {!replacementBackup && <form onSubmit={(event) => restoreBackup(event, (event.currentTarget.elements.namedItem("backup") as HTMLInputElement).files?.[0])}>
                 <label>{text("backupFile")}<input required name="backup" type="file" accept=".llbackup,text/plain" /></label>
                 <label>{text("backupPassword")}<input required minLength={12} type="password" value={restorePassword} onChange={(event) => setRestorePassword(event.target.value)} /></label>
-                <button>{text("restore")}</button>
-              </form>
+                <button disabled={replacementBusy || savingBackup}>{text("restore")}</button>
+              </form>}
             </div>
             {backupStatus && <p role="status">{backupStatus}</p>}
             {backupError && <p className="error" role="alert">{backupError}</p>}
+            {replacementBackup && <form onSubmit={replaceBackup}>
+              <p className="warning" role="note">{text("replacementWarning")}</p>
+              <p>{text("replacementBackupHint")}</p>
+              <label>{text("currentPassword")}<input required type="password" value={replacementPassword} onChange={(event) => setReplacementPassword(event.target.value)} /></label>
+              <label>{text("freshTotp")}<input required inputMode="numeric" pattern="[0-9]{6}" value={replacementCode} onChange={(event) => setReplacementCode(event.target.value)} /></label>
+              <label><span><input required type="checkbox" checked={replacementConfirmed} onChange={(event) => setReplacementConfirmed(event.target.checked)} /> {text("replacementConfirm")}</span></label>
+              <div className="actions">
+                <button disabled={replacementBusy || savingBackup || !replacementConfirmed}>{text("replacementAction")}</button>
+                <button type="button" className="secondary" disabled={replacementBusy} onClick={() => { setReplacementBackup(""); setReplacementPassword(""); setReplacementCode(""); setBackupError(""); }}>{text("cancel")}</button>
+              </div>
+            </form>}
           </section>
         </>
       )}

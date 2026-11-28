@@ -27,8 +27,11 @@ claimed. Do not use real health data.
 
 In the desktop app, creating a backup opens a native save dialog. Select a
 destination and keep the separate backup passphrase safe; the app confirms
-the saved path. Cancelling saves nothing. Restore uses the selected backup
-file and replaces the current database.
+the saved path. Cancelling saves nothing; an existing file is never overwritten.
+Restore validates the selected backup and warns that it replaces the current
+data. Optionally save the current Owner's backup to a new file first, then
+confirm using the current Owner password and a fresh TOTP code. Close other
+instances before replacing data; the separately saved backup is a snapshot.
 
 On a fresh profile without an Owner, recover from the start screen with the
 backup file and its passphrase. This path refuses any nonempty database and

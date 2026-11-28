@@ -9,3 +9,11 @@ export async function saveBackup(
   await write(path, content);
   return path;
 }
+
+export async function writeNewBackup(
+  path: string,
+  content: string,
+  write: (path: string, content: string, options: { createNew: true }) => Promise<void>,
+): Promise<void> {
+  await write(path, content, { createNew: true });
+}

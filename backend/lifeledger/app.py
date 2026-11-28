@@ -190,6 +190,17 @@ class BackupRestore(BaseModel):
     backup_base64: Annotated[str, StringConstraints(min_length=64, max_length=100_000_000)]
 
 
+class BackupReplace(BackupRestore):
+    password: PASSWORD
+    code: Annotated[str, StringConstraints(pattern=r"^\d{6}$")]
+
+
+BACKUP_TABLES = (
+    "identity_owner", "patients", "document_references", "medication_statements",
+    "consent", "capability_grants", "audit", "event_outbox", "metadata",
+)
+
+
 def decrypt_backup(request: BackupRestore) -> bytes:
     try:
         envelope = json.loads(b64decode(request.backup_base64))
@@ -219,6 +230,46 @@ def decrypt_backup(request: BackupRestore) -> bytes:
         )
     except (ValueError, KeyError, TypeError, json.JSONDecodeError, InvalidTag) as exc:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid_backup") from exc
+
+
+def open_backup_database(request: BackupRestore) -> sqlite3.Connection:
+    plaintext = decrypt_backup(request)
+    source = sqlite3.connect(":memory:")
+    source.row_factory = sqlite3.Row
+    try:
+        source.deserialize(plaintext)
+        if source.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+            raise ValueError("backup integrity check failed")
+        if source.execute("PRAGMA foreign_key_check").fetchone() is not None:
+            raise ValueError("backup foreign key check failed")
+        version = source.execute(
+            "SELECT value FROM metadata WHERE key = 'schema_version'"
+        ).fetchone()
+        owners = source.execute("SELECT * FROM identity_owner").fetchall()
+        if version is None or version["value"] != SCHEMA_VERSION or len(owners) != 1 or owners[0]["confirmed"] != 1:
+            raise ValueError("backup owner or version invalid")
+        return source
+    except (sqlite3.Error, ValueError) as exc:
+        source.close()
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid_backup") from exc
+
+
+def check_backup_schema(source: sqlite3.Connection, target: sqlite3.Connection) -> None:
+    for table in BACKUP_TABLES:
+        source_columns = source.execute(f'PRAGMA table_info("{table}")').fetchall()
+        target_columns = target.execute(f'PRAGMA table_info("{table}")').fetchall()
+        if not source_columns or [tuple(row)[1:] for row in source_columns] != [
+            tuple(row)[1:] for row in target_columns
+        ]:
+            raise ValueError("backup schema mismatch")
+
+
+def copy_backup_tables(source: sqlite3.Connection, target: sqlite3.Connection) -> None:
+    for table in BACKUP_TABLES:
+        cursor = source.execute(f'SELECT * FROM "{table}"')
+        placeholders = ", ".join("?" for _ in cursor.description)
+        while rows := cursor.fetchmany(128):
+            target.executemany(f'INSERT INTO "{table}" VALUES ({placeholders})', rows)
 
 
 class OwnerStatusResponse(BaseModel):
@@ -319,6 +370,7 @@ class Session:
         self.owner_id = owner_id
         self.key = key
         self.expires_at = datetime.now(timezone.utc) + SESSION_LIFETIME
+        self.active = True
 
 
 class SessionStore:
@@ -329,6 +381,8 @@ class SessionStore:
     def issue(self, owner_id: str, key: bytes) -> str:
         token = secrets.token_urlsafe(32)
         with self._lock:
+            for session in self._sessions.values():
+                session.active = False
             self._sessions.clear()
             self._sessions[token] = Session(owner_id, key)
         return token
@@ -345,6 +399,8 @@ class SessionStore:
 
     def clear(self) -> None:
         with self._lock:
+            for session in self._sessions.values():
+                session.active = False
             self._sessions.clear()
 
 
@@ -425,6 +481,7 @@ def _authorize(
     resource_type: str,
     operation: str,
 ) -> None:
+    _check_session(connection, session)
     required = CAPABILITIES.get(resource_type, {}).get(operation)
     if required is None:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "capability_denied")
@@ -457,6 +514,17 @@ def _authorize(
         })
         connection.commit()
         raise HTTPException(status.HTTP_403_FORBIDDEN, "consent_or_capability_denied")
+
+
+def _check_session(connection: sqlite3.Connection, session: Session) -> None:
+    owner = _owner_row(connection)
+    if (
+        not session.active
+        or session.expires_at <= datetime.now(timezone.utc)
+        or owner is None
+        or owner["owner_id"] != session.owner_id
+    ):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "session_expired")
 
 
 def _record_resource(
@@ -766,6 +834,7 @@ def create_app(
     @app.post("/api/v1/owner/lock", status_code=status.HTTP_204_NO_CONTENT, tags=["Owner"])
     def lock_owner(session: SessionDependency) -> Response:
         with transaction(db_path) as db:
+            _check_session(db, session)
             _audit(db, session.owner_id, session.key, "OWNER_LOCKED", {})
         sessions.clear()
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -994,6 +1063,7 @@ def create_app(
     @app.post("/api/v1/consent/revoke", status_code=status.HTTP_204_NO_CONTENT, tags=["Consent"])
     def revoke_consent(session: SessionDependency) -> Response:
         with transaction(db_path) as connection:
+            _check_session(connection, session)
             rows = connection.execute(
                 "SELECT consent_id FROM consent WHERE owner_id = ? AND status = 'ACTIVE'",
                 (session.owner_id,),
@@ -1150,60 +1220,27 @@ def create_app(
         description="Recover into an empty local database, then unlock using the backed-up Owner credentials.",
     )
     def recover_backup(request: BackupRestore) -> Response:
-        plaintext = decrypt_backup(request)
-        tables = (
-            "identity_owner", "patients", "document_references",
-            "medication_statements", "consent", "capability_grants",
-            "audit", "event_outbox", "metadata",
-        )
-        source = sqlite3.connect(":memory:")
-        source.row_factory = sqlite3.Row
+        source = open_backup_database(request)
         try:
-            source.deserialize(plaintext)
-            if source.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
-                raise ValueError("backup integrity check failed")
-            if source.execute("PRAGMA foreign_key_check").fetchone() is not None:
-                raise ValueError("backup foreign key check failed")
-            version = source.execute(
-                "SELECT value FROM metadata WHERE key = 'schema_version'"
-            ).fetchone()
-            owners = source.execute("SELECT * FROM identity_owner").fetchall()
-            if (
-                version is None
-                or version["value"] != SCHEMA_VERSION
-                or len(owners) != 1
-                or owners[0]["confirmed"] != 1
-            ):
-                raise ValueError("backup owner or version invalid")
             with transaction(db_path) as target:
                 existing_tables = {
                     row[0] for row in target.execute(
                         "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'"
                     )
                 }
-                if existing_tables != set(tables):
+                if existing_tables != set(BACKUP_TABLES):
                     raise HTTPException(status.HTTP_409_CONFLICT, "recovery_database_not_empty")
                 if any(
                     target.execute(f'SELECT 1 FROM "{table}" LIMIT 1').fetchone()
-                    for table in tables if table != "metadata"
+                    for table in BACKUP_TABLES if table != "metadata"
                 ):
                     raise HTTPException(status.HTTP_409_CONFLICT, "recovery_database_not_empty")
                 metadata = target.execute("SELECT key, value FROM metadata").fetchall()
                 if len(metadata) != 1 or tuple(metadata[0]) != ("schema_version", SCHEMA_VERSION):
                     raise HTTPException(status.HTTP_409_CONFLICT, "recovery_database_not_empty")
-                for table in tables:
-                    source_columns = source.execute(f'PRAGMA table_info("{table}")').fetchall()
-                    target_columns = target.execute(f'PRAGMA table_info("{table}")').fetchall()
-                    if [tuple(row)[1:] for row in source_columns] != [
-                        tuple(row)[1:] for row in target_columns
-                    ]:
-                        raise ValueError("backup schema mismatch")
+                check_backup_schema(source, target)
                 target.execute("DELETE FROM metadata")
-                for table in tables:
-                    cursor = source.execute(f'SELECT * FROM "{table}"')
-                    placeholders = ", ".join("?" for _ in cursor.description)
-                    while rows := cursor.fetchmany(128):
-                        target.executemany(f'INSERT INTO "{table}" VALUES ({placeholders})', rows)
+                copy_backup_tables(source, target)
             sessions.clear()
         except HTTPException:
             raise
@@ -1213,6 +1250,58 @@ def create_app(
         finally:
             source.close()
         return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+    @app.post("/api/v1/backup/validate", status_code=204, tags=["Backup"])
+    def validate_backup(request: BackupRestore, session: SessionDependency) -> Response:
+        source = open_backup_database(request)
+        try:
+            with transaction(db_path) as target:
+                _authorize(target, session, "Backup", "restore")
+                check_backup_schema(source, target)
+        except (sqlite3.Error, ValueError) as exc:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid_backup") from exc
+        finally:
+            source.close()
+        return Response(status_code=204)
+
+    @app.post("/api/v1/backup/replace", status_code=204, tags=["Backup"])
+    def replace_backup(request: BackupReplace, session: SessionDependency) -> Response:
+        source = open_backup_database(request)
+        try:
+            with transaction(db_path) as target:
+                _authorize(target, session, "Backup", "restore")
+                check_backup_schema(source, target)
+                owner = _owner_row(target)
+                if owner is None or owner["owner_id"] != session.owner_id or not owner["confirmed"]:
+                    raise HTTPException(status.HTTP_401_UNAUTHORIZED, "invalid_credentials")
+                key = _unlock_key(owner, request.password)
+                if key is None or not hmac.compare_digest(key, session.key):
+                    raise HTTPException(status.HTTP_401_UNAUTHORIZED, "invalid_credentials")
+                secret = decrypt_bytes(
+                    key, owner["totp_ciphertext"], f"owner-totp:{owner['owner_id']}".encode()
+                ).decode()
+                step = _totp_step(secret, request.code, owner["last_totp_step"])
+                if step is None:
+                    raise HTTPException(status.HTTP_401_UNAUTHORIZED, "invalid_mfa_code")
+                for table in reversed(BACKUP_TABLES):
+                    target.execute(f'DELETE FROM "{table}"')
+                copy_backup_tables(source, target)
+                restored_owner = _owner_row(target)
+                if restored_owner is not None and restored_owner["owner_id"] == session.owner_id:
+                    prior = restored_owner["last_totp_step"]
+                    target.execute(
+                        "UPDATE identity_owner SET last_totp_step = ? WHERE owner_id = ?",
+                        (max(step, prior) if prior is not None else step, session.owner_id),
+                    )
+                sessions.clear()
+        except HTTPException:
+            raise
+        except (sqlite3.Error, ValueError, InvalidTag) as exc:
+            LOGGER.warning("Backup replacement failed: %s", type(exc).__name__)
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "backup_restore_failed") from exc
+        finally:
+            source.close()
+        return Response(status_code=204)
 
     @app.get("/api/v1/openapi.json", include_in_schema=False)
     def openapi_json() -> dict[str, Any]:
