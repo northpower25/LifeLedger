@@ -648,6 +648,82 @@
         ]
       }
     },
+    "/api/v1/backup/saved": {
+      "post": {
+        "tags": [
+          "Backup"
+        ],
+        "summary": "Record Saved Backup",
+        "operationId": "record_saved_backup_api_v1_backup_saved_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupSaved"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BackupHistoryEntry"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/backup/history": {
+      "get": {
+        "tags": [
+          "Backup"
+        ],
+        "summary": "Backup History",
+        "operationId": "backup_history_api_v1_backup_history_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BackupHistoryEntry"
+                  },
+                  "type": "array",
+                  "title": "Response Backup History Api V1 Backup History Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/backup/restore": {
       "post": {
         "tags": [
@@ -660,6 +736,119 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/BackupRestore"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/backup/recover": {
+      "post": {
+        "tags": [
+          "Backup"
+        ],
+        "summary": "Recover Backup",
+        "description": "Recover into an empty local database, then unlock using the backed-up Owner credentials.",
+        "operationId": "recover_backup_api_v1_backup_recover_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupRestore"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/backup/validate": {
+      "post": {
+        "tags": [
+          "Backup"
+        ],
+        "summary": "Validate Backup",
+        "operationId": "validate_backup_api_v1_backup_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupRestore"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/backup/replace": {
+      "post": {
+        "tags": [
+          "Backup"
+        ],
+        "summary": "Replace Backup",
+        "operationId": "replace_backup_api_v1_backup_replace_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupReplace"
               }
             }
           },
@@ -706,6 +895,61 @@
         ],
         "title": "BackupCreate"
       },
+      "BackupHistoryEntry": {
+        "properties": {
+          "saved_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Saved At"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "saved_at",
+          "path"
+        ],
+        "title": "BackupHistoryEntry"
+      },
+      "BackupReplace": {
+        "properties": {
+          "passphrase": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 12,
+            "title": "Passphrase"
+          },
+          "backup_base64": {
+            "type": "string",
+            "maxLength": 100000000,
+            "minLength": 64,
+            "title": "Backup Base64"
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 12,
+            "title": "Password"
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^\\d{6}$",
+            "title": "Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "passphrase",
+          "backup_base64",
+          "password",
+          "code"
+        ],
+        "title": "BackupReplace"
+      },
       "BackupResponse": {
         "properties": {
           "backup_base64": {
@@ -746,6 +990,22 @@
           "backup_base64"
         ],
         "title": "BackupRestore"
+      },
+      "BackupSaved": {
+        "properties": {
+          "path": {
+            "type": "string",
+            "maxLength": 4096,
+            "minLength": 1,
+            "title": "Path"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "path"
+        ],
+        "title": "BackupSaved"
       },
       "DocumentAttachment": {
         "properties": {

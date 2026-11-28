@@ -32,7 +32,7 @@ architecture:
 | --- | --- |
 | Owner | Exactly one local Primary Owner per database. Owner setup is one-time; setup can be resumed with the chosen password if the process exits before MFA confirmation. |
 | MFA | Offline TOTP (RFC 6238), 6 digits, 30-second period; accept current step plus/minus one step for clock skew and reject reuse of an already accepted TOTP step. Password plus TOTP is required for every unlock. |
-| Recovery | No password or TOTP recovery key/contact is implemented. If both Owner factors are lost, this synthetic test database is unrecoverable; deleting it discards all local test data. Backup restore also requires an unlocked Owner session. |
+| Recovery | A backup can be recovered from the start screen only into an empty local database, using the separate backup passphrase. The restored Owner password and TOTP are still required to unlock; no password or TOTP reset/recovery is implemented. A populated database is never overwritten by this recovery path. |
 | Password KDF | Argon2id, time cost 3, memory 65,536 KiB, parallelism 1, 32-byte derived key, random 16-byte salt. |
 | Data encryption | AES-256-GCM; random 96-bit nonce per encrypted value; table and opaque row ID are authenticated associated data. A random 256-bit data key is wrapped by the Argon2id-derived password key. |
 | Storage encryption boundary | Every FHIR resource, document body, consent, capability grant, audit payload and outbox payload is encrypted. SQLite schema, opaque IDs, row relationships, timestamps, status, event names, Argon2 password verifier and KDF salt remain visible as operational metadata. The test slice does not claim whole-file/SQLCipher encryption or protection against a process running as the same Windows user. |
@@ -42,7 +42,7 @@ architecture:
 | Documents | PDF, UTF-8 plain text, or PNG only; 10 MiB maximum. MIME signatures/encoding are checked. Document bytes are stored inside the encrypted DocumentReference payload. |
 | Synthetic data | Create/import requests require `synthetic: true`; this is an explicit caller assertion, not an automated detector. Never use real records or upload user documents during development/testing. |
 | Timeline | Descending local record-creation timestamp; timestamps are stored as UTC ISO-8601 metadata. Medication effective time remains inside its encrypted FHIR resource. |
-| Backup | User supplies a separate passphrase (minimum 12 characters). The SQLite online-backup API snapshots a consistent database image up to 64 MiB; the full image is wrapped in an Argon2id-derived AES-256-GCM envelope. Restore requires an unlocked Owner, matching Owner ID, valid backup passphrase, schema version 1 and SQLite integrity check. Restore replaces the local database and invalidates all sessions. |
+| Backup | User supplies a separate passphrase (minimum 12 characters). The SQLite online-backup API snapshots a consistent database image up to 64 MiB; the full image is wrapped in an Argon2id-derived AES-256-GCM envelope. The desktop validates the backup, warns about data loss and requires the current Owner password and fresh TOTP before replacing the local database, including with another Owner's backup. A separate current-Owner backup can be saved first to a new file without overwriting existing files. Start-screen recovery requires an empty database and does not create an authenticated session. Restored Owner credentials are required to unlock. The legacy same-Owner restore endpoint remains supported. |
 | Retention | No automatic purge/retention job in the test slice. User can remove the local test database only after closing the application. Do not rely on this prototype for records requiring retention or deletion guarantees. |
 | Network | Packaged API binds to a random loopback port and uses per-launch TLS. The Tauri host generates an ephemeral self-signed certificate, pins it for every HTTPS request, and pipes the certificate, private key and IPC secret to the child over stdin. The API secret and request data are sent only inside the pinned TLS channel. Direct browser API access is allowed only with the explicit `LIFELEDGER_DEV_MODE=1` development flag. Windows lifecycle and same-user-process isolation remain unverified. |
 
@@ -132,8 +132,38 @@ specified in OpenAPI. Authorization is `Authorization: Bearer <session>`.
 | Timeline | `GET /patients/{patient_id}/timeline` | Return Patient, documents and medications, newest first. |
 | Consent | `POST /consent/revoke` | Revoke the local Owner's active health-record consent synchronously. |
 | Backup | `POST /backup` | Create a passphrase-protected encrypted backup envelope. |
+| Backup history | `POST /backup/saved`, `GET /backup/history` | Record a client-confirmed desktop save and list up to 100 most recent entries; paths are encrypted in audit payloads. Both require backup-create consent and capability. |
 | Restore | `POST /backup/restore` | Validate and restore the encrypted backup; expires all sessions. |
+| Recovery | `POST /backup/recover` | Recover into an empty local database using the backup passphrase; unlock afterwards with the restored Owner credentials. Protected by the local IPC channel, not an Owner session. |
+| Validate | `POST /backup/validate` | Validate the backup and its schema before the replacement confirmation, with an authorized Owner session. |
+| Replace | `POST /backup/replace` | Require an authorized session, backup passphrase, current Owner password and fresh TOTP; transactionally replace the local database and invalidate local sessions. |
 | Readiness | `GET /health` | Report local service readiness without exposing health data. |
+
+Start-screen recovery and cross-Owner replacement cannot write an encrypted `BACKUP_RESTORED` audit event:
+the Owner data key is unavailable until a subsequent unlock. The restored
+database retains the audit records included in the backup; the later unlock
+is audited normally. Recovery decrypts the database image in memory, so large
+backups increase peak memory usage.
+
+Replacement holds a SQLite write transaction; failed imports roll back. Backup
+validation and replacement each decrypt and check the backup, adding latency
+and memory usage. A backup saved before replacement is a snapshot: changes
+made afterward are not included. Close other application instances before
+replacement; cross-process session invalidation and same-user isolation are
+not guaranteed. The desktop requires a new destination filename for every
+backup and never overwrites an existing file.
+
+The suggested backup filename uses the local client clock (`YYYYMMDD_HHmm`);
+backups in the same minute require distinct filenames. Only after a successful
+desktop file write is a `BACKUP_SAVED` audit entry recorded, with the path
+encrypted under the Owner data key and the timestamp in database metadata.
+The app warns when no save is recorded or more than 14 days have elapsed,
+and flags future or invalid timestamps. The clock must be correct. History
+does not prove a file is still present or restorable, and browser downloads
+are not recorded. The save entry is created after the snapshot, so restoring
+that file restores only earlier history. A failure to record after writing is
+reported separately and does not mean the file was lost. This is a client
+assertion, not a tamper-proof proof of a save against a malicious local user.
 
 ## Deliverable 4: SQLite schema
 
@@ -178,6 +208,8 @@ not implemented by this slice.
   closed; verify no change is committed.
 - Backup/restore to the same Owner and verify all synthetic resources,
   originals, consent, capability, audit and schema version are present.
+- Recover into an empty database without a session; verify wrong passphrases
+  and populated databases are rejected and original Owner MFA is still required.
 - Inject failure during restore and prove original DB remains readable.
 
 ### Offline

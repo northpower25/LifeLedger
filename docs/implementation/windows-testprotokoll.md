@@ -36,7 +36,8 @@ Produktionssicherheit.
 
    Jeder Schritt muss erfolgreich enden; bei einem Fehler abbrechen und die
    Fehlermeldung im Formular notieren. Der Sidecar liegt unter
-   `frontend-desktop/src-tauri/binaries/lifeledger-api-x86_64-pc-windows-msvc.exe`,
+   `frontend-desktop/src-tauri/binaries/lifeledger-api/lifeledger-api.exe`
+   mit den zugehörigen Laufzeitdateien im selben Verzeichnis,
    die Installer unter `frontend-desktop/src-tauri/target/release/bundle/`.
    Alternativ kann ein erfolgreiches Windows-Actions-Artefakt desselben
    Commits verwendet werden. Ein erfolgreicher Build ersetzt die folgenden
@@ -62,18 +63,22 @@ festhalten; keine Geheimnisse, Tokens oder personenbezogenen Daten teilen.
 | ID | Durchführung | Erwartetes Ergebnis |
 | --- | --- | --- |
 | W01 Start | App starten; im Task-Manager den Prozess `lifeledger-api.exe` suchen. | UI mit Hinweis auf synthetische Daten erscheint; ein API-Prozess läuft. |
-| W02 Owner | Owner mit Testnamen und Passwort (mindestens 12 Zeichen) anlegen; angezeigten TOTP-Schlüssel im Authenticator erfassen und aktuellen Code bestätigen. | Einrichtung erfolgreich, Patient-Bereich erscheint. |
+| W02 Owner | Owner mit Testnamen und Passwort (mindestens 12 Zeichen) anlegen; QR-Code im Authenticator scannen oder den angezeigten TOTP-Schlüssel manuell erfassen und aktuellen Code bestätigen. Auch Wiederaufnahme einer unterbrochenen Einrichtung prüfen. | Einrichtung erfolgreich, Patient-Bereich erscheint; QR-Code und manueller Schlüssel richten denselben TOTP-Zugang ein. |
 | W03 Daten | Patient `Testperson Alpha` anlegen, auswählen, `synthetisch.txt` unter Titel `Testdokument 123` importieren, Medikation `Testmedikation 123` anlegen. | Timeline zeigt Patient, DocumentReference und MedicationStatement mit den Testbezeichnungen. |
-| W04 Backup | Separate Test-Passphrase mit mindestens 12 Zeichen eingeben und verschlüsseltes Backup erstellen. Downloadverzeichnis und Dateigröße prüfen. | Datei `LifeLedger-synthetic-backup.llbackup` vorhanden und nicht leer. |
+| W04 Backup | Separate Test-Passphrase mit mindestens 12 Zeichen eingeben und verschlüsseltes Backup erstellen. Im Speicherdialog neuen Dateinamen wählen; danach erneut denselben Dateinamen wählen und den Dialog zusätzlich abbrechen. | Datei ist vorhanden und nicht leer; Speicherort wird bestätigt. Eine vorhandene Datei wird nicht überschrieben; bei Abbruch wird nichts gespeichert. |
 | W05 Veränderung | Nach dem Backup `Testperson Beta` anlegen. | Beide Testpersonen sind auswählbar. |
-| W06 Negativ-Restore | Backup mit falscher Passphrase wiederherstellen. | Fehlermeldung; beide Testpersonen bleiben erhalten. |
-| W07 Restore | Korrekte Passphrase eingeben und Backup wiederherstellen; falls nötig auf einen neuen TOTP-Zeitschritt warten, dann erneut entsperren. | Erneute Anmeldung erforderlich; Alpha und dessen drei Timeline-Einträge vorhanden, Beta fehlt. |
+| W06 Negativ-Restore | Backup mit falscher Passphrase und anschließend mit falschem Owner-Passwort oder bereits verwendetem TOTP-Code wiederherstellen. | Fehlermeldung; beide Testpersonen bleiben erhalten. |
+| W07 Restore | Korrekte Backup-Passphrase eingeben, Warnung prüfen, optional aktuelle Daten in eine neue Datei sichern. Ersetzen bestätigen und Owner-Passwort sowie frischen TOTP-Code eingeben; nach Restore erneut entsperren. | Erneute Anmeldung erforderlich; Alpha und dessen drei Timeline-Einträge vorhanden, Beta fehlt. |
 | W08 Sperren | `Sperren` wählen und mit Passwort und frischem TOTP-Code wieder entsperren. | Geschützte Daten verschwinden und erscheinen erst nach erfolgreicher Anmeldung. |
 | W09 Negativ-Anmeldung | Nach Sperren falsches Passwort bzw. falschen TOTP-Code verwenden; anschließend mit gültigen Daten anmelden. | Falsche Daten werden abgelehnt; gültige Anmeldung funktioniert mit einem noch nicht verwendeten TOTP-Code. |
 | W10 Beenden/Neustart | App schließen; Prozessliste prüfen; neu starten und anmelden. | Sidecar endet ebenfalls; erneuter Start und persistierte Daten funktionieren offline. |
 | W11 Mehrfachstart | Bei laufender App ein zweites Exemplar starten; Prozesse, Meldungen und Datenbestand beobachten. | Keine konkurrierenden Instanzen/Seiteneffekte; ansonsten als Fehler bzw. offene Sicherheitsgrenze dokumentieren. |
 | W12 IPC-Basistest | Bei laufender App deren Sidecar-PID und lokalen TCP-Port ermitteln. Plain-HTTP-Anfrage ohne Geheimnis versuchen, danach eine HTTPS-Anfrage ohne IPC-Header senden. | HTTP wird nicht verwendet; HTTPS ohne Vertrauen zum ephemeren Zertifikat scheitert im TLS-Handshake. Selbst bei manuell akzeptiertem Zertifikat wird eine Anfrage ohne IPC-Header mit HTTP 403 abgewiesen. Kein Testbeweis für Same-User-Isolation. |
 | W13 Dokumentgrenze | Unterstützte synthetische Textdatei über 10 MiB bzw. ungültige PDF-Datei importieren. | Import wird abgewiesen und kein neuer Timeline-Eintrag erzeugt. |
+| W14 Wiederherstellung ohne Owner | In einem separaten, frischen Windows-Testprofil die App starten und auf dem Startbildschirm das Backup aus W04 mit falscher, danach richtiger Backup-Passphrase auswählen. Mit dem ursprünglichen Owner-Passwort und einem frischen TOTP-Code entsperren. | Falsche Passphrase wird abgewiesen; korrektes Backup wird wiederhergestellt und Alpha erscheint nach Entsperrung. Ein bereits vorhandener Owner wird nicht überschrieben. |
+| W15 Anderer Owner | Im separaten Testprofil neuen Owner anlegen und Daten erfassen. Backup aus W04 wählen, Warnung prüfen, aktuelles Backup unter neuem Namen erstellen und mit aktuellem Owner-Passwort und frischem TOTP ersetzen. | Ursprüngliche Backup-Datei unverändert; nach Ersetzen Anmeldung mit ursprünglichem Owner und dessen TOTP möglich; separat gespeichertes Backup bleibt vorhanden. Abbruch verändert nichts. |
+| W16 Backup-Verlauf | Bei neuem Owner Hinweis auf fehlendes Backup prüfen; Backup speichern, Sperren/Entsperren und App-Neustart durchführen. Ein weiteres Backup innerhalb derselben Minute mit demselben Namen versuchen; danach mit neuem Namen speichern. | Lokaler Name enthält Datum und Uhrzeit. Der Verlauf zeigt erfolgreiche Speicherungen mit Datum und Pfad auch nach Neustart; die vorhandene Datei wird nicht überschrieben und der fehlgeschlagene Versuch nicht erfasst. |
+| W17 Erinnerung und Restore | In isolierter Testumgebung Systemzeit kontrolliert um mehr als 14 Tage vorstellen; TOTP-Uhr beachten. Danach ein älteres Backup wiederherstellen und Verlauf vergleichen. | Nach über 14 Tagen erscheint der Hinweis mit Tageszahl. Nach Restore entspricht der Verlauf dem Snapshot vor dem Speichern der wiederhergestellten Datei; spätere Einträge fehlen. Systemzeit anschließend zurückstellen. |
 
 Für W12 im separaten PowerShell-Fenster (nicht im Entwicklungsmodus starten;
 `LIFELEDGER_DEV_MODE` darf nicht gesetzt sein):
@@ -114,7 +119,7 @@ W01:                W02:                W03:
 W04:                W05:                W06:
 W07:                W08:                W09:
 W10:                W11:                W12:
-W13:
+W13:                W14:                W15:
 
 Abweichungen / bereinigte Fehlermeldungen:
 Nicht durchgeführte Schritte und Grund:
