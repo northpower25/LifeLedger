@@ -1,14 +1,27 @@
 import base64
+import ipaddress
 import json
+import os
+import socket
+import ssl
 import sqlite3
+import subprocess
+import sys
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from urllib.error import URLError
+from urllib.request import Request, urlopen
 
 import pyotp
+import pytest
+from cryptography import x509
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.x509.oid import NameOID
 from fastapi.testclient import TestClient
 
-from lifeledger.app import create_app
+from lifeledger.app import create_app, parse_ipc_bootstrap
 
 
 PASSWORD = "synthetic-owner-password-1"
@@ -205,6 +218,113 @@ def test_packaged_api_requires_the_private_host_channel(tmp_path):
 
     locked_down = TestClient(create_app())
     assert locked_down.get("/api/v1/health").status_code == 503
+
+
+def test_packaged_sidecar_uses_pinned_tls_before_accepting_http(tmp_path):
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    subject = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "127.0.0.1")])
+    now = datetime.now(timezone.utc)
+    certificate = (
+        x509.CertificateBuilder()
+        .subject_name(subject)
+        .issuer_name(subject)
+        .public_key(private_key.public_key())
+        .serial_number(x509.random_serial_number())
+        .not_valid_before((now - timedelta(minutes=1)).replace(tzinfo=None))
+        .not_valid_after((now + timedelta(days=365)).replace(tzinfo=None))
+        .add_extension(
+            x509.SubjectAlternativeName(
+                [x509.IPAddress(ipaddress.ip_address("127.0.0.1"))]
+            ),
+            critical=False,
+        )
+        .sign(private_key, hashes.SHA256())
+    )
+    certificate_pem = certificate.public_bytes(serialization.Encoding.PEM).decode()
+    private_key_pem = private_key.private_bytes(
+        serialization.Encoding.PEM,
+        serialization.PrivateFormat.PKCS8,
+        serialization.NoEncryption(),
+    ).decode()
+    secret_hex = os.urandom(32).hex()
+    bootstrap = json.dumps(
+        {
+            "ipc_secret": secret_hex,
+            "certificate_pem": certificate_pem,
+            "private_key_pem": private_key_pem,
+        }
+    ).encode()
+    with socket.socket() as reservation:
+        reservation.bind(("127.0.0.1", 0))
+        port = reservation.getsockname()[1]
+    repository = Path(__file__).resolve().parents[2]
+    environment = os.environ.copy()
+    environment["PYTHONPATH"] = str(repository / "backend")
+    environment["LIFELEDGER_DATABASE"] = str(tmp_path / "sidecar.sqlite3")
+    process = subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "lifeledger.app",
+            "--port",
+            str(port),
+            "--ipc-stdin",
+        ],
+        cwd=repository,
+        env=environment,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    assert process.stdin is not None
+    process.stdin.write(bootstrap + b"\n")
+    process.stdin.close()
+    endpoint = f"https://127.0.0.1:{port}/api/v1/health"
+    trusted_context = ssl.create_default_context(cadata=certificate_pem)
+    untrusted_context = ssl.create_default_context()
+    try:
+        for _ in range(50):
+            if process.poll() is not None:
+                pytest.fail(f"Sidecar exited early with code {process.returncode}")
+            try:
+                urlopen(endpoint, context=untrusted_context, timeout=0.2)
+            except URLError as error:
+                if isinstance(error.reason, ssl.SSLCertVerificationError):
+                    break
+                time.sleep(0.1)
+        else:
+            pytest.fail("Sidecar did not reject an untrusted TLS client")
+
+        request = Request(endpoint, headers={"X-LifeLedger-IPC": "wrong"})
+        with pytest.raises(URLError):
+            urlopen(request, context=trusted_context, timeout=2)
+        request = Request(
+            endpoint,
+            headers={"X-LifeLedger-IPC": secret_hex},
+        )
+        with urlopen(request, context=trusted_context, timeout=2) as response:
+            assert response.status == 200
+            assert json.loads(response.read())["pid"] == process.pid
+    finally:
+        process.terminate()
+        process.wait(timeout=5)
+
+
+def test_ipc_bootstrap_rejects_missing_or_malformed_tls_material():
+    certificate_pem = "-----BEGIN CERTIFICATE-----\nsynthetic\n"
+    private_key_pem = "-----BEGIN PRIVATE KEY-----\nsynthetic\n"
+    secret_hex = (b"x" * 32).hex()
+    assert parse_ipc_bootstrap(
+        json.dumps(
+            {
+                "ipc_secret": secret_hex,
+                "certificate_pem": certificate_pem,
+                "private_key_pem": private_key_pem,
+            }
+        ).encode()
+    ) == (b"x" * 32, certificate_pem, private_key_pem)
+    with pytest.raises(RuntimeError):
+        parse_ipc_bootstrap(b'{"ipc_secret":"00"}')
 
 
 def test_checked_in_openapi_contract_matches_fastapi():

@@ -43,21 +43,20 @@ für echte Gesundheitsdaten. SQLite-FHIR-Payloads, Dokumentbytes, Consent-
 Scopes, Capability-Grants, Audit-Details und Outbox-Payloads sind
 AEAD-verschlüsselt; Tabellenstruktur, opake Beziehungen, Status, Eventtypen
 und Zeitstempel bleiben als Metadaten sichtbar. Whole-file/SQLCipher-
-Verschlüsselung ist nicht umgesetzt. Die Tauri-UI kann den Dienst nicht direkt ansprechen: der Host startet einen
-Sidecar, übergibt ein zufälliges Geheimnis über stdin und proxyt Requests.
-Der Dienst ist an Loopback gebunden und der Host vergleicht beim Start die
-PID-Antwort mit dem gestarteten Prozess. Das ersetzt keine verifizierte
-Windows-Named-Pipe- oder Same-User-Isolation; Port-Race und Prozess-
-Impersonation müssen auf Windows geprüft werden.
+Verschlüsselung ist nicht umgesetzt. Die Tauri-UI kann den Dienst nicht direkt
+ansprechen: der Host startet einen Sidecar und übergibt IPC-Geheimnis sowie
+ephemeres TLS-Zertifikat und -Schlüssel über stdin. Er pinnt das Zertifikat
+und sendet Health- und API-Aufrufe ausschließlich über HTTPS.
 
-Die Quellcode-Sicherheitsprüfung hat ein konkretes Risiko mit hoher
-Schwere festgestellt: Zwischen Portfreigabe und Sidecar-Bindung kann ein
-lokaler Prozess den Port belegen. Die anschließende Anfrage übermittelt das
-IPC-Geheimnis an diesen Prozess; dessen selbst gemeldete PID authentisiert
-ihn nicht. Bei erfolgreicher Täuschung könnten weitere Anfragen einschließlich
-Anmeldedaten abgefangen werden. Der Angriff wurde unter Windows nicht
-reproduziert. Die IPC-Grenze bleibt bis zur Korrektur und Windows-Prüfung
-offen; der vorhandene Handshake ist keine gegenseitige Authentisierung.
+Eine Quellcode-Prüfung identifizierte ein Port-Race, bei dem ein fremder
+Loopback-Listener den bisherigen unverschlüsselten Health-Handshake hätte
+abfangen können. Die Implementierung wurde daraufhin auf per-Start
+zertifikat-gepinntes TLS umgestellt: ein Listener ohne den privaten Schlüssel
+kann den TLS-Handshake nicht abschließen, bevor Host-Anfragen oder
+Anmeldedaten gesendet werden. Backend-Tests decken den HTTPS-Pfad und die
+Ablehnung nicht vertrauenswürdiger Zertifikate ab. Ein Windows-Build und
+Windows-Laufzeittest stehen noch aus; Same-User-Prozessisolation wird nicht
+behauptet oder durch diese TLS-Änderung hergestellt.
 
 Siehe [Implementation Backlog, Annahmen, API, Schema und Testplan](../implementation/first-offline-slice.md)
 und [OpenAPI Contract](../implementation/openapi.json).

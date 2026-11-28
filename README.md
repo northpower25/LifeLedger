@@ -32,10 +32,10 @@ family features, Home Assistant, and external integrations are out of scope.
 
 The [implementation contract](docs/implementation/first-offline-slice.md)
 records fixed implementation assumptions, backlog, API, storage schema and
-test plan. The implementation is not yet a production application: Windows
-service packaging and mutually authenticated Tauri-to-backend IPC remain
-unverified. Do not use the test slice with real health data or make medical
-decisions.
+test plan. The implementation is not yet a production application: Windows service
+packaging and the pinned Tauri-to-backend TLS channel remain unverified on
+Windows, and same-user process isolation is not claimed. Do not use the test
+slice with real health data or make medical decisions.
 
 The architecture is design intent, not a statement of implemented features.
 

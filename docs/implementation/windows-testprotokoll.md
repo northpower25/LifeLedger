@@ -67,7 +67,7 @@ festhalten; keine Geheimnisse, Tokens oder personenbezogenen Daten teilen.
 | W09 Negativ-Anmeldung | Nach Sperren falsches Passwort bzw. falschen TOTP-Code verwenden; anschließend mit gültigen Daten anmelden. | Falsche Daten werden abgelehnt; gültige Anmeldung funktioniert mit einem noch nicht verwendeten TOTP-Code. |
 | W10 Beenden/Neustart | App schließen; Prozessliste prüfen; neu starten und anmelden. | Sidecar endet ebenfalls; erneuter Start und persistierte Daten funktionieren offline. |
 | W11 Mehrfachstart | Bei laufender App ein zweites Exemplar starten; Prozesse, Meldungen und Datenbestand beobachten. | Keine konkurrierenden Instanzen/Seiteneffekte; ansonsten als Fehler bzw. offene Sicherheitsgrenze dokumentieren. |
-| W12 IPC-Basistest | Bei laufender App deren Sidecar-PID und zugehörigen lokalen TCP-Listen-Port ermitteln; `GET http://127.0.0.1:<Port>/api/v1/health` ohne IPC-Header senden. | Bindung nur an Loopback; direkte Anfrage ohne Geheimnis wird mit HTTP 403 abgewiesen. Kein Testbeweis für Same-User-Isolation. |
+| W12 IPC-Basistest | Bei laufender App deren Sidecar-PID und lokalen TCP-Port ermitteln. Plain-HTTP-Anfrage ohne Geheimnis versuchen, danach eine HTTPS-Anfrage ohne IPC-Header senden. | HTTP wird nicht verwendet; HTTPS ohne Vertrauen zum ephemeren Zertifikat scheitert im TLS-Handshake. Selbst bei manuell akzeptiertem Zertifikat wird eine Anfrage ohne IPC-Header mit HTTP 403 abgewiesen. Kein Testbeweis für Same-User-Isolation. |
 | W13 Dokumentgrenze | Unterstützte synthetische Textdatei über 10 MiB bzw. ungültige PDF-Datei importieren. | Import wird abgewiesen und kein neuer Timeline-Eintrag erzeugt. |
 
 Für W12 im separaten PowerShell-Fenster (nicht im Entwicklungsmodus starten;
@@ -79,16 +79,17 @@ Get-NetTCPConnection -State Listen -OwningProcess <PID>
 try {
   Invoke-WebRequest "http://127.0.0.1:<Port>/api/v1/health" -UseBasicParsing
 } catch {
-  if ($_.Exception.Response) { [int]$_.Exception.Response.StatusCode }
-  else { throw }
+  "Plain HTTP rejected: $($_.Exception.Message)"
 }
 ```
 
-PID und Port durch tatsächlich ermittelte Werte ersetzen. Andere lokale
-Prozesse, Port-Races, Prozess-Impersonation und Zugriff durch denselben
-Windows-Benutzer sind durch W12 nicht ausreichend geprüft. Scheitert W11 oder
-ist die gegenseitige Authentisierung nicht belegt, bleibt das IPC-Gate offen.
-Erst nach allen Tests Netzwerkadapter wieder aktivieren.
+PID und Port durch tatsächlich ermittelte Werte ersetzen. Eine HTTPS-Anfrage
+mit Standard-Zertifikatsprüfung muss wegen des selbstsignierten, nicht
+installierten Zertifikats ebenfalls scheitern. Die Tauri-Anwendung selbst
+validiert mit ihrem angehefteten Zertifikat. W12 prüft nicht die Isolation
+gegen einen Prozess desselben Windows-Benutzers. Scheitert W11 oder der
+HTTPS-Start, bleibt das IPC-Gate offen. Erst nach allen Tests Netzwerkadapter
+wieder aktivieren.
 
 ## Auszufüllendes Formular
 
@@ -120,7 +121,7 @@ Bestätigung: Nur synthetische Daten verwendet: ja / nein
 W01–W10 tatsächlich offline durchgeführt wurden. Auch dann bleibt die
 Windows-IPC-Sicherheitsprüfung separat offen, bis Same-User-Grenze,
 gegenseitige Authentisierung und Startup-Race fachlich verifiziert sind.
-Eine Quellcode-Prüfung hat bereits ein Port-Race mit möglicher Offenlegung
-des IPC-Geheimnisses und von Anmeldedaten aufgezeigt. Es wurde unter Windows
-nicht reproduziert und wird durch W12 nicht ausgeschlossen; Details stehen im
-[Implementierungsstatus](../review/offene-informationen-erste-testversion.md).
+Die frühere Port-Race-Schwachstelle wurde durch zertifikat-gepinntes TLS
+adressiert; die Windows-Laufzeitprüfung bleibt ausstehend. Die
+[Implementierungsgrenzen](../review/offene-informationen-erste-testversion.md)
+beschreiben den verbleibenden Same-User-Vorbehalt.

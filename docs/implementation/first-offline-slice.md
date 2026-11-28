@@ -44,7 +44,7 @@ architecture:
 | Timeline | Descending local record-creation timestamp; timestamps are stored as UTC ISO-8601 metadata. Medication effective time remains inside its encrypted FHIR resource. |
 | Backup | User supplies a separate passphrase (minimum 12 characters). The SQLite online-backup API snapshots a consistent database image up to 64 MiB; the full image is wrapped in an Argon2id-derived AES-256-GCM envelope. Restore requires an unlocked Owner, matching Owner ID, valid backup passphrase, schema version 1 and SQLite integrity check. Restore replaces the local database and invalidates all sessions. |
 | Retention | No automatic purge/retention job in the test slice. User can remove the local test database only after closing the application. Do not rely on this prototype for records requiring retention or deletion guarantees. |
-| Network | Packaged API binds to a random loopback port, accepts only the per-launch secret piped by the Tauri host, and is reached through Tauri IPC commands. Direct browser API access is allowed only with the explicit `LIFELEDGER_DEV_MODE=1` development flag. The Windows port-race and same-user-process threat remain unverified. |
+| Network | Packaged API binds to a random loopback port and uses per-launch TLS. The Tauri host generates an ephemeral self-signed certificate, pins it for every HTTPS request, and pipes the certificate, private key and IPC secret to the child over stdin. The API secret and request data are sent only inside the pinned TLS channel. Direct browser API access is allowed only with the explicit `LIFELEDGER_DEV_MODE=1` development flag. Windows lifecycle and same-user-process isolation remain unverified. |
 
 These assumptions keep the implementation bounded but have consequences:
 the SQLite file leaks timing and access-pattern metadata; a same-user process
@@ -70,7 +70,7 @@ platform prerequisites are not complete.
 | B4 | P0 | Implement timeline API/view and document retrieval | Implemented; desktop journey needs Windows test | S | B3 | Timeline shows allowed records for the selected Patient, newest first; access is audited. |
 | B5 | P0 | Implement encrypted backup/restore and recovery tests | Implemented; Windows restore test pending | M | B2 | Wrong passphrase, modified ciphertext, unsupported schema and corrupt SQLite are rejected without replacing the active database; valid restore reinstates the synthetic fixture set. |
 | B6 | P0 | Build Tauri Windows shell and integrated Health Record journey | Partial; UI, host and sidecar source exist | L | B1–B5 | Windows app starts the local service, completes Owner → Patient → document → medication → timeline → backup/restore without network. |
-| B7 | P0 | Verify/package the Windows IPC and service lifecycle | Incomplete; loopback secret/PID handshake is not yet a verified Windows security boundary | L | B6 | No unauthenticated local HTTP fallback; mutually authenticated host/service, single-instance protection, safe startup/shutdown, packaged offline dependencies, and Windows-specific negative tests pass. |
+| B7 | P0 | Verify/package the Windows IPC and service lifecycle | Per-launch pinned TLS and IPC secret implemented; Windows validation pending | L | B6 | Untrusted loopback listeners cannot receive API requests or credentials; no unauthenticated local HTTP fallback; safe startup/shutdown, packaged offline dependencies, and Windows-specific negative tests pass. Same-user process isolation is not claimed. |
 | B8 | P0 | Run integration/offline/negative tests and dependency/license review | Backend tests pass on Linux; Windows acceptance pending | M | B1–B7 | Acceptance suite passes on a clean Windows reference machine with networking disabled; only synthetic fixtures used. |
 | B9 | P1 | Add signed release packaging and upgrade/migration verification | Not started | M | B8 | Signed installer and upgrade do not expose, reset or corrupt local data. Not required for the first internal test build. |
 
@@ -204,6 +204,10 @@ not implemented by this slice.
 - Test repeated concurrent Owner setup, concurrent revoke/write, duplicate
   requests and SQLite busy/error paths.
 
-Windows IPC and same-user-process isolation are explicit acceptance gates:
-the loopback-only development API is not a substitute for the packaged,
-mutually authenticated Tauri-to-service channel.
+Windows IPC and service lifecycle remain acceptance gates: the packaged
+Tauri-to-service channel pins a per-launch TLS certificate before sending
+the IPC secret or API requests. This prevents a different local process from
+impersonating the sidecar merely by winning the loopback-port race. Windows
+verification is still required, and this design does not claim isolation from
+another process running as the same Windows user. The loopback-only
+development API is not a substitute for the packaged channel.

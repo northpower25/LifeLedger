@@ -14,12 +14,13 @@ npm run build
 npm run tauri dev
 ```
 
-The Tauri host starts the packaged API child, sends a random per-run IPC
-secret through stdin, proxies API calls over Tauri commands, and validates the
-child PID during readiness. The current loopback channel and PID check are not
-a verified Windows named-pipe or same-user-process isolation boundary. The
-Windows installer, startup race, shutdown, and offline behavior still require
-Windows testing. Do not use real health data.
+The Tauri host starts the packaged API child and sends a per-run IPC secret
+and ephemeral TLS keypair through stdin. It pins the generated certificate and
+uses HTTPS for readiness and every proxied API call, so a loopback listener
+without that key cannot receive credentials or API requests. The Windows
+installer, service lifecycle, and offline behavior still require Windows
+testing; isolation from another process running as the same user is not
+claimed. Do not use real health data.
 
 For Windows build, offline acceptance steps and a results form, see the
 [Windows test protocol](../docs/implementation/windows-testprotokoll.md).

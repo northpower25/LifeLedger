@@ -1,6 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use rcgen::generate_simple_self_signed;
 use reqwest::blocking::Client;
+use reqwest::Certificate;
 use serde::{Deserialize, Serialize};
 use std::io::{Error, ErrorKind, Write};
 use std::net::TcpListener;
@@ -14,7 +16,15 @@ use tauri::{Manager, RunEvent, State};
 struct ApiState {
     base_url: String,
     ipc_secret: String,
+    client: Client,
     child: Mutex<Child>,
+}
+
+#[derive(Serialize)]
+struct SidecarBootstrap {
+    ipc_secret: String,
+    certificate_pem: String,
+    private_key_pem: String,
 }
 
 #[derive(Deserialize)]
@@ -81,6 +91,14 @@ fn start_api(app: &tauri::App) -> Result<ApiState, Box<dyn std::error::Error>> {
         .iter()
         .map(|byte| format!("{byte:02x}"))
         .collect::<String>();
+    let tls = generate_simple_self_signed(vec!["127.0.0.1".to_string()])?;
+    let certificate_pem = tls.cert.pem();
+    let private_key_pem = tls.signing_key.serialize_pem();
+    let bootstrap = serde_json::to_vec(&SidecarBootstrap {
+        ipc_secret: ipc_secret.clone(),
+        certificate_pem: certificate_pem.clone(),
+        private_key_pem,
+    })?;
     let mut child = Command::new(sidecar)
         .args(["--port", &port.to_string(), "--ipc-stdin"])
         .stdin(Stdio::piped())
@@ -91,12 +109,15 @@ fn start_api(app: &tauri::App) -> Result<ApiState, Box<dyn std::error::Error>> {
         .stdin
         .take()
         .ok_or_else(|| Error::new(ErrorKind::BrokenPipe, "local_api_stdin_unavailable"))?;
-    child_stdin.write_all(ipc_secret.as_bytes())?;
+    child_stdin.write_all(&bootstrap)?;
     child_stdin.write_all(b"\n")?;
     drop(child_stdin);
 
-    let base_url = format!("http://127.0.0.1:{port}");
+    let base_url = format!("https://127.0.0.1:{port}");
+    let pinned_certificate = Certificate::from_pem(certificate_pem.as_bytes())?;
     let client = Client::builder()
+        .no_proxy()
+        .add_root_certificate(pinned_certificate)
         .timeout(Duration::from_millis(500))
         .build()?;
     let deadline = Instant::now() + Duration::from_secs(15);
@@ -124,6 +145,7 @@ fn start_api(app: &tauri::App) -> Result<ApiState, Box<dyn std::error::Error>> {
     Ok(ApiState {
         base_url,
         ipc_secret,
+        client,
         child: Mutex::new(child),
     })
 }
@@ -142,11 +164,8 @@ fn api_request(request: ApiRequest, state: State<'_, ApiState>) -> Result<ApiRep
     if method != reqwest::Method::GET && method != reqwest::Method::POST {
         return Err("api_method_not_allowed".into());
     }
-    let client = Client::builder()
-        .timeout(Duration::from_secs(60))
-        .build()
-        .map_err(|_| "local_api_client_failed")?;
-    let mut call = client
+    let mut call = state
+        .client
         .request(method, format!("{}{}", state.base_url, request.path))
         .header("X-LifeLedger-IPC", &state.ipc_secret);
     if let Some(authorization) = request.authorization {

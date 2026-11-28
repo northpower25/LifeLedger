@@ -1150,9 +1150,35 @@ def create_app(
 app = create_app()
 
 
+def parse_ipc_bootstrap(payload: bytes) -> tuple[bytes, str, str]:
+    try:
+        bootstrap = json.loads(payload)
+        secret = bytes.fromhex(bootstrap["ipc_secret"])
+        certificate_pem = bootstrap["certificate_pem"]
+        private_key_pem = bootstrap["private_key_pem"]
+    except (
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+        KeyError,
+        TypeError,
+        ValueError,
+    ) as exc:
+        raise RuntimeError("Invalid host IPC initialization") from exc
+    if (
+        len(secret) != 32
+        or not isinstance(certificate_pem, str)
+        or not certificate_pem.startswith("-----BEGIN CERTIFICATE-----")
+        or not isinstance(private_key_pem, str)
+        or not private_key_pem.startswith("-----BEGIN PRIVATE KEY-----")
+    ):
+        raise RuntimeError("Invalid host IPC initialization")
+    return secret, certificate_pem, private_key_pem
+
+
 def run() -> None:
     import argparse
     import sys
+    import tempfile
 
     import uvicorn
 
@@ -1161,24 +1187,44 @@ def run() -> None:
     parser.add_argument("--ipc-stdin", action="store_true")
     arguments = parser.parse_args()
     if arguments.ipc_stdin:
-        secret_hex = sys.stdin.buffer.readline(129).strip()
-        try:
-            secret = bytes.fromhex(secret_hex.decode("ascii"))
-        except (UnicodeDecodeError, ValueError) as exc:
-            raise RuntimeError("Invalid host IPC initialization") from exc
-        if len(secret) != 32:
+        bootstrap_line = sys.stdin.buffer.readline(65537)
+        if len(bootstrap_line) > 65536 or not bootstrap_line.endswith(b"\n"):
             raise RuntimeError("Invalid host IPC initialization")
+        secret, certificate_pem, private_key_pem = parse_ipc_bootstrap(
+            bootstrap_line
+        )
         app.state.ipc_secret = secret
         app.state.dev_api = False
+        with tempfile.TemporaryDirectory(prefix="lifeledger-tls-") as directory:
+            certificate_path = Path(directory) / "server-cert.pem"
+            private_key_path = Path(directory) / "server-key.pem"
+            certificate_path.write_text(certificate_pem, encoding="ascii")
+            private_key_path.write_text(private_key_pem, encoding="ascii")
+            if os.name != "nt":
+                private_key_path.chmod(0o600)
+            server_config = uvicorn.Config(
+                app,
+                host="127.0.0.1",
+                port=arguments.port,
+                reload=False,
+                log_level="info",
+                ssl_certfile=str(certificate_path),
+                ssl_keyfile=str(private_key_path),
+            )
+            server_config.load()
+            private_key_path.unlink()
+            certificate_path.unlink()
+            uvicorn.Server(server_config).run()
     elif os.environ.get("LIFELEDGER_DEV_MODE") != "1":
         raise RuntimeError("Use the Tauri host to start the protected API service")
-    uvicorn.run(
-        "lifeledger.app:app",
-        host="127.0.0.1",
-        port=arguments.port,
-        reload=False,
-        log_level="info",
-    )
+    else:
+        uvicorn.run(
+            app,
+            host="127.0.0.1",
+            port=arguments.port,
+            reload=False,
+            log_level="info",
+        )
 
 
 if __name__ == "__main__":
