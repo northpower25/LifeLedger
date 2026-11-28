@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { isTauri } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
 import { writeTextFile } from "@tauri-apps/plugin-fs";
+import { QRCodeSVG } from "qrcode.react";
 import { api, FhirResource } from "./api";
 import { saveBackup } from "./backup";
 import { Locale, message } from "./i18n";
@@ -26,12 +27,14 @@ export default function App() {
   const [password, setPassword] = useState("");
   const [totp, setTotp] = useState("");
   const [totpSecret, setTotpSecret] = useState("");
+  const [totpUri, setTotpUri] = useState("");
   const [token, setToken] = useState("");
   const [patientName, setPatientName] = useState("");
   const [medicationName, setMedicationName] = useState("");
   const [documentTitle, setDocumentTitle] = useState("");
   const [documentFile, setDocumentFile] = useState<File>();
   const [backupPassword, setBackupPassword] = useState("");
+  const [restorePassword, setRestorePassword] = useState("");
   const [patients, setPatients] = useState<FhirResource[]>([]);
   const [selectedPatient, setSelectedPatient] = useState("");
   const [timeline, setTimeline] = useState<TimelineEntry[]>([]);
@@ -39,6 +42,8 @@ export default function App() {
   const [backupStatus, setBackupStatus] = useState("");
   const [backupError, setBackupError] = useState("");
   const [savingBackup, setSavingBackup] = useState(false);
+  const [recovering, setRecovering] = useState(false);
+  const [recoveryStatus, setRecoveryStatus] = useState("");
   const text = useMemo(() => (key: Parameters<typeof message>[1]) => message(locale, key), [locale]);
 
   useEffect(() => {
@@ -65,11 +70,12 @@ export default function App() {
 
   async function setup(event: FormEvent) {
     await submit(event, async () => {
-      const result = await api<{ totp_secret: string }>("/owner/setup", {
+      const result = await api<{ totp_secret: string; totp_uri: string }>("/owner/setup", {
         method: "POST",
         body: JSON.stringify({ display_name: displayName, password }),
       });
       setTotpSecret(result.totp_secret);
+      setTotpUri(result.totp_uri);
       setOwnerStatus({ owner_exists: true, owner_confirmed: false });
     });
   }
@@ -82,6 +88,7 @@ export default function App() {
       });
       setToken(session.access_token);
       setTotpSecret("");
+      setTotpUri("");
       setOwnerStatus({ owner_exists: true, owner_confirmed: true });
       await refreshPatients(session.access_token);
     });
@@ -89,11 +96,12 @@ export default function App() {
 
   async function resumeSetup(event: FormEvent) {
     await submit(event, async () => {
-      const result = await api<{ totp_secret: string }>("/owner/setup/resume", {
+      const result = await api<{ totp_secret: string; totp_uri: string }>("/owner/setup/resume", {
         method: "POST",
         body: JSON.stringify({ password }),
       });
       setTotpSecret(result.totp_secret);
+      setTotpUri(result.totp_uri);
     });
   }
 
@@ -217,12 +225,12 @@ export default function App() {
     await submit(event, async () => {
       setBackupStatus("");
       setBackupError("");
-      if (!file || backupPassword.length < 12) throw new Error("invalid_backup_input");
+      if (!file || restorePassword.length < 12) throw new Error("invalid_backup_input");
       const backupBase64 = (await file.text()).trim();
       await api("/backup/restore", {
         method: "POST",
         body: JSON.stringify({
-          passphrase: backupPassword,
+          passphrase: restorePassword,
           backup_base64: backupBase64,
         }),
       }, token);
@@ -231,7 +239,41 @@ export default function App() {
       setSelectedPatient("");
       setTimeline([]);
       setBackupPassword("");
+      setRestorePassword("");
     });
+  }
+
+  async function recoverBackup(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const fileInput = form.elements.namedItem("recoveryFile");
+    const file = fileInput instanceof HTMLInputElement ? fileInput.files?.[0] : undefined;
+    setError("");
+    setRecoveryStatus("");
+    if (!file || backupPassword.length < 12) {
+      setError(text("recoveryInputInvalid"));
+      return;
+    }
+    setRecovering(true);
+    try {
+      await api("/backup/recover", {
+        method: "POST",
+        body: JSON.stringify({
+          passphrase: backupPassword,
+          backup_base64: (await file.text()).trim(),
+        }),
+      });
+      setBackupPassword("");
+      setRestorePassword("");
+      form.reset();
+      setOwnerStatus({ owner_exists: true, owner_confirmed: true });
+      setRecoveryStatus(text("recoverySucceeded"));
+    } catch (error) {
+      setError(error instanceof Error && error.message === "recovery_database_not_empty"
+        ? text("recoveryNotEmpty") : text("recoveryFailed"));
+    } finally {
+      setRecovering(false);
+    }
   }
 
   async function lock() {
@@ -245,6 +287,7 @@ export default function App() {
       setBackupStatus("");
       setBackupError("");
       setBackupPassword("");
+      setRestorePassword("");
     }
   }
 
@@ -273,14 +316,24 @@ export default function App() {
 
       <p className="warning" role="note">{text("syntheticWarning")}</p>
       {error && <p className="error" role="alert">{error}</p>}
+      {recoveryStatus && <p role="status">{recoveryStatus}</p>}
 
       {!token && !totpSecret && ownerStatus?.owner_exists === false && (
-        <form className="card narrow" onSubmit={setup}>
-          <h2>{text("setup")}</h2>
-          <label>{text("displayName")}<input required value={displayName} onChange={(event) => setDisplayName(event.target.value)} /></label>
-          <label>{text("password")}<input required minLength={12} type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></label>
-          <button>{text("setup")}</button>
-        </form>
+        <>
+          <form className="card narrow" onSubmit={setup}>
+            <h2>{text("setup")}</h2>
+            <label>{text("displayName")}<input required value={displayName} onChange={(event) => setDisplayName(event.target.value)} /></label>
+            <label>{text("password")}<input required minLength={12} type="password" value={password} onChange={(event) => setPassword(event.target.value)} /></label>
+            <button disabled={recovering}>{text("setup")}</button>
+          </form>
+          <form className="card narrow" onSubmit={recoverBackup}>
+            <h2>{text("recover")}</h2>
+            <p>{text("recoveryHint")}</p>
+            <label>{text("backupFile")}<input required name="recoveryFile" type="file" accept=".llbackup,text/plain" /></label>
+            <label>{text("backupPassword")}<input required minLength={12} type="password" value={backupPassword} onChange={(event) => setBackupPassword(event.target.value)} /></label>
+            <button disabled={recovering}>{text("recover")}</button>
+          </form>
+        </>
       )}
 
       {!token && !totpSecret && ownerStatus?.owner_exists && !ownerStatus.owner_confirmed && (
@@ -295,6 +348,7 @@ export default function App() {
         <form className="card narrow" onSubmit={confirmSetup}>
           <h2>{text("confirm")}</h2>
           <p>{text("totpSetup")}</p>
+          {totpUri && <QRCodeSVG value={totpUri} size={200} title={text("totpQr")} />}
           <code className="secret">{totpSecret}</code>
           <label>{text("totp")}<input required inputMode="numeric" pattern="[0-9]{6}" value={totp} onChange={(event) => setTotp(event.target.value)} /></label>
           <button>{text("confirm")}</button>
@@ -372,11 +426,14 @@ export default function App() {
 
           <section className="card">
             <h2>Backup</h2>
-            <label>{text("backupPassword")}<input required minLength={12} type="password" value={backupPassword} onChange={(event) => setBackupPassword(event.target.value)} /></label>
             <div className="actions">
-              <form onSubmit={createBackup}><button disabled={savingBackup}>{text("backup")}</button></form>
+              <form onSubmit={createBackup}>
+                <label>{text("backupPassword")}<input required minLength={12} type="password" value={backupPassword} onChange={(event) => setBackupPassword(event.target.value)} /></label>
+                <button disabled={savingBackup}>{text("backup")}</button>
+              </form>
               <form onSubmit={(event) => restoreBackup(event, (event.currentTarget.elements.namedItem("backup") as HTMLInputElement).files?.[0])}>
-                <label>{text("restore")}<input required name="backup" type="file" accept=".llbackup,text/plain" /></label>
+                <label>{text("backupFile")}<input required name="backup" type="file" accept=".llbackup,text/plain" /></label>
+                <label>{text("backupPassword")}<input required minLength={12} type="password" value={restorePassword} onChange={(event) => setRestorePassword(event.target.value)} /></label>
                 <button>{text("restore")}</button>
               </form>
             </div>

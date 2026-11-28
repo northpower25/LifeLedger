@@ -190,6 +190,37 @@ class BackupRestore(BaseModel):
     backup_base64: Annotated[str, StringConstraints(min_length=64, max_length=100_000_000)]
 
 
+def decrypt_backup(request: BackupRestore) -> bytes:
+    try:
+        envelope = json.loads(b64decode(request.backup_base64))
+        if not isinstance(envelope, dict):
+            raise ValueError("invalid backup envelope")
+        kdf = envelope.get("kdf")
+        cipher = envelope.get("cipher")
+        if not isinstance(kdf, dict) or not isinstance(cipher, dict):
+            raise ValueError("invalid backup parameters")
+        if envelope.get("format") != "lifledger-backup" or envelope.get("version") != 1:
+            raise ValueError("unsupported backup")
+        if (
+            kdf.get("name") != "Argon2id"
+            or kdf.get("time_cost") != ARGON2_TIME_COST
+            or kdf.get("memory_kib") != ARGON2_MEMORY_KIB
+            or kdf.get("parallelism") != ARGON2_PARALLELISM
+            or cipher.get("name") != "AES-256-GCM"
+        ):
+            raise ValueError("unsupported backup parameters")
+        salt = b64decode(kdf["salt"])
+        nonce = b64decode(cipher["nonce"])
+        ciphertext = b64decode(envelope["ciphertext"])
+        if len(salt) != 16 or len(nonce) != 12 or len(ciphertext) > MAX_BACKUP_DATABASE_BYTES + 16:
+            raise ValueError("invalid backup parameters")
+        return AESGCM(derive_key(request.passphrase, salt)).decrypt(
+            nonce, ciphertext, BACKUP_AAD
+        )
+    except (ValueError, KeyError, TypeError, json.JSONDecodeError, InvalidTag) as exc:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid_backup") from exc
+
+
 class OwnerStatusResponse(BaseModel):
     owner_exists: bool
     owner_confirmed: bool
@@ -664,7 +695,12 @@ def create_app(
                 f"owner-totp:{owner['owner_id']}".encode(),
             ).decode()
             _audit(db, owner["owner_id"], data_key, "OWNER_SETUP_RESUMED", {})
-        return {"totp_secret": secret}
+        return {
+            "totp_secret": secret,
+            "totp_uri": pyotp.TOTP(secret).provisioning_uri(
+                name="Owner", issuer_name="LifeLedger"
+            ),
+        }
 
     @app.post(
         "/api/v1/owner/setup/confirm",
@@ -1032,40 +1068,7 @@ def create_app(
     def restore_backup(request: BackupRestore, session: SessionDependency) -> Response:
         with transaction(db_path) as db:
             _authorize(db, session, "Backup", "restore")
-        try:
-            envelope = json.loads(b64decode(request.backup_base64))
-            if not isinstance(envelope, dict):
-                raise ValueError("invalid backup envelope")
-            kdf = envelope.get("kdf")
-            cipher = envelope.get("cipher")
-            if not isinstance(kdf, dict) or not isinstance(cipher, dict):
-                raise ValueError("invalid backup parameters")
-            if envelope.get("format") != "lifledger-backup" or envelope.get("version") != 1:
-                raise ValueError("unsupported backup")
-            if kdf.get("name") != "Argon2id":
-                raise ValueError("unsupported kdf")
-            if (
-                kdf.get("time_cost") != ARGON2_TIME_COST
-                or kdf.get("memory_kib") != ARGON2_MEMORY_KIB
-                or kdf.get("parallelism") != ARGON2_PARALLELISM
-            ):
-                raise ValueError("unsupported kdf parameters")
-            if cipher.get("name") != "AES-256-GCM":
-                raise ValueError("unsupported cipher")
-            salt = b64decode(kdf["salt"])
-            nonce = b64decode(cipher["nonce"])
-            if len(salt) != 16 or len(nonce) != 12:
-                raise ValueError("invalid backup parameters")
-            backup_key = derive_key(
-                request.passphrase, salt
-            )
-            plaintext = AESGCM(backup_key).decrypt(
-                nonce,
-                b64decode(envelope["ciphertext"]),
-                BACKUP_AAD,
-            )
-        except (ValueError, KeyError, TypeError, json.JSONDecodeError, InvalidTag) as exc:
-            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid_backup") from exc
+        plaintext = decrypt_backup(request)
         fd, temporary_name = tempfile.mkstemp(
             prefix="lifledger-restore-", suffix=".sqlite3", dir=db_path.parent
         )
@@ -1138,6 +1141,77 @@ def create_app(
         finally:
             temporary_path.unlink(missing_ok=True)
             replacement_path.unlink(missing_ok=True)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+    @app.post(
+        "/api/v1/backup/recover",
+        status_code=status.HTTP_204_NO_CONTENT,
+        tags=["Backup"],
+        description="Recover into an empty local database, then unlock using the backed-up Owner credentials.",
+    )
+    def recover_backup(request: BackupRestore) -> Response:
+        plaintext = decrypt_backup(request)
+        tables = (
+            "identity_owner", "patients", "document_references",
+            "medication_statements", "consent", "capability_grants",
+            "audit", "event_outbox", "metadata",
+        )
+        source = sqlite3.connect(":memory:")
+        source.row_factory = sqlite3.Row
+        try:
+            source.deserialize(plaintext)
+            if source.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+                raise ValueError("backup integrity check failed")
+            if source.execute("PRAGMA foreign_key_check").fetchone() is not None:
+                raise ValueError("backup foreign key check failed")
+            version = source.execute(
+                "SELECT value FROM metadata WHERE key = 'schema_version'"
+            ).fetchone()
+            owners = source.execute("SELECT * FROM identity_owner").fetchall()
+            if (
+                version is None
+                or version["value"] != SCHEMA_VERSION
+                or len(owners) != 1
+                or owners[0]["confirmed"] != 1
+            ):
+                raise ValueError("backup owner or version invalid")
+            with transaction(db_path) as target:
+                existing_tables = {
+                    row[0] for row in target.execute(
+                        "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'"
+                    )
+                }
+                if existing_tables != set(tables):
+                    raise HTTPException(status.HTTP_409_CONFLICT, "recovery_database_not_empty")
+                if any(
+                    target.execute(f'SELECT 1 FROM "{table}" LIMIT 1').fetchone()
+                    for table in tables if table != "metadata"
+                ):
+                    raise HTTPException(status.HTTP_409_CONFLICT, "recovery_database_not_empty")
+                metadata = target.execute("SELECT key, value FROM metadata").fetchall()
+                if len(metadata) != 1 or tuple(metadata[0]) != ("schema_version", SCHEMA_VERSION):
+                    raise HTTPException(status.HTTP_409_CONFLICT, "recovery_database_not_empty")
+                for table in tables:
+                    source_columns = source.execute(f'PRAGMA table_info("{table}")').fetchall()
+                    target_columns = target.execute(f'PRAGMA table_info("{table}")').fetchall()
+                    if [tuple(row)[1:] for row in source_columns] != [
+                        tuple(row)[1:] for row in target_columns
+                    ]:
+                        raise ValueError("backup schema mismatch")
+                target.execute("DELETE FROM metadata")
+                for table in tables:
+                    cursor = source.execute(f'SELECT * FROM "{table}"')
+                    placeholders = ", ".join("?" for _ in cursor.description)
+                    while rows := cursor.fetchmany(128):
+                        target.executemany(f'INSERT INTO "{table}" VALUES ({placeholders})', rows)
+            sessions.clear()
+        except HTTPException:
+            raise
+        except (sqlite3.Error, ValueError) as exc:
+            LOGGER.warning("Backup recovery failed: %s", type(exc).__name__)
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "invalid_backup") from exc
+        finally:
+            source.close()
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     @app.get("/api/v1/openapi.json", include_in_schema=False)

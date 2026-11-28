@@ -63,7 +63,7 @@ festhalten; keine Geheimnisse, Tokens oder personenbezogenen Daten teilen.
 | ID | Durchführung | Erwartetes Ergebnis |
 | --- | --- | --- |
 | W01 Start | App starten; im Task-Manager den Prozess `lifeledger-api.exe` suchen. | UI mit Hinweis auf synthetische Daten erscheint; ein API-Prozess läuft. |
-| W02 Owner | Owner mit Testnamen und Passwort (mindestens 12 Zeichen) anlegen; angezeigten TOTP-Schlüssel im Authenticator erfassen und aktuellen Code bestätigen. | Einrichtung erfolgreich, Patient-Bereich erscheint. |
+| W02 Owner | Owner mit Testnamen und Passwort (mindestens 12 Zeichen) anlegen; QR-Code im Authenticator scannen oder den angezeigten TOTP-Schlüssel manuell erfassen und aktuellen Code bestätigen. Auch Wiederaufnahme einer unterbrochenen Einrichtung prüfen. | Einrichtung erfolgreich, Patient-Bereich erscheint; QR-Code und manueller Schlüssel richten denselben TOTP-Zugang ein. |
 | W03 Daten | Patient `Testperson Alpha` anlegen, auswählen, `synthetisch.txt` unter Titel `Testdokument 123` importieren, Medikation `Testmedikation 123` anlegen. | Timeline zeigt Patient, DocumentReference und MedicationStatement mit den Testbezeichnungen. |
 | W04 Backup | Separate Test-Passphrase mit mindestens 12 Zeichen eingeben und verschlüsseltes Backup erstellen. Im Speicherdialog Speicherort und Dateiname auswählen; anschließend Datei und Bestätigung prüfen. Den Dialog zusätzlich abbrechen. | Die ausgewählte `.llbackup`-Datei ist vorhanden und nicht leer, der Speicherort wird bestätigt. Bei Abbruch wird keine Datei gespeichert. |
 | W05 Veränderung | Nach dem Backup `Testperson Beta` anlegen. | Beide Testpersonen sind auswählbar. |
@@ -75,6 +75,7 @@ festhalten; keine Geheimnisse, Tokens oder personenbezogenen Daten teilen.
 | W11 Mehrfachstart | Bei laufender App ein zweites Exemplar starten; Prozesse, Meldungen und Datenbestand beobachten. | Keine konkurrierenden Instanzen/Seiteneffekte; ansonsten als Fehler bzw. offene Sicherheitsgrenze dokumentieren. |
 | W12 IPC-Basistest | Bei laufender App deren Sidecar-PID und lokalen TCP-Port ermitteln. Plain-HTTP-Anfrage ohne Geheimnis versuchen, danach eine HTTPS-Anfrage ohne IPC-Header senden. | HTTP wird nicht verwendet; HTTPS ohne Vertrauen zum ephemeren Zertifikat scheitert im TLS-Handshake. Selbst bei manuell akzeptiertem Zertifikat wird eine Anfrage ohne IPC-Header mit HTTP 403 abgewiesen. Kein Testbeweis für Same-User-Isolation. |
 | W13 Dokumentgrenze | Unterstützte synthetische Textdatei über 10 MiB bzw. ungültige PDF-Datei importieren. | Import wird abgewiesen und kein neuer Timeline-Eintrag erzeugt. |
+| W14 Wiederherstellung ohne Owner | In einem separaten, frischen Windows-Testprofil die App starten und auf dem Startbildschirm das Backup aus W04 mit falscher, danach richtiger Backup-Passphrase auswählen. Mit dem ursprünglichen Owner-Passwort und einem frischen TOTP-Code entsperren. | Falsche Passphrase wird abgewiesen; korrektes Backup wird wiederhergestellt und Alpha erscheint nach Entsperrung. Ein bereits vorhandener Owner wird nicht überschrieben. |
 
 Für W12 im separaten PowerShell-Fenster (nicht im Entwicklungsmodus starten;
 `LIFELEDGER_DEV_MODE` darf nicht gesetzt sein):
@@ -115,7 +116,7 @@ W01:                W02:                W03:
 W04:                W05:                W06:
 W07:                W08:                W09:
 W10:                W11:                W12:
-W13:
+W13:                W14:
 
 Abweichungen / bereinigte Fehlermeldungen:
 Nicht durchgeführte Schritte und Grund:

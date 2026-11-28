@@ -30,5 +30,11 @@ destination and keep the separate backup passphrase safe; the app confirms
 the saved path. Cancelling saves nothing. Restore uses the selected backup
 file and replaces the current database.
 
+On a fresh profile without an Owner, recover from the start screen with the
+backup file and its passphrase. This path refuses any nonempty database and
+restores the original Owner credentials; the original password and TOTP are
+still required to unlock. Owner setup displays a locally generated QR code
+and the same secret for manual entry.
+
 For Windows build, offline acceptance steps and a results form, see the
 [Windows test protocol](../docs/implementation/windows-testprotokoll.md).

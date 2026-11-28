@@ -686,6 +686,41 @@
           }
         ]
       }
+    },
+    "/api/v1/backup/recover": {
+      "post": {
+        "tags": [
+          "Backup"
+        ],
+        "summary": "Recover Backup",
+        "description": "Recover into an empty local database, then unlock using the backed-up Owner credentials.",
+        "operationId": "recover_backup_api_v1_backup_recover_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BackupRestore"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
