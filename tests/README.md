@@ -1,6 +1,9 @@
 # Tests
 
-Placeholder for cross-component and end-to-end tests. Component-specific tests
-should live with their components; no application test suite exists yet.
+Backend API and encrypted-storage integration tests are in
+`backend/tests/`. The cross-component test layout is reserved for Windows
+service lifecycle, offline desktop and packaged restore tests.
 
-Part of the LifeLedger Platform Architecture: LifeLedger, VitaFabric, and LifeWeaver.
+The current test plan, including offline and negative cases, is in the
+[first offline slice contract](../docs/implementation/first-offline-slice.md).
+All fixtures, uploaded documents, logs and backups must be synthetic.

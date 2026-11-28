@@ -22,13 +22,20 @@ The platform's component responsibilities remain distinct:
   storage abstraction. Health data must pass through VitaFabric.
 - **LifeWeaver** owns optional AI providers, MCP and agents.
 
-The [draft RFC-0002](rfc/0002-platform-core-architecture.md) proposes a
-Core Runtime for shared identity and consent, security services, an event bus,
-and plugin hosting, with capability-based access and a WASM-first plugin
-runtime. The Core Runtime is not intended to contain business logic, health
-models, or AI. These remain proposals under review, not implemented services
-or accepted component assignments; the [platform proposal](rfc/0001-platform-direction.md)
-and [architecture overview](docs/architecture/README.md) describe their status.
+RFC-0001 through RFC-0014, the roadmap, and repository review are accepted
+architecture for the first offline vertical slice. The implementation target
+is a Windows desktop client using Tauri, a local FastAPI service, SQLite behind
+VitaFabric, and the integrated Health Record. The slice supports only
+synthetic `Patient`, `DocumentReference`, and `MedicationStatement` resources,
+plus timeline and encrypted backup/restore. Plugins, marketplace, AI, sync,
+family features, Home Assistant, and external integrations are out of scope.
+
+The [implementation contract](docs/implementation/first-offline-slice.md)
+records fixed implementation assumptions, backlog, API, storage schema and
+test plan. The Windows sidecar and Tauri installer builds now pass in CI, but the
+installed application's runtime, offline journey and pinned TLS channel still
+need manual Windows testing. Same-user process isolation is not claimed. Do not
+use the test slice with real health data or make medical decisions.
 
 The architecture is design intent, not a statement of implemented features.
 
@@ -63,8 +70,10 @@ the [assessment and roadmaps](docs/roadmap/README.md), and
 
 ## Get involved
 
-There are no runnable services or installation instructions yet. Proposed
-direction and decisions are documented through [ADRs](adr/) and [RFCs](rfc/).
+The backend development instructions are in [backend/README](backend/README.md).
+Current implementation status and acceptance limitations are recorded in the
+[slice review](docs/review/offene-informationen-erste-testversion.md).
+Architecture decisions are documented through [ADRs](adr/) and [RFCs](rfc/).
 See [governance](docs/governance/README.md) for decision-making and
 [SECURITY](SECURITY.md) for private vulnerability reporting.
 

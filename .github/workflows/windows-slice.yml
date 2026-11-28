@@ -1,0 +1,45 @@
+name: Windows offline slice
+
+on:
+  push:
+    branches: [implementation/first-offline-vertical-slice]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend-desktop/package-lock.json
+      - name: Install backend test dependencies
+        run: python -m pip install -e "./backend[test]"
+      - name: Run backend tests on Windows
+        run: python -m pytest backend/tests -q
+      - name: Build Windows API sidecar
+        run: ./backend/scripts/build_windows_sidecar.ps1
+      - name: Install frontend dependencies
+        working-directory: frontend-desktop
+        run: npm ci
+      - name: Build Windows desktop and installers
+        working-directory: frontend-desktop
+        run: npm run tauri build
+      - name: Upload unsigned internal test builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: LifeLedger-windows-internal-test
+          if-no-files-found: error
+          path: |
+            frontend-desktop/src-tauri/target/release/lifeledger-desktop.exe
+            frontend-desktop/src-tauri/target/release/bundle/**/*.msi
+            frontend-desktop/src-tauri/target/release/bundle/**/*.exe
