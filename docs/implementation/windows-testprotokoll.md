@@ -1,10 +1,15 @@
 # Windows-Testprotokoll: erster Offline-Slice
 
-**Status: Vorlage, nicht durchgeführt.** Nur für eine isolierte Testumgebung
-und ausschließlich synthetische Daten. Der Build ist ein unsignierter
-Entwicklungsstand, keine Freigabe für echte Gesundheitsdaten. Den folgenden
-Test mit dem exakt im Formular notierten Commit durchführen. Ein erfolgreicher
-Funktionstest beweist keine Same-User-Isolation oder Produktionssicherheit.
+**Status: Windows-CI-Build bestanden; interaktive Windows-Abnahme nicht
+durchgeführt.** Der CI-Lauf für Commit `56279b3` hat Sidecar, Desktop-EXE und
+MSI/NSIS-Installer gebaut; Actions Run
+[46139999458](https://github.com/northpower25/LifeLedger/actions/runs/46139999458),
+Artefakt `LifeLedger-windows-internal-test`. Nur für eine isolierte
+Testumgebung und ausschließlich synthetische Daten. Der Build ist unsigniert
+und keine Freigabe für echte Gesundheitsdaten. Die interaktiven Tests müssen
+mit dem exakt im Formular notierten Commit durchgeführt werden. Ein
+erfolgreicher Funktionstest beweist keine Same-User-Isolation oder
+Produktionssicherheit.
 
 ## Vorbereitung und Build
 

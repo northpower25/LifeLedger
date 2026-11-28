@@ -17,9 +17,10 @@ npm run tauri dev
 The Tauri host starts the packaged API child and sends a per-run IPC secret
 and ephemeral TLS keypair through stdin. It pins the generated certificate and
 uses HTTPS for readiness and every proxied API call, so a loopback listener
-without that key cannot receive credentials or API requests. The Windows
-installer, service lifecycle, and offline behavior still require Windows
-testing; isolation from another process running as the same user is not
+without that key cannot receive credentials or API requests. Windows CI builds
+the sidecar, desktop executable, MSI, and NSIS installer; install, service
+lifecycle, offline behavior, and runtime TLS still require manual Windows
+testing. Isolation from another process running as the same user is not
 claimed. Do not use real health data.
 
 For Windows build, offline acceptance steps and a results form, see the

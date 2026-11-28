@@ -27,14 +27,24 @@ Integrationen gehören nicht zum Slice und blockieren ihn nicht.
   Argon2id und AES-256-GCM-Payload-Verschlüsselung, TOTP-Owner-Setup/Unlock,
   Consent-/Capability-Prüfung, VitaFabric-Ressourcenpfad, synthetische
   FHIR-Datensätze, Dokumentimport, Timeline, verschlüsselter Backup/Restore,
-  OpenAPI 3.1 und Backend-Integrationstests.
+  OpenAPI 3.1 und Backend-Integrationstests. Der Windows-CI-Lauf hat die
+  Sidecar-Paketierung, Backendtests, Tauri-EXE sowie MSI- und NSIS-Installer
+  erfolgreich erstellt.
 - **Teilweise vorhanden:** Tauri- und TypeScript-UI mit den Slice-Formularen,
-  Lokalisierung, Sidecar-Start und API-Proxy. Der Windows-Service-Start und
-  die vollständige Tauri-zu-FastAPI-Integration sind nicht nachgewiesen.
-- **Noch erforderlich für Definition of Done:** überprüfte Windows-IPC-
-  Authentisierung und Same-User-Grenze, FastAPI-Paketierung und
-  Lebenszyklussteuerung als Tauri-Service, Windows-Installer sowie Offline-
-  und Negativabnahme auf Windows.
+  Lokalisierung, Sidecar-Start und API-Proxy. Der installierte Windows-
+  Laufzeitstart und die vollständige Offline-Journey sind noch nicht manuell
+  nachgewiesen.
+- **Noch erforderlich für Definition of Done:** installierte Windows-App
+  starten/beenden, Offline-Flows inklusive Backup/Restore durchspielen und
+  TLS-IPC auf Windows prüfen. Eine Same-User-Isolationsgrenze wird nicht
+  behauptet.
+
+Der erfolgreiche Windows-Build lief für Commit `56279b3` in
+[GitHub Actions Run 46139999458](https://github.com/northpower25/LifeLedger/actions/runs/46139999458).
+Das unsignierte interne Build-Artefakt heißt
+`LifeLedger-windows-internal-test` und enthält EXE sowie MSI/NSIS-Installer.
+Es ist ein Buildnachweis, kein Nachweis der Installation, des Offline-
+Laufzeitverhaltens oder der manuellen IPC-Abnahme.
 
 ## Fest dokumentierte Einschränkungen
 
@@ -53,9 +63,9 @@ Loopback-Listener den bisherigen unverschlüsselten Health-Handshake hätte
 abfangen können. Die Implementierung wurde daraufhin auf per-Start
 zertifikat-gepinntes TLS umgestellt: ein Listener ohne den privaten Schlüssel
 kann den TLS-Handshake nicht abschließen, bevor Host-Anfragen oder
-Anmeldedaten gesendet werden. Backend-Tests decken den HTTPS-Pfad und die
-Ablehnung nicht vertrauenswürdiger Zertifikate ab. Ein Windows-Build und
-Windows-Laufzeittest stehen noch aus; Same-User-Prozessisolation wird nicht
+Anmeldedaten gesendet werden. Backend-Tests decken den HTTPS-Pfad und die Ablehnung nicht vertrauenswürdiger
+Zertifikate ab; Windows-Build und Sidecar-Paketierung sind in CI erfolgreich.
+Der Windows-Laufzeittest steht noch aus; Same-User-Prozessisolation wird nicht
 behauptet oder durch diese TLS-Änderung hergestellt.
 
 Siehe [Implementation Backlog, Annahmen, API, Schema und Testplan](../implementation/first-offline-slice.md)
