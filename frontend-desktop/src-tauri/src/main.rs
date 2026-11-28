@@ -196,6 +196,8 @@ fn api_request(request: ApiRequest, state: State<'_, ApiState>) -> Result<ApiRep
 
 fn main() {
     let app = tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let state = start_api(app)?;
             app.manage(state);

@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
+    "test": "node --experimental-strip-types --test tests/backup.test.ts",
     "tauri": "tauri"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.5.0",
+    "@tauri-apps/plugin-dialog": "^2.8.4",
+    "@tauri-apps/plugin-fs": "^2.7.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

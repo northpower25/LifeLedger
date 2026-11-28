@@ -25,5 +25,10 @@ lifecycle, offline behavior, and runtime TLS still require manual Windows
 testing. Isolation from another process running as the same user is not
 claimed. Do not use real health data.
 
+In the desktop app, creating a backup opens a native save dialog. Select a
+destination and keep the separate backup passphrase safe; the app confirms
+the saved path. Cancelling saves nothing. Restore uses the selected backup
+file and replaces the current database.
+
 For Windows build, offline acceptance steps and a results form, see the
 [Windows test protocol](../docs/implementation/windows-testprotokoll.md).

@@ -1,5 +1,9 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { isTauri } from "@tauri-apps/api/core";
+import { save } from "@tauri-apps/plugin-dialog";
+import { writeTextFile } from "@tauri-apps/plugin-fs";
 import { api, FhirResource } from "./api";
+import { saveBackup } from "./backup";
 import { Locale, message } from "./i18n";
 
 type OwnerStatus = { owner_exists: boolean; owner_confirmed: boolean };
@@ -32,6 +36,9 @@ export default function App() {
   const [selectedPatient, setSelectedPatient] = useState("");
   const [timeline, setTimeline] = useState<TimelineEntry[]>([]);
   const [error, setError] = useState("");
+  const [backupStatus, setBackupStatus] = useState("");
+  const [backupError, setBackupError] = useState("");
+  const [savingBackup, setSavingBackup] = useState(false);
   const text = useMemo(() => (key: Parameters<typeof message>[1]) => message(locale, key), [locale]);
 
   useEffect(() => {
@@ -163,22 +170,54 @@ export default function App() {
   }
 
   async function createBackup(event: FormEvent) {
-    await submit(event, async () => {
-      const result = await api<{ backup_base64: string }>("/backup", {
-        method: "POST",
-        body: JSON.stringify({ passphrase: backupPassword }),
-      }, token);
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(new Blob([result.backup_base64]));
-      link.download = "LifeLedger-synthetic-backup.llbackup";
-      link.click();
-      URL.revokeObjectURL(link.href);
-    });
+    event.preventDefault();
+    setError("");
+    setBackupError("");
+    setBackupStatus("");
+    if (backupPassword.length < 12) {
+      setBackupError(text("backupPasswordInvalid"));
+      return;
+    }
+    setSavingBackup(true);
+    try {
+      const create = async () => {
+        const result = await api<{ backup_base64: string }>("/backup", {
+          method: "POST",
+          body: JSON.stringify({ passphrase: backupPassword }),
+        }, token);
+        return result.backup_base64;
+      };
+      if (isTauri()) {
+        const path = await saveBackup(
+          () => save({
+            defaultPath: "LifeLedger-synthetic-backup.llbackup",
+            filters: [{ name: "LifeLedger Backup", extensions: ["llbackup"] }],
+          }),
+          create,
+          writeTextFile,
+        );
+        setBackupStatus(path === null ? text("backupCancelled") : `${text("backupSaved")} ${path}`);
+      } else {
+        const content = await create();
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(new Blob([content], { type: "text/plain" }));
+        link.download = "LifeLedger-synthetic-backup.llbackup";
+        link.click();
+        window.setTimeout(() => URL.revokeObjectURL(link.href), 60_000);
+        setBackupStatus(text("backupDownloadStarted"));
+      }
+    } catch {
+      setBackupError(text("backupSaveFailed"));
+    } finally {
+      setSavingBackup(false);
+    }
   }
 
   async function restoreBackup(event: FormEvent, file?: File) {
     await submit(event, async () => {
-      if (!file) return;
+      setBackupStatus("");
+      setBackupError("");
+      if (!file || backupPassword.length < 12) throw new Error("invalid_backup_input");
       const backupBase64 = (await file.text()).trim();
       await api("/backup/restore", {
         method: "POST",
@@ -191,6 +230,7 @@ export default function App() {
       setPatients([]);
       setSelectedPatient("");
       setTimeline([]);
+      setBackupPassword("");
     });
   }
 
@@ -202,6 +242,9 @@ export default function App() {
       setPatients([]);
       setSelectedPatient("");
       setTimeline([]);
+      setBackupStatus("");
+      setBackupError("");
+      setBackupPassword("");
     }
   }
 
@@ -331,12 +374,14 @@ export default function App() {
             <h2>Backup</h2>
             <label>{text("backupPassword")}<input required minLength={12} type="password" value={backupPassword} onChange={(event) => setBackupPassword(event.target.value)} /></label>
             <div className="actions">
-              <form onSubmit={createBackup}><button>{text("backup")}</button></form>
+              <form onSubmit={createBackup}><button disabled={savingBackup}>{text("backup")}</button></form>
               <form onSubmit={(event) => restoreBackup(event, (event.currentTarget.elements.namedItem("backup") as HTMLInputElement).files?.[0])}>
                 <label>{text("restore")}<input required name="backup" type="file" accept=".llbackup,text/plain" /></label>
                 <button>{text("restore")}</button>
               </form>
             </div>
+            {backupStatus && <p role="status">{backupStatus}</p>}
+            {backupError && <p className="error" role="alert">{backupError}</p>}
           </section>
         </>
       )}
